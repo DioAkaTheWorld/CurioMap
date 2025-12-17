@@ -48,6 +48,17 @@
         - curioMap_net
       restart: unless-stopped
 
+    curioMap:
+      image: php:8.2-cli-alpine
+      working_dir: /app
+      volumes:
+        - ./:/app
+      ports:
+        - "8000:80"
+      command: php -S 0.0.0.0:80 -t /app/front/public
+      networks:
+        - curioMap_net
+
   networks:
     curioMap_net:
       driver: bridge

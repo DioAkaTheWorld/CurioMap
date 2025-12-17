@@ -87,4 +87,8 @@ class PointInteret{
     public function getVisibilite(): int{
         return $this->visibilite;
     }
+
+    public function setId(int $id): void{
+        $this->id = $id;
+    }
 }

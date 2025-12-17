@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("La géolocalisation a échoué");
             });
         }
+        //Marqueur d'exemple ajouté manuellement
+        const marker = L.marker([48.8566, 2.3522]).addTo(map);
+        marker.bindPopup("<b>Salut !</b><br>Exemple point d'intérêt").openPopup();
     }
 
     //On ajoute un événement sur le bouton pour recentrer la carte sur l'utilisateur
@@ -46,8 +49,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     centrerMap();
-
-    //Marqueur d'exemple ajouté manuellement
-    const marker = L.marker([48.8566, 2.3522]).addTo(map);
-    marker.bindPopup("<b>Salut !</b><br>Exemple point d'intérêt").openPopup();
 });

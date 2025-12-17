@@ -1,5 +1,5 @@
 <?php
-namespace CurioMap\back\src\api\middlewares;
+namespace CurioMap\src\api\middlewares;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -30,7 +30,12 @@ class CorsMiddleware implements MiddlewareInterface{
             throw new HttpUnauthorizedException($request, 'missing Origin Header (cors)');
         }
 
-        $response = $handler->handle($request);
+        //Si c'est une requête OPTIONS (preflight), on répond directement ????????
+        if ($request->getMethod() === 'OPTIONS') {
+            $response = new \Slim\Psr7\Response();
+        } else {
+            $response = $handler->handle($request);
+        }
 
         //détermine la valeur de Access-Control-Allow-Origin
         if($this->allowAll){
@@ -46,7 +51,7 @@ class CorsMiddleware implements MiddlewareInterface{
             ->withHeader('Access-Control-Allow-Origin', $allowOrigin)
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
             ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-            ->withHeader('Access-Control-Max-Age', 3600)
+            ->withHeader('Access-Control-Max-Age', '3600')
             ->withHeader('Access-Control-Allow-Credentials', 'true');
     }
 }

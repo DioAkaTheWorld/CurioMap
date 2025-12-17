@@ -1,68 +1,68 @@
-  services:
-    db:
-      image: mysql:5.7
-      restart: always
-      environment:
-        MYSQL_DATABASE: wordpress
-        MYSQL_USER: wpuser
-        MYSQL_PASSWORD: wppass
-        MYSQL_ROOT_PASSWORD: rootpass
-      volumes:
-        - db-data:/var/lib/mysql
-      networks:
-        - curioMap_net
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - curioMap_net
 
-    wordpress:
-      image: wordpress:latest
-      restart: always
-      depends_on:
-        - db
-      ports:
-        - "5555:80"
-      environment:
-        WORDPRESS_DB_HOST: db
-        WORDPRESS_DB_NAME: wordpress
-        WORDPRESS_DB_USER: wpuser
-        WORDPRESS_DB_PASSWORD: wppass
-      volumes:
-        - wp-data:/var/www/html
-      networks:
-        - curioMap_net
+  wordpress:
+    image: wordpress:latest
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "5555:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass
+    volumes:
+      - wp-data:/var/www/html
+    networks:
+      - curioMap_net
 
-    curiomap.db:
-      image: postgres:latest
-      env_file: ./curioMap.env
-      ports:
-        - "5435:5432"
-      networks:
-        - curioMap_net
-      volumes:
-        - ./sql:/var/sql
-      restart: unless-stopped
+  curiomap.db:
+    image: postgres:latest
+    env_file: ./curioMap.env
+    ports:
+      - "5435:5432"
+    networks:
+      - curioMap_net
+    volumes:
+      - ./sql:/var/sql
+    restart: unless-stopped
 
-    adminer:
-      image: adminer
-      ports:
-        - "2026:8080"
-      networks:
-        - curioMap_net
-      restart: unless-stopped
+  adminer:
+    image: adminer
+    ports:
+      - "2026:8080"
+    networks:
+      - curioMap_net
+    restart: unless-stopped
 
-    curioMap:
-      image: php:8.2-cli-alpine
-      working_dir: /app
-      volumes:
-        - ./:/app
-      ports:
-        - "8000:80"
-      command: php -S 0.0.0.0:80 -t /app/front/public
-      networks:
-        - curioMap_net
+  curioMap:
+    image: php:8.2-cli-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:80"
+    command: php -S 0.0.0.0:80 -t /app/front/public
+    networks:
+      - curioMap_net
 
-  networks:
-    curioMap_net:
-      driver: bridge
+networks:
+  curioMap_net:
+    driver: bridge
 
-  volumes:
-    db-data:
-    wp-data:
+volumes:
+  db-data:
+  wp-data:

@@ -1,20 +1,24 @@
 .idea/
-# IDE
 .vscode/
-.DS_STORE
-/coverage/
-# Vendor
-/vendor/
-# Logs
-/app/logs/*
-!/app/logs/README.md
-# Cache
-/var/cache/*
+.DS_Store
+*.swp
+
+vendor/
+
+.env
+.env.local
+back/.env
+
+*.log
+back/var/cache/
+back/var/logs/
 .phpunit.result.cache
-cache.properties
 .php_cs.cache
-# Composer
+
 composer.phar
-composer.lock
-/app/vendor/
-/app/config/.env
+
+node_modules/
+dist/
+.sass-cache/
+
+docker-data/

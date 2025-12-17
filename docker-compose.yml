@@ -1,32 +1,57 @@
-version: "3.8"
+  services:
+    db:
+      image: mysql:5.7
+      restart: always
+      environment:
+        MYSQL_DATABASE: wordpress
+        MYSQL_USER: wpuser
+        MYSQL_PASSWORD: wppass
+        MYSQL_ROOT_PASSWORD: rootpass
+      volumes:
+        - db-data:/var/lib/mysql
+      networks:
+        - curioMap_net
 
-services:
-  db:
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wpuser
-      MYSQL_PASSWORD: wppass
-      MYSQL_ROOT_PASSWORD: rootpass
-    volumes:
-      - db-data:/var/lib/mysql
+    wordpress:
+      image: wordpress:latest
+      restart: always
+      depends_on:
+        - db
+      ports:
+        - "5555:80"
+      environment:
+        WORDPRESS_DB_HOST: db
+        WORDPRESS_DB_NAME: wordpress
+        WORDPRESS_DB_USER: wpuser
+        WORDPRESS_DB_PASSWORD: wppass
+      volumes:
+        - wp-data:/var/www/html
+      networks:
+        - curioMap_net
 
-  wordpress:
-    image: wordpress:latest
-    restart: always
-    depends_on:
-      - db
-    ports:
-      - "5555:80"
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: wpuser
-      WORDPRESS_DB_PASSWORD: wppass
-    volumes:
-      - wp-data:/var/www/html
+    curiomap.db:
+      image: postgres:latest
+      env_file: ./curioMap.env
+      ports:
+        - "5435:5432"
+      networks:
+        - curioMap_net
+      volumes:
+        - ./sql:/var/sql
+      restart: unless-stopped
 
-volumes:
-  db-data:
-  wp-data:
+    adminer:
+      image: adminer
+      ports:
+        - "2026:8080"
+      networks:
+        - curioMap_net
+      restart: unless-stopped
+
+  networks:
+    curioMap_net:
+      driver: bridge
+
+  volumes:
+    db-data:
+    wp-data:

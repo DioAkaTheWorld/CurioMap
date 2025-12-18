@@ -9,12 +9,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         //Par défaut on centre la carte sur Paris, avec un zoom de 13
-        map = L.map('map').setView([48.8566, 2.3522], 13);
+        map = L.map('map', {
+            //minzoom pour que l'utilisateur ne dézoome pas trop
+            minZoom: 3,
+            //maxbounds pour que l'utilisateur ne puisse pas sortir de la carte
+            maxBounds: [
+                [-90, -180],
+                [90, 180]
+            ],
+        }).setView([48.8566, 2.3522], 13);
 
         //Ajout des tuiles (=le fond de carte visuel de la map)
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            noWrap: true
         }).addTo(map);
 
         //On tente de géolocaliser l'utilisateur. Si on y arrive, on centre la carte dessus

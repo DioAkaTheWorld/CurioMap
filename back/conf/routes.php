@@ -8,12 +8,10 @@ return function(\Slim\App $app):\Slim\App {
     //Route pour créer un point d'intérêt
     $app->post('/api/points', creePointInteretAction::class);
 
-    // Route OPTIONS pour CORS preflight ?????
-    $app->options('/api/points', function ($request, $response) {
+    //Route OPTIONS pour CORS preflight (catch-all)
+    $app->options('/{routes:.+}', function ($request, $response, $args) {
         return $response;
     });
 
-    //Middleware CORS
-    $app->add(new CorsMiddleware());
     return $app;
 };

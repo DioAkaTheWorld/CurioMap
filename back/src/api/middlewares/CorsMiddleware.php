@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Exception\HttpUnauthorizedException;
+use Slim\Psr7\Response;
 
 class CorsMiddleware implements MiddlewareInterface{
     private array $allowedOrigins;
@@ -30,10 +31,10 @@ class CorsMiddleware implements MiddlewareInterface{
             throw new HttpUnauthorizedException($request, 'missing Origin Header (cors)');
         }
 
-        //Si c'est une requête OPTIONS (preflight), on répond directement ????????
-        if ($request->getMethod() === 'OPTIONS') {
-            $response = new \Slim\Psr7\Response();
-        } else {
+        //si c'est une requête OPTIONS (preflight), on rep direct
+        if ($request->getMethod() === 'OPTIONS'){
+            $response = new Response();
+        }else{
             $response = $handler->handle($request);
         }
 

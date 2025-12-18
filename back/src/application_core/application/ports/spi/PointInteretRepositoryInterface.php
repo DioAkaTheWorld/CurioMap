@@ -1,7 +1,7 @@
 <?php
-namespace CurioMap\src\back\application_core\application\ports\spi;
+namespace CurioMap\src\application_core\application\ports\spi;
 
-use CurioMap\src\back\application_core\domain\entities\PointInteret;
+use CurioMap\src\application_core\domain\entities\PointInteret;
 
 interface PointInteretRepositoryInterface{
     //public function findAll(): array;

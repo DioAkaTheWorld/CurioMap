@@ -59,6 +59,20 @@ services:
     networks:
       - curioMap_net
 
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "8888:80"
+    networks:
+      - curioMap_net
+    depends_on:
+      - curiomap.db
+
 networks:
   curioMap_net:
     driver: bridge

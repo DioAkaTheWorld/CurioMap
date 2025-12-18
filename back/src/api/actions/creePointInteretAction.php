@@ -4,7 +4,7 @@ namespace CurioMap\src\api\actions;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use CurioMap\src\back\application_core\application\ports\api\ServicePointInteretInterface;
+use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 
 class creePointInteretAction{
     private ServicePointInteretInterface $service;
@@ -27,12 +27,12 @@ class creePointInteretAction{
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 
         }catch (\InvalidArgumentException $e){
-            //Erreur client (données manquantes)
+            //erreur client (données manquantes)
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }catch (\Exception $e){
-            //Erreur serv
-            $response->getBody()->write(json_encode(['error' => 'Erreur interne']));
+            //erreur serv
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     }

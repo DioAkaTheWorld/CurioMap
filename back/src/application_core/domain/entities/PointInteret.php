@@ -1,6 +1,6 @@
 <?php
 
-namespace CurioMap\src\back\application_core\domain\entities;
+namespace CurioMap\src\application_core\domain\entities;
 
 use DateTime;
 
@@ -43,7 +43,7 @@ class PointInteret{
         $this->visibilite = $visibilite;
     }
 
-    //Toutes les fonctions utile pour plus tard, yen a beaucoup mais au moins c'est fait
+    //toutes les fonctions utile pour plus tard, yen a beaucoup mais au moins c'est fait
     public function getId(): ?int{
         return $this->id;
     }

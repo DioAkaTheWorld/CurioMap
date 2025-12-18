@@ -1,10 +1,10 @@
 <?php
 
 use CurioMap\src\api\actions\creePointInteretAction;
-use CurioMap\src\back\application_core\application\ports\api\ServicePointInteretInterface;
-use CurioMap\src\back\application_core\application\ports\spi\PointInteretRepositoryInterface;
-use CurioMap\src\back\application_core\application\usecases\ServicePointInteret;
-use CurioMap\src\back\infrastructure\repositories\PDOPointRepository;
+use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
+use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
+use CurioMap\src\application_core\application\usecases\ServicePointInteret;
+use CurioMap\src\infrastructure\repositories\PDOPointRepository;
 use Psr\Container\ContainerInterface;
 
 return [

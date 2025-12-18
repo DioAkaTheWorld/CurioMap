@@ -6,14 +6,14 @@ use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
-$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ );
+$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__, 'curioMap.env');
 $dotenv->load();
 
 $builder = new ContainerBuilder();
 $builder->useAutowiring(false);
 $builder->addDefinitions(__DIR__ . '/settings.php');
 $builder->addDefinitions(__DIR__ . '/services.php');
-$builder->addDefinitions(__DIR__ . '/api.php');
+//$builder->addDefinitions(__DIR__ . '/api.php');
 $c = $builder->build();
 
 $app = AppFactory::createFromContainer($c);

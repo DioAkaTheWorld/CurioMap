@@ -1,8 +1,8 @@
 <?php
-namespace CurioMap\src\back\infrastructure\repositories;
+namespace CurioMap\src\infrastructure\repositories;
 
-use CurioMap\src\back\application_core\application\ports\spi\PointInteretRepositoryInterface;
-use CurioMap\src\back\application_core\domain\entities\PointInteret;
+use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
+use CurioMap\src\application_core\domain\entities\PointInteret;
 use PDO;
 use PDOException;
 
@@ -15,7 +15,8 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
 
     public function save(PointInteret $point): int{
         $sql = "INSERT INTO pointinteret (iduser, titre, image, description, categorie, date, latitude, longitude, adresse, visibilite) 
-                VALUES (:iduser, :titre, :image, :description, :categorie, :date, :latitude, :longitude, :adresse, :visibilite)";
+                VALUES (:iduser, :titre, :image, :description, :categorie, :date, :latitude, :longitude, :adresse, :visibilite)
+                RETURNING id";
 
         $stmt = $this->pdo->prepare($sql);
 
@@ -32,6 +33,7 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
             'date' => $point->getDate()->format('Y-m-d H:i:s')
         ]);
 
-        return (int) $this->pdo->lastInsertId();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int) $result['id'];
     }
 }

@@ -1,9 +1,9 @@
 <?php
-namespace CurioMap\src\back\application_core\application\usecases;
+namespace CurioMap\src\application_core\application\usecases;
 
-use CurioMap\src\back\application_core\application\ports\api\ServicePointInteretInterface;
-use CurioMap\src\back\application_core\application\ports\spi\PointInteretRepositoryInterface;
-use CurioMap\src\back\application_core\domain\entities\PointInteret;
+use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
+use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
+use CurioMap\src\application_core\domain\entities\PointInteret;
 
 class ServicePointInteret implements ServicePointInteretInterface{
     private PointInteretRepositoryInterface $pointRepository;

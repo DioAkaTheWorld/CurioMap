@@ -31,7 +31,7 @@ services:
 
   curiomap.db:
     image: postgres:latest
-    env_file: ./curioMap.env
+    env_file: back/conf/curioMap.env
     ports:
       - "5435:5432"
     networks:

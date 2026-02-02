@@ -1,34 +1,4 @@
 services:
-  db:
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wpuser
-      MYSQL_PASSWORD: wppass
-      MYSQL_ROOT_PASSWORD: rootpass
-    volumes:
-      - db-data:/var/lib/mysql
-    networks:
-      - curioMap_net
-
-  wordpress:
-    image: wordpress:latest
-    restart: always
-    depends_on:
-      - db
-    ports:
-      - "5555:80"
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: wpuser
-      WORDPRESS_DB_PASSWORD: wppass
-    volumes:
-      - wp-data:/var/www/html
-    networks:
-      - curioMap_net
-
   curiomap.db:
     image: postgres:latest
     env_file: back/conf/curioMap.env
@@ -79,6 +49,4 @@ networks:
     driver: bridge
 
 volumes:
-  db-data:
-  wp-data:
   pg-data:

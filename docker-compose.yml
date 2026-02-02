@@ -38,6 +38,7 @@ services:
       - curioMap_net
     volumes:
       - ./sql:/var/sql
+      - pg-data:/var/lib/postgresql/data
     restart: unless-stopped
 
   adminer:
@@ -80,3 +81,4 @@ networks:
 volumes:
   db-data:
   wp-data:
+  pg-data:

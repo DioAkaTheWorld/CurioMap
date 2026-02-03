@@ -5,6 +5,7 @@ use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryIn
 use CurioMap\src\application_core\domain\entities\PointInteret;
 use PDO;
 use PDOException;
+use DateTime;
 
 class PDOPointRepository implements PointInteretRepositoryInterface{
     private PDO $pdo;
@@ -35,5 +36,28 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return (int) $result['id'];
+    }
+
+    public function findAll(): array{
+        $sql = "SELECT * FROM pointinteret";
+        $stmt = $this->pdo->query($sql);
+        $points = [];
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $points[] = new PointInteret(
+                iduser: $row['iduser'],
+                titre: $row['titre'],
+                categorie: $row['categorie'],
+                latitude: (float)$row['latitude'],
+                longitude: (float)$row['longitude'],
+                image: $row['image'],
+                description: $row['description'],
+                adresse: $row['adresse'],
+                visibilite: $row['visibilite'],
+                date: new DateTime($row['date']),
+                id: $row['id']
+            );
+        }
+        return $points;
     }
 }

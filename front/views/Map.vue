@@ -1,7 +1,7 @@
 <template>
   <div class="map-wrapper">
     <div ref="map" class="map"></div>
-    <!-- Ajout de la modale -->
+    <!-- Ajout du formulaire d'ajout de point -->
     <div v-if="modaleOuverte" class="modal-overlay" @click.self="fermerModale">
       <div class="modal-content">
         <span class="close-btn" @click="fermerModale">&times;</span>
@@ -46,6 +46,18 @@
         </form>
       </div>
     </div>
+
+    <!-- Les fiiiiiiiltres -->
+    <div class="filter-panel">
+      <h3>Filtres</h3>
+      <div class="filter-group">
+        <h4>Catégories</h4>
+        <div v-for="cat in categories" :key="cat.id" class="checkbox-item">
+            <input type="checkbox" :id="'cat-'+cat.id" :value="cat.id" v-model="selectedCategories" @change="updateMarkers">
+            <label :for="'cat-'+cat.id" :style="{color: getCategoryColor(cat.id)}">{{ cat.label }}</label>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -72,11 +84,21 @@ export default {
   data() {
     return {
       map: null,
+      markerLayerGroup: null, //Groupe de calques pour les marqueurs
       userMarker:null,
       modaleOuverte: false,
+      points: [], //On charge tout les points au lancement
+      categories: [
+          { id: 1, label: 'Restaurant' },
+          { id: 2, label: 'Monument' },
+          { id: 3, label: 'Concert' },
+          { id: 4, label: 'Parc' },
+          { id: 5, label: 'Musée' }
+      ],
+      selectedCategories: [1, 2, 3, 4, 5], //Tout coché par défaut
       nouveauPoint: {
         titre: '',
-        categorie: 2, // Par défaut 'Monument'
+        categorie: 1,
         description: '',
         latitude: 0,
         longitude: 0
@@ -85,15 +107,58 @@ export default {
   },
   mounted() {
     this.initMap()
+    this.fetchPoints()
   },
   beforeUnmount() {
     if (this.map) this.map.remove()
   },
   methods: {
+    //Chargement des points au lancement
+    async fetchPoints() {
+        try {
+            const response = await fetch('http://localhost:8888/api/points');
+            if (response.ok) {
+                this.points = await response.json();
+                this.updateMarkers();
+            }
+        } catch (e) {
+            console.error("Erreur chargement points", e);
+        }
+    },
+
+    //Maj de l'affichage des points
+    updateMarkers() {
+        if (!this.markerLayerGroup) return;
+
+        this.markerLayerGroup.clearLayers();
+
+        this.points.forEach(point => {
+            //Vérif si la caté est sélectionnée
+            if (this.selectedCategories.includes(parseInt(point.categorie))) {
+                const color = this.getCategoryColor(point.categorie);
+                const label = this.getCategoryLabel(point.categorie);
+
+                const marker = L.circleMarker([point.latitude, point.longitude], {
+                    radius: 8,
+                    fillColor: color,
+                    color: "#fff",
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 1
+                });
+
+                marker.bindPopup(`<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span><br>${point.description || ''}`);
+
+                this.markerLayerGroup.addLayer(marker);
+            }
+        });
+    },
+
+    //Initialisation de la map
     initMap() {
       if (this.map) this.map.remove()
 
-      //Utilisation de markRaw pour éviter que Vue rende l'objet Map réactif (ce qui cause des bugs avec Leaflet)
+      //Utilisation de markRaw pour éviter que Vue rende l'objet Map réactif (qui cause des bugs avec Leaflet)
       this.map = markRaw(L.map(this.$refs.map, {
         minZoom: 3,
         maxBounds: [
@@ -108,6 +173,9 @@ export default {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         noWrap: true
       }).addTo(this.map)
+
+      //LayerGroup pour les marqueurs filtrables
+      this.markerLayerGroup = L.layerGroup().addTo(this.map);
 
       //Gestion du clic pour ajouter un point
       this.map.on('click', (e) => {
@@ -157,16 +225,8 @@ export default {
           console.log("La géolocalisation a échoué")
         })
       }
-
-      //Marqueur d'exemple ajouté manuellement
-      L.circleMarker([48.8566, 2.3522], {
-        radius: 6,
-        fillColor: "#3388ff",
-        color: "#fff",
-        weight: 1,
-        fillOpacity: 0.9
-      }).addTo(this.map).bindPopup("<b>Salut !</b><br>Exemple point d'intérêt").openPopup()
     },
+
     //Recentrer sur la position de l'utilisateur
     recentrer() {
       const latParis = 48.8566;
@@ -195,27 +255,47 @@ export default {
         this.map.flyTo([latParis, lngParis], 13)
       }
     },
+
+    //Pour ouvrir le formulaire de création de point
     ouvrirModale(lat, lng) {
       this.nouveauPoint.latitude = lat;
       this.nouveauPoint.longitude = lng;
       this.modaleOuverte = true;
     },
+
+    //Pour le fermer
     fermerModale() {
       this.modaleOuverte = false;
       this.nouveauPoint.titre = '';
       this.nouveauPoint.description = '';
       this.nouveauPoint.categorie = 2;
     },
+
+    //Recup le libelle des catés
+    getCategoryLabel(id) {
+      switch(parseInt(id)) {
+        case 1: return 'Restaurant';
+        case 2: return 'Monument';
+        case 3: return 'Concert';
+        case 4: return 'Parc';
+        case 5: return 'Musée';
+        default: return 'Autre';
+      }
+    },
+
+    //Des jolies couleurs pour chaque caté
     getCategoryColor(id) {
       switch(parseInt(id)) {
         case 1: return '#ff9800'; //Resto en orange
         case 2: return '#774d0e'; //Monument en brun
-        case 3: return '#e91e63'; //Concert en rose
+        case 3: return '#ea5a90'; //Concert en rose
         case 4: return '#4caf50'; //Parc en vert
         case 5: return '#9c27b0'; //Musée en violet
         default: return '#3388ff'; //Par défaut en bleu
       }
     },
+
+    //Créer un point
     async creerPoint() {
       try {
         const payload = {
@@ -232,23 +312,15 @@ export default {
         if (response.ok) {
             alert('Point créé avec succès !');
 
-            //Couleur selon la catégorie
-            const color = this.getCategoryColor(this.nouveauPoint.categorie);
+            //Ajout du point à la liste locale
+            this.points.push({
+                ...payload,
+                latitude: parseFloat(payload.latitude),
+                longitude: parseFloat(payload.longitude)
+            });
 
-            //Un point plutôt qu'un pin comme ça c'est joli avec la couleur
-            L.circleMarker([
-              parseFloat(this.nouveauPoint.latitude),
-              parseFloat(this.nouveauPoint.longitude)
-            ], {
-              radius: 8,
-              fillColor: color,
-              color: "#fff", // Bordure blanche
-              weight: 2,
-              opacity: 1,
-              fillOpacity: 1
-            })
-             .addTo(this.map)
-             .bindPopup(`<b>${this.nouveauPoint.titre}</b><br>${this.nouveauPoint.description}`);
+            //Maj des marqueurs (si filtre)
+            this.updateMarkers();
 
             this.fermerModale();
         } else {
@@ -278,7 +350,7 @@ export default {
   width: 100%;
 }
 
-/* Modal Styles */
+/* Formulaire d'ajout */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -346,5 +418,51 @@ export default {
 .btn-secondary {
   background: #ccc;
   color: black;
+}
+
+/* Filtres */
+.filter-panel {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    border: 2px solid rgba(0,0,0,0.2);
+    z-index: 1000;
+    width: 150px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+}
+
+.filter-panel h3 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.filter-group h4 {
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.checkbox-item input {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.checkbox-item label {
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-weight: bold;
 }
 </style>

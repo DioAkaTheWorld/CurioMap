@@ -46,3 +46,16 @@ CREATE TABLE Commentaire (
     FOREIGN KEY (iduser) REFERENCES Utilisateur(id) ON DELETE CASCADE,
     FOREIGN KEY (idpoint) REFERENCES PointInteret(id) ON DELETE CASCADE
 );
+
+CREATE TABLE Agenda (
+    id SERIAL PRIMARY KEY,
+    iduser INT NOT NULL,
+    idpoint INT,
+    titre_evenement VARCHAR(200), -- au cas où si idpoint est null, ou pour renommer l'activité
+    date_debut TIMESTAMP NOT NULL,
+    date_fin TIMESTAMP NOT NULL,
+    notes TEXT,
+    FOREIGN KEY (iduser) REFERENCES Utilisateur(id) ON DELETE CASCADE,
+    FOREIGN KEY (idpoint) REFERENCES PointInteret(id) ON DELETE SET NULL,
+    CHECK (date_fin >= date_debut) -- pour éviter les bugs de dates
+);

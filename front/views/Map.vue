@@ -262,7 +262,7 @@ export default {
   z-index: 10000;
   top: 10px;
   right: 10px;
-  background: white;
+  background: rgb(72, 72, 72);
   border: none;
   padding: 8px;
   border-radius: 4px;

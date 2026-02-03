@@ -5,6 +5,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
+    "@popperjs/core": "^2.11.8",
+    "@schedule-x/calendar": "^4.1.0",
+    "@schedule-x/theme-default": "^4.1.0",
+    "@schedule-x/vue": "^4.0.0",
     "leaflet": "^1.9.4",
     "vue": "^3.5.27",
     "vue-router": "^4.6.4"

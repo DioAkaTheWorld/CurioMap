@@ -2,7 +2,8 @@
 
 use CurioMap\src\api\actions\creeAgendaAction;
 use CurioMap\src\api\actions\creePointInteretAction;
-use CurioMap\src\api\actions\getAgendaAction;
+use CurioMap\src\api\actions\GetAgendaAction;
+use CurioMap\src\api\actions\getPointsAction;
 use CurioMap\src\application_core\application\ports\api\ServiceAgendaInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\spi\AgendaRepositoryInterface;
@@ -47,7 +48,10 @@ return [
     creeAgendaAction::class => function (ContainerInterface $c) {
         return new creeAgendaAction($c->get(ServiceAgendaInterface::class));
     },
-    getAgendaAction::class => function (ContainerInterface $c) {
-        return new getAgendaAction($c->get(ServiceAgendaInterface::class));
+    GetAgendaAction::class => function (ContainerInterface $c) {
+        return new GetAgendaAction($c->get(ServiceAgendaInterface::class));
+    },
+    getPointsAction::class => function (ContainerInterface $c) {
+        return new getPointsAction($c->get(ServicePointInteretInterface::class));
     },
 ];

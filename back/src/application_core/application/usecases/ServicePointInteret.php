@@ -13,8 +13,7 @@ class ServicePointInteret implements ServicePointInteretInterface{
     }
 
     public function getAllPoints(): array{
-        //à faire après
-        return [];
+        return $this->pointRepository->findAll();
     }
 
     public function creePoint(array $data): PointInteret{

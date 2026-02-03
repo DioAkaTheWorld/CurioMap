@@ -164,7 +164,8 @@ export default {
         maxBounds: [
           [-90, -180],
           [90, 180]
-        ]
+        ],
+        zoomControl: false
       })).setView([48.8566, 2.3522], 13)
 
       //Ajout des tuiles (=le fond de carte visuel de la map)

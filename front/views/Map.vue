@@ -1,8 +1,6 @@
 <template>
   <div class="map-wrapper">
     <div ref="map" class="map"></div>
-    <button class="recenter-btn" @click="recentrer" title="Recentrer">📍</button>
-
     <!-- Ajout de la modale -->
     <div v-if="modaleOuverte" class="modal-overlay" @click.self="fermerModale">
       <div class="modal-content">
@@ -262,7 +260,8 @@ export default {
         alert('Impossible de contacter le serveur.');
       }
     }
-  }
+  },
+  expose: ['recentrer']
 }
 </script>
 
@@ -277,17 +276,6 @@ export default {
 .map {
   height: 100%;
   width: 100%;
-}
-.recenter-btn {
-  position: absolute;
-  z-index: 10000;
-  top: 10px;
-  right: 10px;
-  background: rgb(72, 72, 72);
-  border: none;
-  padding: 8px;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 /* Modal Styles */

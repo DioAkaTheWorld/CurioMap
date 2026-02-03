@@ -208,6 +208,16 @@ export default {
       this.nouveauPoint.description = '';
       this.nouveauPoint.categorie = 2;
     },
+    getCategoryColor(id) {
+      switch(parseInt(id)) {
+        case 1: return '#ff9800'; //Resto en orange
+        case 2: return '#774d0e'; //Monument en brun
+        case 3: return '#e91e63'; //Concert en rose
+        case 4: return '#4caf50'; //Parc en vert
+        case 5: return '#9c27b0'; //Musée en violet
+        default: return '#3388ff'; //Par défaut en bleu
+      }
+    },
     async creerPoint() {
       try {
         const payload = {
@@ -223,11 +233,22 @@ export default {
 
         if (response.ok) {
             alert('Point créé avec succès !');
-            // Ajout immédiat sur la carte
-            L.marker([
+
+            //Couleur selon la catégorie
+            const color = this.getCategoryColor(this.nouveauPoint.categorie);
+
+            //Un point plutôt qu'un pin comme ça c'est joli avec la couleur
+            L.circleMarker([
               parseFloat(this.nouveauPoint.latitude),
               parseFloat(this.nouveauPoint.longitude)
-            ])
+            ], {
+              radius: 8,
+              fillColor: color,
+              color: "#fff", // Bordure blanche
+              weight: 2,
+              opacity: 1,
+              fillOpacity: 1
+            })
              .addTo(this.map)
              .bindPopup(`<b>${this.nouveauPoint.titre}</b><br>${this.nouveauPoint.description}`);
 

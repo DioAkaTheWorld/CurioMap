@@ -41,7 +41,7 @@ const emit = defineEmits(['recentrer'])
   background: white;
   display: flex;
   align-items: center;
-  padding: 0 80px;
+  padding: 0 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   gap: 16px;
@@ -57,7 +57,6 @@ const emit = defineEmits(['recentrer'])
   font-size: 32px;
   font-weight: bold;
   color: #111;
-  margin-left: 10px;
   margin-right: auto;
 }
 

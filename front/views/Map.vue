@@ -78,7 +78,7 @@ export default {
       modaleOuverte: false,
       nouveauPoint: {
         titre: '',
-        categorie: 2, // Par défaut 'Monument'
+        categorie: 1,
         description: '',
         latitude: 0,
         longitude: 0
@@ -159,15 +159,6 @@ export default {
           console.log("La géolocalisation a échoué")
         })
       }
-
-      //Marqueur d'exemple ajouté manuellement
-      L.circleMarker([48.8566, 2.3522], {
-        radius: 6,
-        fillColor: "#3388ff",
-        color: "#fff",
-        weight: 1,
-        fillOpacity: 0.9
-      }).addTo(this.map).bindPopup("<b>Salut !</b><br>Exemple point d'intérêt").openPopup()
     },
     //Recentrer sur la position de l'utilisateur
     recentrer() {
@@ -208,6 +199,16 @@ export default {
       this.nouveauPoint.description = '';
       this.nouveauPoint.categorie = 2;
     },
+    getCategoryLabel(id) {
+      switch(parseInt(id)) {
+        case 1: return 'Restaurant';
+        case 2: return 'Monument';
+        case 3: return 'Concert';
+        case 4: return 'Parc';
+        case 5: return 'Musée';
+        default: return 'Autre';
+      }
+    },
     getCategoryColor(id) {
       switch(parseInt(id)) {
         case 1: return '#ff9800'; //Resto en orange
@@ -236,6 +237,7 @@ export default {
 
             //Couleur selon la catégorie
             const color = this.getCategoryColor(this.nouveauPoint.categorie);
+            const label = this.getCategoryLabel(this.nouveauPoint.categorie);
 
             //Un point plutôt qu'un pin comme ça c'est joli avec la couleur
             L.circleMarker([
@@ -250,7 +252,7 @@ export default {
               fillOpacity: 1
             })
              .addTo(this.map)
-             .bindPopup(`<b>${this.nouveauPoint.titre}</b><br>${this.nouveauPoint.description}`);
+             .bindPopup(`<b>${this.nouveauPoint.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span><br>${this.nouveauPoint.description}`);
 
             this.fermerModale();
         } else {

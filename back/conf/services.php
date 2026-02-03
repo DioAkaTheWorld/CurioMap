@@ -1,9 +1,15 @@
 <?php
 
+use CurioMap\src\api\actions\creeAgendaAction;
 use CurioMap\src\api\actions\creePointInteretAction;
+use CurioMap\src\api\actions\getAgendaAction;
+use CurioMap\src\application_core\application\ports\api\ServiceAgendaInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
+use CurioMap\src\application_core\application\ports\spi\AgendaRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
+use CurioMap\src\application_core\application\usecases\ServiceAgenda;
 use CurioMap\src\application_core\application\usecases\ServicePointInteret;
+use CurioMap\src\infrastructure\repositories\PDOAgendaRepository;
 use CurioMap\src\infrastructure\repositories\PDOPointRepository;
 use Psr\Container\ContainerInterface;
 
@@ -29,7 +35,19 @@ return [
     ServicePointInteretInterface::class => function (ContainerInterface $c) {
         return new ServicePointInteret($c->get(PointInteretRepositoryInterface::class));
     },
+    AgendaRepositoryInterface::class => function(ContainerInterface $c) {
+        return new PDOAgendaRepository($c->get(PDO::class));
+    },
+    ServiceAgendaInterface::class => function(ContainerInterface $c) {
+        return new ServiceAgenda($c->get(AgendaRepositoryInterface::class));
+    },
     creePointInteretAction::class => function (ContainerInterface $c) {
         return new creePointInteretAction($c->get(ServicePointInteretInterface::class));
+    },
+    creeAgendaAction::class => function (ContainerInterface $c) {
+        return new creeAgendaAction($c->get(ServiceAgendaInterface::class));
+    },
+    getAgendaAction::class => function (ContainerInterface $c) {
+        return new getAgendaAction($c->get(ServiceAgendaInterface::class));
     },
 ];

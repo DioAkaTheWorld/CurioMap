@@ -74,6 +74,7 @@ export default {
   data() {
     return {
       map: null,
+      userMarker:null,
       modaleOuverte: false,
       nouveauPoint: {
         titre: '',
@@ -141,8 +142,12 @@ export default {
           const lat = position.coords.latitude
           const lon = position.coords.longitude
           this.map.setView([lat, lon], 13)
+          if(this.userMarker){
+            this.userMarker.remove()
+            this.userMarker = null
+          }
 
-          L.circleMarker([lat, lon], {
+          this.userMarker = L.circleMarker([lat, lon], {
             radius: 8,
             fillColor: "#f00020",
             color: "#ffffff",
@@ -173,7 +178,17 @@ export default {
         navigator.geolocation.getCurrentPosition((position) => {
           const lat = position.coords.latitude
           const lon = position.coords.longitude
-          this.map.flyTo([lat, lon], 13)
+          if(this.userMarker){
+            this.userMarker.setStyle({ opacity: 0, fillOpacity: 0 });
+            this.userMarker.closePopup()
+          }
+          this.map.flyTo([lat, lon], 13);
+          this.map.once('moveend', () =>{
+            if(this.userMarker){
+              this.userMarker.openPopup();
+              this.userMarker.setStyle({ opacity: 1, fillOpacity: 1 });
+            }
+          })
         }, () => {
           //Si échec géolocalisation, on retourne sur Paris
           this.map.flyTo([latParis, lngParis], 13)

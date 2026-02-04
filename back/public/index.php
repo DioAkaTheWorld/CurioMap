@@ -6,4 +6,3 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require __DIR__ . '/../conf/bootstrap.php';
 
 $app->run();
-

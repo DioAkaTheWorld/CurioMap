@@ -42,7 +42,6 @@ const emit = defineEmits(['recentrer'])
   display: flex;
   align-items: center;
   padding: 0 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   gap: 16px;
 }
@@ -71,52 +70,45 @@ const emit = defineEmits(['recentrer'])
   font-weight: 600;
   font-size: 14px;
   white-space: nowrap;
+  margin-right:30px;
 }
 
 .recenter-btn {
   background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
   color: white;
-  box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
   font-size: 20px;
   padding: 8px 16px;
 }
 
 .recenter-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
 }
 
 .map-btn {
   background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
   color: white;
-  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
 }
 
 .map-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
 .agenda-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #6366f1;
   color: white;
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
 }
 
 .agenda-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .profile-btn {
   background: linear-gradient(135deg, #111 0%, #333 100%);
   color: white;
-  box-shadow: 0 2px 6px rgba(17, 17, 17, 0.3);
 }
 
 .profile-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(17, 17, 17, 0.4);
 }
 
 .map-btn:active,

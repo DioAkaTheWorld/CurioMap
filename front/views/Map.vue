@@ -241,13 +241,13 @@ export default {
             this.userMarker.setStyle({ opacity: 0, fillOpacity: 0 });
             this.userMarker.closePopup()
           }
-          this.map.flyTo([lat, lon], 13);
           this.map.once('moveend', () =>{
             if(this.userMarker){
               this.userMarker.openPopup();
               this.userMarker.setStyle({ opacity: 1, fillOpacity: 1 });
             }
           })
+          this.map.flyTo([lat, lon], 13);
         }, () => {
           //Si échec géolocalisation, on retourne sur Paris
           this.map.flyTo([latParis, lngParis], 13)
@@ -340,18 +340,18 @@ export default {
 
 <style scoped>
 .map-wrapper {
-  height: 100vh;
+  height:100vh;
   width: 100%;
-  position: relative;
-  margin: 0;
-  padding: 0;
+  position: fixed;
+  top: 60px;
+  overflow: hidden;
+  left:0;
 }
 .map {
   height: 100%;
   width: 100%;
 }
 
-/* Formulaire d'ajout */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -359,7 +359,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 20000; /* Plus haut que Leaflet */
+  z-index: 20000; /*pour que le formulaire apparaisse au dessus de leaflet */
 }
 .modal-content {
   background: white;

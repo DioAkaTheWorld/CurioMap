@@ -48,16 +48,11 @@
     </div>
 
     <!-- Les fiiiiiiiltres -->
-    <div class="filter-panel">
-      <h3>Filtres</h3>
-      <div class="filter-group">
-        <h4>Catégories</h4>
-        <div v-for="cat in categories" :key="cat.id" class="checkbox-item">
-            <input type="checkbox" :id="'cat-'+cat.id" :value="cat.id" v-model="selectedCategories" @change="updateMarkers">
-            <label :for="'cat-'+cat.id" :style="{color: getCategoryColor(cat.id)}">{{ cat.label }}</label>
-        </div>
-      </div>
-    </div>
+    <Filtre
+      :categories="categories"
+      v-model="selectedCategories"
+      @change="updateMarkers"
+    />
   </div>
 </template>
 
@@ -65,6 +60,7 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { markRaw } from 'vue'
+import Filtre from '../components/Filtre.vue'
 
 //Correctif pour les icônes Leaflet avec Vite
 import icon from 'leaflet/dist/images/marker-icon.png'
@@ -81,6 +77,9 @@ L.Icon.Default.mergeOptions({
 
 export default {
   name: 'MapView',
+  components: {
+    Filtre
+  },
   data() {
     return {
       map: null,
@@ -419,51 +418,5 @@ export default {
 .btn-secondary {
   background: #ccc;
   color: black;
-}
-
-/* Filtres */
-.filter-panel {
-    position: absolute;
-    top: 50%;
-    left: 10px;
-    transform: translateY(-50%);
-    background: white;
-    padding: 10px;
-    border-radius: 4px;
-    border: 2px solid rgba(0,0,0,0.2);
-    z-index: 1000;
-    width: 150px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-}
-
-.filter-panel h3 {
-    margin: 0 0 10px 0;
-    font-size: 1rem;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-}
-
-.filter-group h4 {
-    margin: 0 0 5px 0;
-    font-size: 0.9rem;
-    color: #555;
-}
-
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.checkbox-item input {
-    margin-right: 8px;
-    cursor: pointer;
-}
-
-.checkbox-item label {
-    font-size: 0.85rem;
-    cursor: pointer;
-    font-weight: bold;
 }
 </style>

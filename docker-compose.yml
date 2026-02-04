@@ -31,6 +31,7 @@ services:
       - curioMap_net
 
   backend:
+    env_file: back/conf/curioMap.env
     build:
       context: .
       dockerfile: Dockerfile

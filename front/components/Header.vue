@@ -5,7 +5,7 @@ const emit = defineEmits(['recentrer'])
     const router = useRouter();
     const route = useRoute();
 
-    function goProfile() {
+    function goProfil() {
         router.push('/profil')
     }
     function goAgenda() {
@@ -27,7 +27,7 @@ const emit = defineEmits(['recentrer'])
       <button v-if="route.path==='/map'" @click="recentrer" class="recenter-btn" title="Recentrer">📍</button>
       <button v-if="route.path!=='/map'" @click="goMap" class="map-btn">Retourner à la map</button>
       <button v-if="route.path!== '/agenda'" @click="goAgenda" class="agenda-btn">Accéder à votre agenda</button>
-      <button v-if="route.path!=='/profil'" @click="goProfile" class="profile-btn">Profil</button>
+      <button v-if="route.path!=='/profil'" @click="goProfil" class="profile-btn">Profil</button>
     </header>
 </template>
 

@@ -25,9 +25,9 @@ const emit = defineEmits(['recentrer'])
         <h1 class="title">CurioMap</h1>
 
       <button v-if="route.path==='/map'" @click="recentrer" class="recenter-btn" title="Recentrer">📍</button>
-      <button v-if="route.path!=='/map'" @click="goMap" class="map-btn">Retourner à la map</button>
-      <button v-if="route.path!== '/agenda'" @click="goAgenda" class="agenda-btn">Accéder à votre agenda</button>
-      <button v-if="route.path!=='/profil'" @click="goProfil" class="profile-btn">Profil</button>
+      <button v-if="route.path!=='/map'" @click="goMap" class="map-btn" title="Retourner à la map">🗺️</button>
+      <button v-if="route.path!== '/agenda'" @click="goAgenda" class="agenda-btn" title="Accéder à votre agenda">📅</button>
+      <button v-if="route.path!=='/profil'" @click="goProfil" class="profile-btn" title="Profil">👤</button>
     </header>
 </template>
 
@@ -65,10 +65,11 @@ const emit = defineEmits(['recentrer'])
 .recenter-btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
+  height:70%;
   white-space: nowrap;
   margin-right:30px;
 }
@@ -103,8 +104,7 @@ const emit = defineEmits(['recentrer'])
 }
 
 .profile-btn {
-  background: linear-gradient(135deg, #111 0%, #333 100%);
-  color: white;
+  background:#d97706;
 }
 
 .profile-btn:hover {

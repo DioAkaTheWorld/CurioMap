@@ -104,7 +104,7 @@ const emit = defineEmits(['recentrer'])
 }
 
 .profile-btn {
-  background:#d97706;
+  background:#dd9900;
 }
 
 .profile-btn:hover {

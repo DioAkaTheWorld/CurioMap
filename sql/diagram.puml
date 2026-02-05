@@ -1,0 +1,69 @@
+@startuml
+
+class Utilisateur {
+  + id : int
+  + nom : string
+  + email : string
+  + motdepasse : string
+  + role : int
+}
+
+class Favoris {
+  + iduser : int
+  + idpoint : int
+  + date_ajout : timestamp
+}
+
+class PointInteret {
+  - id : ?int
+  - iduser : int
+  - titre : string
+  - image : ?string
+  - description : ?string
+  - categorie : int
+  - date : Date
+  - latitude : decimal
+  - longitude : decimal
+  - adresse : ?string
+  - visibilite : int
+  Getters()
+  Setters()
+}
+
+class Categorie {
+  + id : int
+  + libelle : string
+}
+
+class Commentaire {
+  + id : int
+  + iduser : int
+  + idpoint : int
+  + commentaire : string
+  + note : int
+  + date_creation : Date
+}
+
+class Agenda {
+    - id : ?int
+    - iduser : int
+    - idpoint : ?int
+    - titre_evenement : ?string
+    - date_debut : Date
+    - date_fin : Date
+    - notes : ?string
+    Getters()
+    Setters()
+}
+
+Utilisateur "1" -- "*" Favoris : possède
+Favoris "*" -right- "1" PointInteret
+Utilisateur "1" -- "*" PointInteret : crée
+PointInteret "*" -right- "1" Categorie : défini par
+PointInteret "1" -- "*" Commentaire : contient
+Utilisateur "1" -- "*" Commentaire : rédige
+
+Utilisateur "1" -- "*" Agenda : planifie
+Agenda "*" -left- "0..1" PointInteret : concerne
+
+@enduml

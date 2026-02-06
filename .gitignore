@@ -8,6 +8,8 @@ vendor/
 .env
 .env.local
 back/.env
+front/.env.production
+front/.env.development
 
 *.log
 back/var/cache/

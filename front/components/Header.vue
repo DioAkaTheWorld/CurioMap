@@ -63,8 +63,8 @@ const emit = defineEmits(['recentrer'])
 .agenda-btn,
 .profile-btn,
 .recenter-btn {
-  width: 50px;
-  height: 50px;
+  width: 2em;
+  height: 2em;
   padding: 0;
   border: none;
   border-radius: 12px;
@@ -109,14 +109,55 @@ const emit = defineEmits(['recentrer'])
 }
 
 @media (max-width: 768px) {
-  .logo{
-    width:3em;
+  .top-bar {
+    height: 4em;
+    padding: 0 1%;
+    gap: 12px;
   }
-  .title{
-    font-size:1.5em;
+
+  .logo {
+    width: 3em;
+  }
+
+  .title {
+    font-size: 1.5em;
+  }
+
+  .map-btn,
+  .agenda-btn,
+  .profile-btn,
+  .recenter-btn {
+    width: 1.9em;
+    height: 1.9em;
+    font-size: 1.3em;
+    margin-right: 0.7em;
   }
 }
 
+@media (max-width: 480px) {
+  .top-bar {
+    height: 3.5em;
+    gap: 8px;
+  }
 
+  .logo {
+    width: 2.5em;
+  }
+
+  .title {
+    font-size: 1.2em;
+  }
+
+  .map-btn,
+  .agenda-btn,
+  .profile-btn,
+  .recenter-btn {
+    width: 1.6em;
+    height: 1.6em;
+    font-size: 1.1em;
+    margin-right: 0.5em;
+    border-radius: 10px;
+  }
+}
 </style>
 

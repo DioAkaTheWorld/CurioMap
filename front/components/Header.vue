@@ -37,7 +37,7 @@ const emit = defineEmits(['recentrer'])
   top: 0;
   left: 0;
   width: 100%;
-  height: 70px;
+  height: 5em;
   background: white;
   display: flex;
   align-items: center;
@@ -47,13 +47,13 @@ const emit = defineEmits(['recentrer'])
 }
 
 .logo {
-  width: 60px;
+  width: 4em;
   height: auto;
   border-radius: 20%;
 }
 
 .title {
-  font-size: 32px;
+  font-size: 2em;
   font-weight: bold;
   color: #111;
   margin-right: auto;
@@ -63,52 +63,41 @@ const emit = defineEmits(['recentrer'])
 .agenda-btn,
 .profile-btn,
 .recenter-btn {
-  padding: 10px 20px;
+  width: 2em;
+  height: 2em;
+  padding: 0;
   border: none;
-  border-radius: 50%;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  height:70%;
-  white-space: nowrap;
-  margin-right:30px;
+  font-size: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right:1em;
 }
 
 .recenter-btn {
   background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
-  color: white;
-  font-size: 20px;
-  padding: 8px 16px;
-}
-
-.recenter-btn:hover {
-  transform: translateY(-2px);
 }
 
 .map-btn {
   background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
-}
-
-.map-btn:hover {
-  transform: translateY(-2px);
 }
 
 .agenda-btn {
-  background: #6366f1;
-  color: white;
-}
-
-.agenda-btn:hover {
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
 }
 
 .profile-btn {
-  background:#dd9900;
+  background: linear-gradient(135deg, #dd9900 0%, #cc8800 100%);
 }
 
-.profile-btn:hover {
+.map-btn:hover,
+.agenda-btn:hover,
+.profile-btn:hover,
+.recenter-btn:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .map-btn:active,
@@ -116,7 +105,59 @@ const emit = defineEmits(['recentrer'])
 .profile-btn:active,
 .recenter-btn:active {
   transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 768px) {
+  .top-bar {
+    height: 4em;
+    padding: 0 1%;
+    gap: 12px;
+  }
+
+  .logo {
+    width: 3em;
+  }
+
+  .title {
+    font-size: 1.5em;
+  }
+
+  .map-btn,
+  .agenda-btn,
+  .profile-btn,
+  .recenter-btn {
+    width: 1.9em;
+    height: 1.9em;
+    font-size: 1.3em;
+    margin-right: 0.7em;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-bar {
+    height: 3.5em;
+    gap: 8px;
+  }
+
+  .logo {
+    width: 2.5em;
+  }
+
+  .title {
+    font-size: 1.2em;
+  }
+
+  .map-btn,
+  .agenda-btn,
+  .profile-btn,
+  .recenter-btn {
+    width: 1.6em;
+    height: 1.6em;
+    font-size: 1.1em;
+    margin-right: 0.5em;
+    border-radius: 10px;
+  }
+}
 </style>
 

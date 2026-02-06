@@ -9,12 +9,12 @@ use CurioMap\src\api\actions\getPointsAction;
 
 return function(\Slim\App $app):\Slim\App {
     //Route des points d'intérêt
-    $app->post('/api/points', creePointInteretAction::class);
-    $app->get('/api/points', getPointsAction::class);
+    $app->post('/points', creePointInteretAction::class);
+    $app->get('/points', getPointsAction::class);
 
     //Routes pour l'agenda
-    $app->post('/api/agenda', creeAgendaAction::class);
-    $app->get('/api/agenda', getAgendaAction::class);
+    $app->post('/agenda', creeAgendaAction::class);
+    $app->get('/agenda', getAgendaAction::class);
 
     //Route OPTIONS pour CORS preflight (catch-all)
     $app->options('/{routes:.+}', function ($request, $response, $args) {

@@ -115,7 +115,7 @@ export default {
     //Chargement des points au lancement
     async fetchPoints() {
         try {
-            const response = await fetch('http://localhost:8888/api/points');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/points`);
             if (response.ok) {
                 this.points = await response.json();
                 this.updateMarkers();
@@ -303,7 +303,8 @@ export default {
             categorie: parseInt(this.nouveauPoint.categorie)
         };
 
-        const response = await fetch('http://localhost:8888/api/points', {
+        //'http://localhost:8888/api/points'
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/points`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

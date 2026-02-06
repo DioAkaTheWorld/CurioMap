@@ -10,4 +10,4 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 
 # Commande par défaut pour lancer le serveur
-CMD ["php", "-S", "0.0.0.0:80", "-t", "/app/back/public"]
+CMD ["php", "-S", "0.0.0.0:80", "-t", "/app/back/public", "/app/back/public/index.php"]

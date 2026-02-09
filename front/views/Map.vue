@@ -62,6 +62,8 @@
     <Filtre
       :categories="categories"
       v-model="selectedCategories"
+      v-model:distance="maxDistance"
+      :localisationActive="!!userLocation"
       @change="updateMarkers"
     />
   </div>
@@ -96,6 +98,8 @@ export default {
       map: null,
       markerLayerGroup: null, //Groupe de calques pour les marqueurs
       userMarker:null,
+      userLocation: null, //Pour stocker les coos du user
+      maxDistance: 100, //Pour filtre distance (100 = partout par convention)
       modaleOuverte: false,
       points: [], //On charge tout les points au lancement
       categories: [
@@ -145,6 +149,17 @@ export default {
         this.markerLayerGroup.clearLayers();
 
         this.points.forEach(point => {
+            //Filtre par distance (si user localisé et filtre activé < 100km)
+            if (this.userLocation && this.maxDistance < 100) {
+                const userLatLng = L.latLng(this.userLocation.lat, this.userLocation.lon);
+                const pointLatLng = L.latLng(point.latitude, point.longitude);
+                const distKm = userLatLng.distanceTo(pointLatLng) / 1000;
+
+                if (distKm > this.maxDistance) {
+                    return; //On passe au point suivant, celui-ci est trop loin
+                }
+            }
+
             //Vérif si la caté est sélectionnée
             if (this.selectedCategories.includes(parseInt(point.categorie))) {
                 const color = this.getCategoryColor(point.categorie);
@@ -239,8 +254,12 @@ export default {
       //On tente de géolocaliser l'utilisateur. Si on y arrive, on centre la carte dessus
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
+          console.log("Position trouvée:", position);
           const lat = position.coords.latitude
           const lon = position.coords.longitude
+
+          this.userLocation = { lat, lon }; //On garde la pos en mémoire pour les filtres
+
           this.map.setView([lat, lon], 13)
           if(this.userMarker){
             this.userMarker.remove()
@@ -255,8 +274,12 @@ export default {
             opacity: 1,
             fillOpacity: 1
           }).addTo(this.map).bindPopup("<b>Vous êtes ici !</b>").openPopup()
-        }, () => {
-          console.log("La géolocalisation a échoué")
+        }, (error) => {
+          console.warn("La géolocalisation a échoué ou a été refusée", error);
+        }, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
         })
       }
     },
@@ -270,6 +293,9 @@ export default {
         navigator.geolocation.getCurrentPosition((position) => {
           const lat = position.coords.latitude
           const lon = position.coords.longitude
+
+          this.userLocation = { lat, lon }; //Maj
+
           if(this.userMarker){
             this.userMarker.setStyle({ opacity: 0, fillOpacity: 0 });
             this.userMarker.closePopup()

@@ -9,5 +9,13 @@ export default defineConfig({
         alias: {
             '@': path.resolve(__dirname, 'src')
         }
+    },
+    server: {
+        allowedHosts: ['docketu.iutnc.univ-lorraine.fr'],
+        host: true,
+        port: 5173,
+        watch: {
+            usePolling: true
+        }
     }
 })

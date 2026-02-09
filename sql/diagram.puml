@@ -26,6 +26,8 @@ class PointInteret {
   - longitude : decimal
   - adresse : ?string
   - visibilite : int
+  - date_event : Date
+  - heure_event : Time
   Getters()
   Setters()
 }

@@ -30,6 +30,17 @@
 
           <div class="coords-row">
             <div class="form-group">
+              <label>Date (optionnel)</label>
+              <input v-model="nouveauPoint.dateEvent" type="date" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label>Heure (optionnel)</label>
+              <input v-model="nouveauPoint.heureEvent" type="time" class="form-control" />
+            </div>
+          </div>
+
+          <div class="coords-row">
+            <div class="form-group">
               <label>Latitude</label>
               <input v-model="nouveauPoint.latitude" type="text" readonly class="form-control readonly" />
             </div>
@@ -100,7 +111,9 @@ export default {
         categorie: 1,
         description: '',
         latitude: 0,
-        longitude: 0
+        longitude: 0,
+        dateEvent: '',
+        heureEvent: ''
       }
     }
   },
@@ -137,6 +150,15 @@ export default {
                 const color = this.getCategoryColor(point.categorie);
                 const label = this.getCategoryLabel(point.categorie);
 
+                let popupContent = `<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span><br>${point.description || ''}`;
+
+                if(point.dateEvent) {
+                    popupContent += `<br>Date: ${point.dateEvent}`;
+                }
+                if(point.heureEvent) {
+                    popupContent += `<br>Heure: ${point.heureEvent}`;
+                }
+
                 const marker = L.circleMarker([point.latitude, point.longitude], {
                     radius: 8,
                     fillColor: color,
@@ -146,7 +168,7 @@ export default {
                     fillOpacity: 1
                 });
 
-                marker.bindPopup(`<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span><br>${point.description || ''}`);
+                marker.bindPopup(popupContent);
 
                 this.markerLayerGroup.addLayer(marker);
             }
@@ -268,7 +290,9 @@ export default {
       this.modaleOuverte = false;
       this.nouveauPoint.titre = '';
       this.nouveauPoint.description = '';
-      this.nouveauPoint.categorie = 2;
+      this.nouveauPoint.categorie = 1;
+      this.nouveauPoint.dateEvent = '';
+      this.nouveauPoint.heureEvent = '';
     },
 
     //Recup le libelle des catés
@@ -302,6 +326,9 @@ export default {
             ...this.nouveauPoint,
             categorie: parseInt(this.nouveauPoint.categorie)
         };
+        //Nettoyage des champs vides
+        if(!payload.dateEvent) delete payload.dateEvent;
+        if(!payload.heureEvent) delete payload.heureEvent;
 
         //'http://localhost:8888/api/points'
         const response = await fetch(`${import.meta.env.VITE_API_URL}/points`, {

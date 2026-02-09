@@ -33,7 +33,9 @@ class ServicePointInteret implements ServicePointInteretInterface{
             image: $data['image'] ?? null,
             description: $data['description'] ?? null,
             adresse: $data['adresse'] ?? null,
-            visibilite: $data['visibilite'] ?? 1 //public par défaut
+            visibilite: $data['visibilite'] ?? 1, //public par défaut
+            dateEvent: $data['dateEvent'] ?? null,
+            heureEvent: $data['heureEvent'] ?? null
         );
 
         //sauvegarde le point en base

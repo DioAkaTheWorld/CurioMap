@@ -16,6 +16,8 @@ class PointInteret{
     private float $longitude;
     private ?string $adresse;
     private int $visibilite;
+    private ?string $dateEvent;
+    private ?string $heureEvent;
 
     public function __construct(
         int $iduser,
@@ -28,6 +30,8 @@ class PointInteret{
         ?string $adresse = null,
         int $visibilite = 0,
         ?DateTime $date = null,
+        ?string $dateEvent = null,
+        ?string $heureEvent = null,
         ?int $id = null
     ) {
         $this->id = $id;
@@ -41,6 +45,8 @@ class PointInteret{
         $this->longitude = $longitude;
         $this->adresse = $adresse;
         $this->visibilite = $visibilite;
+        $this->dateEvent = $dateEvent;
+        $this->heureEvent = $heureEvent;
     }
 
     //toutes les fonctions utile pour plus tard, yen a beaucoup mais au moins c'est fait
@@ -86,6 +92,14 @@ class PointInteret{
 
     public function getVisibilite(): int{
         return $this->visibilite;
+    }
+
+    public function getDateEvent(): ?string {
+        return $this->dateEvent;
+    }
+
+    public function getHeureEvent(): ?string {
+        return $this->heureEvent;
     }
 
     public function setId(int $id): void{

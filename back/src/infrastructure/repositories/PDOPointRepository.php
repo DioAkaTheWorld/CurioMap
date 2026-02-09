@@ -15,8 +15,8 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
     }
 
     public function save(PointInteret $point): int{
-        $sql = "INSERT INTO pointinteret (iduser, titre, image, description, categorie, date, latitude, longitude, adresse, visibilite) 
-                VALUES (:iduser, :titre, :image, :description, :categorie, :date, :latitude, :longitude, :adresse, :visibilite)
+        $sql = "INSERT INTO pointinteret (iduser, titre, image, description, categorie, date, latitude, longitude, adresse, visibilite, date_event, heure_event) 
+                VALUES (:iduser, :titre, :image, :description, :categorie, :date, :latitude, :longitude, :adresse, :visibilite, :date_event, :heure_event)
                 RETURNING id";
 
         $stmt = $this->pdo->prepare($sql);
@@ -31,7 +31,9 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
             'longitude' => $point->getLongitude(),
             'adresse' => $point->getAdresse(),
             'visibilite' => $point->getVisibilite(),
-            'date' => $point->getDate()->format('Y-m-d H:i:s')
+            'date' => $point->getDate()->format('Y-m-d H:i:s'),
+            'date_event' => $point->getDateEvent(),
+            'heure_event' => $point->getHeureEvent()
         ]);
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -55,6 +57,8 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
                 adresse: $row['adresse'],
                 visibilite: $row['visibilite'],
                 date: new DateTime($row['date']),
+                dateEvent: $row['date_event'] ?? null,
+                heureEvent: $row['heure_event'] ?? null,
                 id: $row['id']
             );
         }

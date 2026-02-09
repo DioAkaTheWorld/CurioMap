@@ -23,6 +23,8 @@ CREATE TABLE PointInteret (
     longitude DECIMAL(11, 8) NOT NULL,
     adresse VARCHAR(255),
     visibilite SMALLINT DEFAULT 0 NOT NULL,
+    date_event DATE,
+    heure_event TIME,
     FOREIGN KEY (iduser) REFERENCES Utilisateur(id) ON DELETE CASCADE,
     FOREIGN KEY (categorie) REFERENCES Categorie(id)
 );

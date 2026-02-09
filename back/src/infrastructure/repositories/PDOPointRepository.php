@@ -32,7 +32,7 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
             'adresse' => $point->getAdresse(),
             'visibilite' => $point->getVisibilite(),
             'date' => $point->getDate()->format('Y-m-d H:i:s'),
-            'date_event' => $point->getDateEvent(),
+            'date_event' => $point->getDateEvent() ? $point->getDateEvent()->format('Y-m-d') : null,
             'heure_event' => $point->getHeureEvent()
         ]);
 
@@ -57,7 +57,7 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
                 adresse: $row['adresse'],
                 visibilite: $row['visibilite'],
                 date: new DateTime($row['date']),
-                dateEvent: $row['date_event'] ?? null,
+                dateEvent: !empty($row['date_event']) ? new DateTime($row['date_event']) : null,
                 heureEvent: $row['heure_event'] ?? null,
                 id: $row['id']
             );

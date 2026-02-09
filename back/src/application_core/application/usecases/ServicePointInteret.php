@@ -34,7 +34,7 @@ class ServicePointInteret implements ServicePointInteretInterface{
             description: $data['description'] ?? null,
             adresse: $data['adresse'] ?? null,
             visibilite: $data['visibilite'] ?? 1, //public par défaut
-            dateEvent: $data['dateEvent'] ?? null,
+            dateEvent: !empty($data['dateEvent']) ? new \DateTime($data['dateEvent']) : null,
             heureEvent: $data['heureEvent'] ?? null
         );
 

@@ -150,13 +150,25 @@ export default {
                 const color = this.getCategoryColor(point.categorie);
                 const label = this.getCategoryLabel(point.categorie);
 
-                let popupContent = `<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span><br>${point.description || ''}`;
+                //Contenu de la popup avec les infos du point
+                let popupContent = `<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span>`;
+
+                if (point.description) {
+                    popupContent += `<br><i>${point.description}</i>`;
+                }
 
                 if(point.dateEvent) {
-                    popupContent += `<br>Date: ${point.dateEvent}`;
+                    popupContent += `<br>📅 <b>Evénement :</b> ${point.dateEvent}`;
                 }
                 if(point.heureEvent) {
-                    popupContent += `<br>Heure: ${point.heureEvent}`;
+                    popupContent += `<br>🕒 <b>Heure :</b> ${point.heureEvent}`;
+                }
+
+                //Date de création
+                if(point.date) {
+                    const dateCrea = new Date(point.date);
+                    const formattedCrea = dateCrea.toLocaleDateString('fr-FR');
+                    popupContent += `<br><small style="color:#666">Créé le ${formattedCrea}</small>`;
                 }
 
                 const marker = L.circleMarker([point.latitude, point.longitude], {

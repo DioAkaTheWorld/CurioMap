@@ -16,7 +16,7 @@ class PointInteret{
     private float $longitude;
     private ?string $adresse;
     private int $visibilite;
-    private ?string $dateEvent;
+    private ?DateTime $dateEvent;
     private ?string $heureEvent;
 
     public function __construct(
@@ -30,7 +30,7 @@ class PointInteret{
         ?string $adresse = null,
         int $visibilite = 0,
         ?DateTime $date = null,
-        ?string $dateEvent = null,
+        ?DateTime $dateEvent = null,
         ?string $heureEvent = null,
         ?int $id = null
     ) {
@@ -94,11 +94,11 @@ class PointInteret{
         return $this->visibilite;
     }
 
-    public function getDateEvent(): ?string {
+    public function getDateEvent(): ?DateTime{
         return $this->dateEvent;
     }
 
-    public function getHeureEvent(): ?string {
+    public function getHeureEvent(): ?string{
         return $this->heureEvent;
     }
 

@@ -98,6 +98,7 @@ export default {
       map: null,
       markerLayerGroup: null, //Groupe de calques pour les marqueurs
       userMarker:null,
+      distanceCircle: null, //Cercle de portée autour du user
       userLocation: null, //Pour stocker les coos du user
       maxDistance: 100, //Pour filtre distance (100 = partout par convention)
       modaleOuverte: false,
@@ -145,6 +146,8 @@ export default {
     //Maj de l'affichage des points
     updateMarkers() {
         if (!this.markerLayerGroup) return;
+
+        this.updateRadiusCircle();
 
         this.markerLayerGroup.clearLayers();
 
@@ -200,6 +203,23 @@ export default {
                 this.markerLayerGroup.addLayer(marker);
             }
         });
+    },
+
+    updateRadiusCircle() {
+        if (this.distanceCircle) {
+            this.map.removeLayer(this.distanceCircle);
+            this.distanceCircle = null;
+        }
+
+        if (this.userLocation && this.maxDistance < 100) {
+            this.distanceCircle = L.circle([this.userLocation.lat, this.userLocation.lon], {
+                radius: this.maxDistance * 1000, //km -> m
+                color: '#3388ff',
+                fillColor: '#3388ff',
+                fillOpacity: 0.1,
+                weight: 1
+            }).addTo(this.map);
+        }
     },
 
     //Initialisation de la map
@@ -259,6 +279,7 @@ export default {
           const lon = position.coords.longitude
 
           this.userLocation = { lat, lon }; //On garde la pos en mémoire pour les filtres
+          this.updateMarkers(); //Maj pour afficher le cercle de portée
 
           this.map.setView([lat, lon], 13)
           if(this.userMarker){

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
+use CurioMap\src\api\actions\ajouterEventAction;
 use CurioMap\src\api\middlewares\CorsMiddleware;
 use CurioMap\src\api\actions\creePointInteretAction;
-use CurioMap\src\api\actions\creeAgendaAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\getPointsAction;
 
@@ -13,7 +13,7 @@ return function(\Slim\App $app):\Slim\App {
     $app->get('/points', getPointsAction::class);
 
     //Routes pour l'agenda
-    $app->post('/agenda', creeAgendaAction::class);
+    $app->post('/agenda', ajouterEventAction::class);
     $app->get('/agenda', getAgendaAction::class);
 
     //Route OPTIONS pour CORS preflight (catch-all)

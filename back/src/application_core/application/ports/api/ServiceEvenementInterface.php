@@ -1,10 +1,10 @@
 <?php
 namespace CurioMap\src\application_core\application\ports\api;
 
-use CurioMap\src\application_core\domain\entities\Agenda;
+use CurioMap\src\application_core\domain\entities\Evenement;
 
-interface ServiceAgendaInterface{
+interface ServiceEvenementInterface{
     //ajouter un événement à l'agenda
-    public function creeEvent(array $data): Agenda;
+    public function creeEvent(array $data): Evenement;
     public function getUserEvents(int $userId): array;
 }

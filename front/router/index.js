@@ -19,7 +19,7 @@ const router = createRouter({
         },
         {
             path: '/agenda',
-            name: 'Agenda',
+            name: 'Evenement',
             component: Agenda
         },
         {

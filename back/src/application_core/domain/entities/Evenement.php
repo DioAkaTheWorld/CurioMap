@@ -4,7 +4,7 @@ namespace CurioMap\src\application_core\domain\entities;
 
 use DateTime;
 
-class Agenda{
+class Evenement{
     private ?int $id;
     private int $iduser;
     private ?int $idpoint;

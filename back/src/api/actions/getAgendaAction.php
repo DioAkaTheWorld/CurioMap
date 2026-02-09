@@ -3,12 +3,12 @@ namespace CurioMap\src\api\actions;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use CurioMap\src\application_core\application\ports\api\ServiceAgendaInterface;
+use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 
 class getAgendaAction{
-    private ServiceAgendaInterface $service;
+    private ServiceEvenementInterface $service;
 
-    public function __construct(ServiceAgendaInterface $service){
+    public function __construct(ServiceEvenementInterface $service){
         $this->service = $service;
     }
 

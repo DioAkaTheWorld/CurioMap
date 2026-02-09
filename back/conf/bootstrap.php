@@ -18,13 +18,14 @@ $c = $builder->build();
 
 $app = AppFactory::createFromContainer($c);
 
-$app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware($c->get('settings')['displayErrorDetails'], false, false)
     ->getDefaultErrorHandler()
     ->forceContentType('application/json')
 ;
+$app->addBodyParsingMiddleware();
 $app->add(new CorsMiddleware());
+
 $app = (require_once __DIR__ . '/routes.php')($app);
 
 return $app;

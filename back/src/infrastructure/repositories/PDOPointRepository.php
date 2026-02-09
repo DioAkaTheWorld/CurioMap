@@ -15,8 +15,8 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
     }
 
     public function save(PointInteret $point): int{
-        $sql = "INSERT INTO pointinteret (iduser, titre, image, description, categorie, date, latitude, longitude, adresse, visibilite, date_event, heure_event) 
-                VALUES (:iduser, :titre, :image, :description, :categorie, :date, :latitude, :longitude, :adresse, :visibilite, :date_event, :heure_event)
+        $sql = "INSERT INTO pointinteret (iduser, titre, image, description, categorie, date, latitude, longitude, adresse, visibilite, date_debut, date_fin) 
+                VALUES (:iduser, :titre, :image, :description, :categorie, :date, :latitude, :longitude, :adresse, :visibilite, :date_debut, :date_fin)
                 RETURNING id";
 
         $stmt = $this->pdo->prepare($sql);
@@ -32,8 +32,8 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
             'adresse' => $point->getAdresse(),
             'visibilite' => $point->getVisibilite(),
             'date' => $point->getDate()->format('Y-m-d H:i:s'),
-            'date_event' => $point->getDateEvent() ? $point->getDateEvent()->format('Y-m-d') : null,
-            'heure_event' => $point->getHeureEvent()
+            'date_debut' => $point->getDateDebut() ? $point->getDateDebut()->format('Y-m-d H:i:s') : null,
+            'date_fin' => $point->getDateFin() ? $point->getDateFin()->format('Y-m-d H:i:s') : null
         ]);
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -57,8 +57,8 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
                 adresse: $row['adresse'],
                 visibilite: $row['visibilite'],
                 date: new DateTime($row['date']),
-                dateEvent: !empty($row['date_event']) ? new DateTime($row['date_event']) : null,
-                heureEvent: $row['heure_event'] ?? null,
+                dateDebut: !empty($row['date_debut']) ? new DateTime($row['date_debut']) : null,
+                dateFin: !empty($row['date_fin']) ? new DateTime($row['date_fin']) : null,
                 id: $row['id']
             );
         }

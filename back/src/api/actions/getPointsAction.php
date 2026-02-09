@@ -29,8 +29,8 @@ class getPointsAction{
                     'adresse' => $point->getAdresse(),
                     'visibilite' => $point->getVisibilite(),
                     'date' => $point->getDate()->format('Y-m-d H:i:s'),
-                    'dateEvent' => $point->getDateEvent() ? $point->getDateEvent()->format('Y-m-d') : null,
-                    'heureEvent' => $point->getHeureEvent()
+                    'dateDebut' => $point->getDateDebut() ? $point->getDateDebut()->format('Y-m-d H:i:s') : null,
+                    'dateFin' => $point->getDateFin() ? $point->getDateFin()->format('Y-m-d H:i:s') : null
                 ];
             }, $points);
 

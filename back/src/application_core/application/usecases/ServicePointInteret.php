@@ -4,6 +4,7 @@ namespace CurioMap\src\application_core\application\usecases;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
 use CurioMap\src\application_core\domain\entities\PointInteret;
+use DateTime;
 
 class ServicePointInteret implements ServicePointInteretInterface{
     private PointInteretRepositoryInterface $pointRepository;
@@ -21,6 +22,8 @@ class ServicePointInteret implements ServicePointInteretInterface{
         if (empty($data['titre']) || empty($data['latitude']) || empty($data['longitude'])) {
             throw new \InvalidArgumentException("Titre, latitude et longitude obligatoires");
         }
+        $dateDebut = !empty($data['dateDebut']) ? new DateTime($data['dateDebut']) : null;
+        $dateFin = !empty($data['dateFin']) ? new DateTime($data['dateFin']) : null;
 
         //NOTE : pour l'instant, on met des valeurs par défaut pour id_user et categorie
         //ya pas encore la gestion des users connectés
@@ -34,8 +37,8 @@ class ServicePointInteret implements ServicePointInteretInterface{
             description: $data['description'] ?? null,
             adresse: $data['adresse'] ?? null,
             visibilite: $data['visibilite'] ?? 1, //public par défaut
-            dateEvent: !empty($data['dateEvent']) ? new \DateTime($data['dateEvent']) : null,
-            heureEvent: $data['heureEvent'] ?? null
+            dateDebut: $dateDebut,
+            dateFin: $dateFin
         );
 
         //sauvegarde le point en base

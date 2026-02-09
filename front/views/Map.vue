@@ -28,14 +28,29 @@
             <textarea v-model="nouveauPoint.description" class="form-control" rows="3"></textarea>
           </div>
 
+          <div>
+            <h2>Champs optionnels</h2>
+          </div>
+
           <div class="coords-row">
             <div class="form-group">
-              <label>Date (optionnel)</label>
-              <input v-model="nouveauPoint.dateEvent" type="date" class="form-control" />
+              <label>Date début</label>
+              <input v-model="nouveauPoint.dateDebut" type="date" class="form-control" />
             </div>
             <div class="form-group">
-              <label>Heure (optionnel)</label>
-              <input v-model="nouveauPoint.heureEvent" type="time" class="form-control" />
+              <label>Date fin</label>
+              <input v-model="nouveauPoint.dateFin" type="date" class="form-control" />
+            </div>
+          </div>
+
+          <div class="coords-row">
+            <div class="form-group">
+              <label>Heure début</label>
+              <input v-model="nouveauPoint.heureDebut" type="time" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label>Heure fin</label>
+              <input v-model="nouveauPoint.heureFin" type="time" class="form-control" />
             </div>
           </div>
 
@@ -97,17 +112,17 @@ export default {
     return {
       map: null,
       markerLayerGroup: null, //Groupe de calques pour les marqueurs
-      userMarker:null,
+      userMarker: null,
       userLocation: null, //Pour stocker les coos du user
       maxDistance: 100, //Pour filtre distance (100 = partout par convention)
       modaleOuverte: false,
       points: [], //On charge tout les points au lancement
       categories: [
-          { id: 1, label: 'Restaurant' },
-          { id: 2, label: 'Monument' },
-          { id: 3, label: 'Concert' },
-          { id: 4, label: 'Parc' },
-          { id: 5, label: 'Musée' }
+        {id: 1, label: 'Restaurant'},
+        {id: 2, label: 'Monument'},
+        {id: 3, label: 'Concert'},
+        {id: 4, label: 'Parc'},
+        {id: 5, label: 'Musée'}
       ],
       selectedCategories: [1, 2, 3, 4, 5], //Tout coché par défaut
       nouveauPoint: {
@@ -116,8 +131,10 @@ export default {
         description: '',
         latitude: 0,
         longitude: 0,
-        dateEvent: '',
-        heureEvent: ''
+        dateDebut: '',
+        dateFin:'',
+        heureDebut:'',
+        heureFin:'',
       }
     }
   },
@@ -131,75 +148,88 @@ export default {
   methods: {
     //Chargement des points au lancement
     async fetchPoints() {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/points`);
-            if (response.ok) {
-                this.points = await response.json();
-                this.updateMarkers();
-            }
-        } catch (e) {
-            console.error("Erreur chargement points", e);
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/points`);
+        if (response.ok) {
+          this.points = await response.json();
+          this.updateMarkers();
         }
+      } catch (e) {
+        console.error("Erreur chargement points", e);
+      }
     },
 
     //Maj de l'affichage des points
     updateMarkers() {
-        if (!this.markerLayerGroup) return;
+      if (!this.markerLayerGroup) return;
 
-        this.markerLayerGroup.clearLayers();
+      this.markerLayerGroup.clearLayers();
 
-        this.points.forEach(point => {
-            //Filtre par distance (si user localisé et filtre activé < 100km)
-            if (this.userLocation && this.maxDistance < 100) {
-                const userLatLng = L.latLng(this.userLocation.lat, this.userLocation.lon);
-                const pointLatLng = L.latLng(point.latitude, point.longitude);
-                const distKm = userLatLng.distanceTo(pointLatLng) / 1000;
+      this.points.forEach(point => {
+        //Filtre par distance (si user localisé et filtre activé < 100km)
+        if (this.userLocation && this.maxDistance < 100) {
+          const userLatLng = L.latLng(this.userLocation.lat, this.userLocation.lon);
+          const pointLatLng = L.latLng(point.latitude, point.longitude);
+          const distKm = userLatLng.distanceTo(pointLatLng) / 1000;
 
-                if (distKm > this.maxDistance) {
-                    return; //On passe au point suivant, celui-ci est trop loin
-                }
+          if (distKm > this.maxDistance) {
+            return; //On passe au point suivant, celui-ci est trop loin
+          }
+        }
+
+        //Vérif si la caté est sélectionnée
+        if (this.selectedCategories.includes(parseInt(point.categorie))) {
+          const color = this.getCategoryColor(point.categorie);
+          const label = this.getCategoryLabel(point.categorie);
+
+          //Contenu de la popup avec les infos du point
+          let popupContent = `<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span>`;
+
+          if (point.description) {
+            popupContent += `<br><i>${point.description}</i>`;
+          }
+
+          if (point.dateDebut) {
+            popupContent += `<br>📅 <b>Date de debut :</b> ${point.dateDebut}`;
+          }
+          if (point.dateFin) {
+            popupContent += `<br>📅 <b>Date de fin :</b> ${point.dateFin}`;
+          }
+
+          if (point.dateDebut && point.dateFin) {
+            popupContent += `<br/><button class="btn-agenda">Ajouter à mon agenda</button></br>`;
+          }
+
+          //Date de création
+          if (point.date) {
+            const dateCrea = new Date(point.date);
+            const formattedCrea = dateCrea.toLocaleDateString('fr-FR');
+            popupContent += `<br><small style="color:#666">Créé le ${formattedCrea}</small>`;
+          }
+
+          const marker = L.circleMarker([point.latitude, point.longitude], {
+            radius: 8,
+            fillColor: color,
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 1
+          });
+
+          marker.bindPopup(popupContent);
+
+          marker.on('popupopen', () => {
+            const btn = document.querySelector('.btn-agenda');
+            if (btn) {
+              btn.onclick = () => {
+                this.ajouterEvenement(point);
+              };
             }
+          });
 
-            //Vérif si la caté est sélectionnée
-            if (this.selectedCategories.includes(parseInt(point.categorie))) {
-                const color = this.getCategoryColor(point.categorie);
-                const label = this.getCategoryLabel(point.categorie);
-
-                //Contenu de la popup avec les infos du point
-                let popupContent = `<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span>`;
-
-                if (point.description) {
-                    popupContent += `<br><i>${point.description}</i>`;
-                }
-
-                if(point.dateEvent) {
-                    popupContent += `<br>📅 <b>Evénement :</b> ${point.dateEvent}`;
-                }
-                if(point.heureEvent) {
-                    popupContent += `<br>🕒 <b>Heure :</b> ${point.heureEvent}`;
-                }
-
-                //Date de création
-                if(point.date) {
-                    const dateCrea = new Date(point.date);
-                    const formattedCrea = dateCrea.toLocaleDateString('fr-FR');
-                    popupContent += `<br><small style="color:#666">Créé le ${formattedCrea}</small>`;
-                }
-
-                const marker = L.circleMarker([point.latitude, point.longitude], {
-                    radius: 8,
-                    fillColor: color,
-                    color: "#fff",
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 1
-                });
-
-                marker.bindPopup(popupContent);
-
-                this.markerLayerGroup.addLayer(marker);
-            }
-        });
+          this.markerLayerGroup.addLayer(marker);
+        }
+      });
     },
 
     //Initialisation de la map
@@ -228,7 +258,7 @@ export default {
 
       //Gestion du clic pour ajouter un point
       this.map.on('click', (e) => {
-        const { lat, lng } = e.latlng;
+        const {lat, lng} = e.latlng;
 
         const div = document.createElement('div');
         div.innerHTML = `
@@ -241,14 +271,14 @@ export default {
         //Écouteur sur le bouton de la popup
         const btn = div.querySelector('#popup-add-btn');
         btn.onclick = () => {
-           this.ouvrirModale(lat, lng);
-           this.map.closePopup();
+          this.ouvrirModale(lat, lng);
+          this.map.closePopup();
         };
 
         L.popup()
-         .setLatLng(e.latlng)
-         .setContent(div)
-         .openOn(this.map);
+            .setLatLng(e.latlng)
+            .setContent(div)
+            .openOn(this.map);
       });
 
       //On tente de géolocaliser l'utilisateur. Si on y arrive, on centre la carte dessus
@@ -258,10 +288,10 @@ export default {
           const lat = position.coords.latitude
           const lon = position.coords.longitude
 
-          this.userLocation = { lat, lon }; //On garde la pos en mémoire pour les filtres
+          this.userLocation = {lat, lon}; //On garde la pos en mémoire pour les filtres
 
           this.map.setView([lat, lon], 13)
-          if(this.userMarker){
+          if (this.userMarker) {
             this.userMarker.remove()
             this.userMarker = null
           }
@@ -277,9 +307,9 @@ export default {
         }, (error) => {
           console.warn("La géolocalisation a échoué ou a été refusée", error);
         }, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         })
       }
     },
@@ -294,16 +324,16 @@ export default {
           const lat = position.coords.latitude
           const lon = position.coords.longitude
 
-          this.userLocation = { lat, lon }; //Maj
+          this.userLocation = {lat, lon}; //Maj
 
-          if(this.userMarker){
-            this.userMarker.setStyle({ opacity: 0, fillOpacity: 0 });
+          if (this.userMarker) {
+            this.userMarker.setStyle({opacity: 0, fillOpacity: 0});
             this.userMarker.closePopup()
           }
-          this.map.once('moveend', () =>{
-            if(this.userMarker){
+          this.map.once('moveend', () => {
+            if (this.userMarker) {
               this.userMarker.openPopup();
-              this.userMarker.setStyle({ opacity: 1, fillOpacity: 1 });
+              this.userMarker.setStyle({opacity: 1, fillOpacity: 1});
             }
           })
           this.map.flyTo([lat, lon], 13);
@@ -329,73 +359,135 @@ export default {
       this.nouveauPoint.titre = '';
       this.nouveauPoint.description = '';
       this.nouveauPoint.categorie = 1;
-      this.nouveauPoint.dateEvent = '';
-      this.nouveauPoint.heureEvent = '';
+      this.nouveauPoint.dateDebut = '';
+      this.nouveauPoint.dateFin ='';
+      this.nouveauPoint.heureDebut='';
+      this.nouveauPoint.heureFin='';
     },
 
     //Recup le libelle des catés
     getCategoryLabel(id) {
-      switch(parseInt(id)) {
-        case 1: return 'Restaurant';
-        case 2: return 'Monument';
-        case 3: return 'Concert';
-        case 4: return 'Parc';
-        case 5: return 'Musée';
-        default: return 'Autre';
+      switch (parseInt(id)) {
+        case 1:
+          return 'Restaurant';
+        case 2:
+          return 'Monument';
+        case 3:
+          return 'Concert';
+        case 4:
+          return 'Parc';
+        case 5:
+          return 'Musée';
+        default:
+          return 'Autre';
       }
     },
 
     //Des jolies couleurs pour chaque caté
     getCategoryColor(id) {
-      switch(parseInt(id)) {
-        case 1: return '#ff9800'; //Resto en orange
-        case 2: return '#774d0e'; //Monument en brun
-        case 3: return '#ea5a90'; //Concert en rose
-        case 4: return '#4caf50'; //Parc en vert
-        case 5: return '#9c27b0'; //Musée en violet
-        default: return '#3388ff'; //Par défaut en bleu
+      switch (parseInt(id)) {
+        case 1:
+          return '#ff9800'; //Resto en orange
+        case 2:
+          return '#774d0e'; //Monument en brun
+        case 3:
+          return '#ea5a90'; //Concert en rose
+        case 4:
+          return '#4caf50'; //Parc en vert
+        case 5:
+          return '#9c27b0'; //Musée en violet
+        default:
+          return '#3388ff'; //Par défaut en bleu
       }
     },
 
     //Créer un point
     async creerPoint() {
       try {
+        const dateDebutISO = this.nouveauPoint.dateDebut && this.nouveauPoint.heureDebut
+            ? `${this.nouveauPoint.dateDebut} ${this.nouveauPoint.heureDebut}:00`
+            : null;
+
+        const dateFinISO = this.nouveauPoint.dateFin && this.nouveauPoint.heureFin
+            ? `${this.nouveauPoint.dateFin} ${this.nouveauPoint.heureFin}:00`
+            : null;
+
         const payload = {
-            ...this.nouveauPoint,
-            categorie: parseInt(this.nouveauPoint.categorie)
+          ...this.nouveauPoint,
+          categorie: parseInt(this.nouveauPoint.categorie),
+          dateDebut:dateDebutISO,
+          dateFin:dateFinISO
         };
         //Nettoyage des champs vides
-        if(!payload.dateEvent) delete payload.dateEvent;
-        if(!payload.heureEvent) delete payload.heureEvent;
+        /*if (!payload.dateDebut) delete payload.dateDebut;
+        if (!payload.dateFin) delete payload.dateFin;
+        if (!payload.heureDebut) delete payload.heureDebut;
+        if (!payload.heureFin) delete payload.heureFin;*/
 
         //'http://localhost:8888/api/points'
         const response = await fetch(`${import.meta.env.VITE_API_URL}/points`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
         });
 
         if (response.ok) {
-            alert('Point créé avec succès !');
+          alert('Point créé avec succès !');
 
-            //Ajout du point à la liste locale
-            this.points.push({
-                ...payload,
-                latitude: parseFloat(payload.latitude),
-                longitude: parseFloat(payload.longitude)
-            });
+          //Ajout du point à la liste locale
+          this.points.push({
+            ...payload,
+            latitude: parseFloat(payload.latitude),
+            longitude: parseFloat(payload.longitude)
+          });
 
-            //Maj des marqueurs (si filtre)
-            this.updateMarkers();
+          //Maj des marqueurs (si filtre)
+          this.updateMarkers();
 
-            this.fermerModale();
+          this.fermerModale();
         } else {
-            const err = await response.json().catch(() => ({}));
-            alert('Erreur: ' + (err.error || 'Problème serveur'));
+          const err = await response.json().catch(() => ({}));
+          alert('Erreur: ' + (err.error || 'Problème serveur'));
         }
       } catch (error) {
         console.error(error);
         alert('Impossible de contacter le serveur.');
+      }
+    },
+    async ajouterEvenement(point) {
+      try {
+        console.log("Point reçu:", point);
+
+        if (!point.dateDebut || !point.dateFin) {
+          alert('Ce point n\'a pas de dates définies.');
+          return;
+        }
+
+        const payload = {
+          iduser: 1,//a remplacer plus tard
+          idpoint: point.id,
+          titre_evenement: point.titre,
+          dateDebut: point.dateDebut,
+          dateFin: point.dateFin,
+          notes: ""
+        };
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/agenda`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert('Événement ajouté ! Retrouvez-le dans votre agenda.');
+        } else {
+          const errText = await response.text();
+          console.error("Erreur brute:", errText);
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'ajout :", error);
+        alert("Erreur: " + error.message);
       }
     }
   },
@@ -484,5 +576,30 @@ export default {
 .btn-secondary {
   background: #ccc;
   color: black;
+}
+:deep(.btn-agenda) {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+  width: 100%;
+}
+
+:deep(.btn-agenda:hover) {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
+:deep(.btn-agenda:active) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
 }
 </style>

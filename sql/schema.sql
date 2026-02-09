@@ -23,8 +23,8 @@ CREATE TABLE PointInteret (
     longitude DECIMAL(11, 8) NOT NULL,
     adresse VARCHAR(255),
     visibilite SMALLINT DEFAULT 0 NOT NULL,
-    date_event DATE,
-    heure_event TIME,
+    date_debut TIMESTAMP,
+    date_fin TIMESTAMP,
     FOREIGN KEY (iduser) REFERENCES Utilisateur(id) ON DELETE CASCADE,
     FOREIGN KEY (categorie) REFERENCES Categorie(id)
 );
@@ -49,7 +49,7 @@ CREATE TABLE Commentaire (
     FOREIGN KEY (idpoint) REFERENCES PointInteret(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Agenda (
+CREATE TABLE Evenement (
     id SERIAL PRIMARY KEY,
     iduser INT NOT NULL,
     idpoint INT,

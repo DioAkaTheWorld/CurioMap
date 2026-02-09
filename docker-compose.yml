@@ -14,7 +14,7 @@ services:
   adminer:
     image: adminer
     ports:
-      - "2026:8080"
+      - "8001:8080"
     networks:
       - curioMap_net
     restart: unless-stopped
@@ -39,7 +39,7 @@ services:
     volumes:
       - ./:/app
     ports:
-      - "8888:80"
+      - "8002:80"
     networks:
       - curioMap_net
     depends_on:

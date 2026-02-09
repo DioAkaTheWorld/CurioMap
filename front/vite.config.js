@@ -11,6 +11,7 @@ export default defineConfig({
         }
     },
     server: {
+        allowedHosts: ['docketu.iutnc.univ-lorraine.fr'],
         host: true,
         port: 5173,
         watch: {

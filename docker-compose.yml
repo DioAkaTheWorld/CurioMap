@@ -39,7 +39,7 @@ services:
     volumes:
       - ./:/app
     ports:
-      - "8888:80"
+      - "8002:80"
     networks:
       - curioMap_net
     depends_on:

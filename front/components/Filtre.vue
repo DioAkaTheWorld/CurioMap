@@ -1,6 +1,7 @@
 <template>
   <div class="filter-panel">
     <h3>Filtres</h3>
+    <!-- Filtres de catés -->
     <div class="filter-group">
       <h4>Catégories</h4>
       <div v-for="cat in categories" :key="cat.id" class="checkbox-item">
@@ -14,6 +15,28 @@
         <label :for="'cat-'+cat.id" :style="{color: getCategoryColor(cat.id)}">
           {{ cat.label }}
         </label>
+      </div>
+    </div>
+
+    <!-- Filtre de distance -->
+    <div class="filter-group" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+      <h4>Distance (km)</h4>
+      <div class="range-container">
+        <input
+          type="range"
+          min="1"
+          max="100"
+          step="1"
+          :value="distance"
+          @input="updateDistance"
+          :disabled="!localisationActive"
+          style="width: 100%"
+        >
+        <div style="font-size: 0.8rem; text-align: center; margin-top: 5px; color: #666;">
+           <span v-if="!localisationActive">Géolocalisation requise</span>
+           <span v-else-if="distance >= 100">Partout</span>
+           <span v-else>{{ distance }} km</span>
+        </div>
       </div>
     </div>
   </div>
@@ -30,10 +53,22 @@ export default {
     modelValue: {
       type: Array,
       required: true
+    },
+    distance: {
+      type: Number,
+      default: 100
+    },
+    localisationActive: {
+      type: Boolean,
+      default: false
     }
   },
-  emits: ['update:modelValue', 'change'],
+  emits: ['update:modelValue', 'update:distance', 'change'],
   methods: {
+    updateDistance(event) {
+        this.$emit('update:distance', parseInt(event.target.value));
+        this.$emit('change');
+    },
     toggleCategory(id) {
       const newSelection = [...this.modelValue];
       const index = newSelection.indexOf(id);
@@ -105,5 +140,11 @@ export default {
     font-size: 0.85rem;
     cursor: pointer;
     font-weight: bold;
+}
+
+.range-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 </style>

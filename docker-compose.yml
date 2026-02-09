@@ -3,7 +3,7 @@ services:
     image: postgres:latest
     env_file: back/conf/curioMap.env
     ports:
-      - "5435:5432"
+      - "5454:5432"
     networks:
       - curioMap_net
     volumes:

@@ -123,6 +123,8 @@
       :categories="categories"
       v-model="selectedCategories"
       v-model:distance="maxDistance"
+      v-model:dateDebut="filterDateStart"
+      v-model:dateFin="filterDateEnd"
       :localisationActive="!!userLocation"
       @change="updateMarkers"
     />
@@ -161,6 +163,8 @@ export default {
       distanceCircle: null, //Cercle de portée autour du user
       userLocation: null, //Pour stocker les coos du user
       maxDistance: 100, //Pour filtre distance (100 = partout par convention)
+      filterDateStart: '',
+      filterDateEnd: '',
       modaleOuverte: false,
       points: [], //On charge tout les points au lancement
       categories: [
@@ -230,6 +234,30 @@ export default {
           }
         }
 
+        //Filtre par date
+        if (this.filterDateStart || this.filterDateEnd) {
+            //Si le point n'a pas de date défini, on l'affiche quand même (car permanent)
+            if (point.dateDebut && point.dateFin) {
+                const pointStart = new Date(point.dateDebut).getTime();
+                const pointEnd = new Date(point.dateFin).getTime();
+
+                let filterStart = this.filterDateStart ? new Date(this.filterDateStart).getTime() : -8640000000000000; //Min date possible
+                let filterEnd = this.filterDateEnd ? new Date(this.filterDateEnd).getTime() : 8640000000000000;   //Max date possible
+
+                //On ajoute l'heure de fin de journée pour la date de fin du filtre (23:59:59)
+                if (this.filterDateEnd) {
+                    const d = new Date(this.filterDateEnd);
+                    d.setHours(23, 59, 59, 999);
+                    filterEnd = d.getTime();
+                }
+
+                //Verif de l'intersection des plages : si le point commence après la fin du filtre ou finit avant le début du filtre, on ne l'affiche pas
+                if (!(filterStart <= pointEnd && pointStart <= filterEnd)) {
+                    return;
+                }
+            }
+        }
+
         //Vérif si la caté est sélectionnée
         if (this.selectedCategories.includes(parseInt(point.categorie))) {
           const color = this.getCategoryColor(point.categorie);
@@ -243,10 +271,10 @@ export default {
           }
 
           if (point.dateDebut) {
-            popupContent += `<br>📅 <b>Date de debut :</b> ${point.dateDebut}`;
+            popupContent += `<br>📅 <b>Date de debut :</b> ${this.formatDateEvent(point.dateDebut)}`;
           }
           if (point.dateFin) {
-            popupContent += `<br>📅 <b>Date de fin :</b> ${point.dateFin}`;
+            popupContent += `<br>📅 <b>Date de fin :</b> ${this.formatDateEvent(point.dateFin)}`;
           }
 
           popupContent += `<br/><button class="btn-agenda">Ajouter à mon agenda</button></br>`;
@@ -471,16 +499,49 @@ export default {
       }
     },
 
+    //Formater la date pour l'affichage (cache l'heure si 00h00)
+    formatDateEvent(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+
+      const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+      const datePart = date.toLocaleDateString('fr-FR', dateOptions);
+
+      //Si l'heure est 00h00 (= pas d'heure définie par l'user), on n'affiche que la date
+      if (date.getHours() === 0 && date.getMinutes() === 0) {
+        return datePart;
+      }
+
+      const timeOptions = { hour: '2-digit', minute: '2-digit' };
+      const timePart = date.toLocaleTimeString('fr-FR', timeOptions);
+      return `${datePart} à ${timePart}`;
+    },
+
     //Créer un point
     async creerPoint() {
       try {
-        const dateDebutISO = this.nouveauPoint.dateDebut && this.nouveauPoint.heureDebut
-            ? `${this.nouveauPoint.dateDebut} ${this.nouveauPoint.heureDebut}:00`
-            : null;
+        let dateDebutISO = null;
+        if (this.nouveauPoint.dateDebut) {
+          const time = this.nouveauPoint.heureDebut ? `${this.nouveauPoint.heureDebut}:00` : '00:00:00';
+          dateDebutISO = `${this.nouveauPoint.dateDebut} ${time}`;
+        }
 
-        const dateFinISO = this.nouveauPoint.dateFin && this.nouveauPoint.heureFin
-            ? `${this.nouveauPoint.dateFin} ${this.nouveauPoint.heureFin}:00`
-            : null;
+        let dateFinISO = null;
+        if (this.nouveauPoint.dateFin) {
+          const time = this.nouveauPoint.heureFin ? `${this.nouveauPoint.heureFin}:00` : '00:00:00';
+          dateFinISO = `${this.nouveauPoint.dateFin} ${time}`;
+        }
+
+        //Verif des dates
+        if (dateDebutISO && dateFinISO) {
+            const start = new Date(dateDebutISO);
+            const end = new Date(dateFinISO);
+            if (end < start) {
+                alert('La date de fin doit être postérieure ou égale à la date de début.');
+                return;
+            }
+        }
 
         const payload = {
           ...this.nouveauPoint,
@@ -488,11 +549,6 @@ export default {
           dateDebut:dateDebutISO,
           dateFin:dateFinISO
         };
-        //Nettoyage des champs vides
-        /*if (!payload.dateDebut) delete payload.dateDebut;
-        if (!payload.dateFin) delete payload.dateFin;
-        if (!payload.heureDebut) delete payload.heureDebut;
-        if (!payload.heureFin) delete payload.heureFin;*/
 
         //'http://localhost:8888/api/points'
         const response = await fetch(`${import.meta.env.VITE_API_URL}/points`, {

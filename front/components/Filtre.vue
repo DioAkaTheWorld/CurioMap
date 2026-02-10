@@ -39,6 +39,28 @@
         </div>
       </div>
     </div>
+
+    <!-- Filtre par date -->
+    <div class="filter-group" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+      <h4>Date</h4>
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-size: 0.8rem;">Du :</label>
+        <input
+            type="date"
+            :value="dateDebut"
+            @input="updateDate('dateDebut', $event.target.value)"
+            style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 2px;"
+        >
+
+        <label style="font-size: 0.8rem;">Au :</label>
+        <input
+            type="date"
+            :value="dateFin"
+            @input="updateDate('dateFin', $event.target.value)"
+            style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 2px;"
+        >
+      </div>
+    </div>
   </div>
 </template>
 
@@ -61,13 +83,25 @@ export default {
     localisationActive: {
       type: Boolean,
       default: false
+    },
+    dateDebut: {
+      type: String,
+      default: ''
+    },
+    dateFin: {
+      type: String,
+      default: ''
     }
   },
-  emits: ['update:modelValue', 'update:distance', 'change'],
+  emits: ['update:modelValue', 'update:distance', 'update:dateDebut', 'update:dateFin', 'change'],
   methods: {
     updateDistance(event) {
         this.$emit('update:distance', parseInt(event.target.value));
         this.$emit('change');
+    },
+    updateDate(type, value) {
+      this.$emit(`update:${type}`, value);
+      this.$emit('change');
     },
     toggleCategory(id) {
       const newSelection = [...this.modelValue];

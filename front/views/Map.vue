@@ -72,6 +72,51 @@
         </form>
       </div>
     </div>
+  </div>
+
+  <div v-if="modaleAgendaOuverte" class="modal-overlay" @click.self="fermerModaleAgenda">
+    <div class="modal-content">
+      <span class="close-btn" @click="fermerModaleAgenda">&times;</span>
+      <h2>Ajouter à l'agenda</h2>
+      <p class="event-title">{{ pointSelectionne?.titre }}</p>
+
+      <form @submit.prevent="confirmerAjoutAgenda">
+        <div class="form-group">
+          <label>Date de début</label>
+          <input
+              v-model="formulaireAgenda.dateDebut"
+              type="datetime-local"
+              required
+              class="form-control"
+              :min="getMinDate()"
+              :max="getMaxDate()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Date de fin</label>
+          <input
+              v-model="formulaireAgenda.dateFin"
+              type="datetime-local"
+              required
+              class="form-control"
+              :min="getMinDate()"
+              :max="getMaxDate()"
+          />
+        </div>
+        <div class="form-group">
+          <label>Notes (optionnel)</label>
+          <textarea v-model="formulaireAgenda.notes" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Ajouter à l'agenda</button>
+          <button type="button" @click="fermerModaleAgenda" class="btn btn-secondary">Annuler</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
 
     <!-- Les fiiiiiiiltres -->
     <Filtre
@@ -81,7 +126,6 @@
       :localisationActive="!!userLocation"
       @change="updateMarkers"
     />
-  </div>
 </template>
 
 <script>
@@ -93,6 +137,7 @@ import Filtre from '../components/Filtre.vue'
 //Correctif pour les icônes Leaflet avec Vite
 import icon from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
+import router from "../router";
 
 //Reset de la config par défaut des icônes
 delete L.Icon.Default.prototype._getIconUrl;
@@ -136,6 +181,13 @@ export default {
         dateFin:'',
         heureDebut:'',
         heureFin:'',
+      },
+      modaleAgendaOuverte: false,
+      pointSelectionne: null,
+      formulaireAgenda: {
+        dateDebut: '',
+        dateFin: '',
+        notes: ''
       }
     }
   },
@@ -197,9 +249,8 @@ export default {
             popupContent += `<br>📅 <b>Date de fin :</b> ${point.dateFin}`;
           }
 
-          if (point.dateDebut && point.dateFin) {
-            popupContent += `<br/><button class="btn-agenda">Ajouter à mon agenda</button></br>`;
-          }
+          popupContent += `<br/><button class="btn-agenda">Ajouter à mon agenda</button></br>`;
+
 
           //Date de création
           if (point.date) {
@@ -473,22 +524,32 @@ export default {
         alert('Impossible de contacter le serveur.');
       }
     },
-    async ajouterEvenement(point) {
+    ajouterEvenement(point) {
+      this.pointSelectionne = point;
+
+      //On préremplit avec les dates du point si elles sont dispo
+      if (point.dateDebut && point.dateFin) {
+        this.formulaireAgenda.dateDebut = point.dateDebut.replace(' ', 'T').slice(0, 16);
+        this.formulaireAgenda.dateFin = point.dateFin.replace(' ', 'T').slice(0, 16);
+      }
+
+      this.modaleAgendaOuverte = true;
+    },
+
+    fermerModaleAgenda() {
+      this.modaleAgendaOuverte = false;
+      this.formulaireAgenda = { dateDebut: '', dateFin: '', notes: '' };
+    },
+
+    async confirmerAjoutAgenda() {
       try {
-        console.log("Point reçu:", point);
-
-        if (!point.dateDebut || !point.dateFin) {
-          alert('Ce point n\'a pas de dates définies.');
-          return;
-        }
-
         const payload = {
-          iduser: 1,//a remplacer plus tard
-          idpoint: point.id,
-          titre_evenement: point.titre,
-          dateDebut: point.dateDebut,
-          dateFin: point.dateFin,
-          notes: ""
+          iduser: 1,
+          idpoint: this.pointSelectionne.id,
+          titre_evenement: this.pointSelectionne.titre,
+          dateDebut: this.formulaireAgenda.dateDebut.replace('T', ' ') + ':00',
+          dateFin: this.formulaireAgenda.dateFin.replace('T', ' ') + ':00',
+          notes: this.formulaireAgenda.notes
         };
 
         const response = await fetch(`${import.meta.env.VITE_API_URL}/agenda`, {
@@ -498,17 +559,25 @@ export default {
         });
 
         if (response.ok) {
-          const data = await response.json();
-          alert('Événement ajouté ! Retrouvez-le dans votre agenda.');
+          alert('Événement ajouté à l\'agenda !');
+          this.fermerModaleAgenda();
+          this.$router.push('/agenda')
         } else {
-          const errText = await response.text();
-          console.error("Erreur brute:", errText);
+          alert('Erreur lors de l\'ajout');
         }
       } catch (error) {
-        console.error("Erreur lors de l'ajout :", error);
-        alert("Erreur: " + error.message);
+        console.error(error);
+        alert('Erreur de connexion');
       }
+    },
+    getMinDate(){
+      return this.pointSelectionne.dateDebut ?? null;
+    },
+
+    getMaxDate(){
+      return this.pointSelectionne.dateFin ?? null;
     }
+
   },
   expose: ['recentrer']
 }

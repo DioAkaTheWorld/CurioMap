@@ -2,44 +2,72 @@
 
 namespace CurioMap\src\application_core\domain\entities;
 
-class Utilisateur{
-    private int $id;
+class Utilisateur
+{
+    private ?int $id;
     private string $nom;
     private string $email;
     private string $password;
-    private ?int $role;
+    private int $role;
 
-    public function construct__(
-        int $id,
+    public function __construct(
+        ?int $id,
         string $nom,
         string $email,
         string $password,
-        int $role
-    ){
-        $this->id=$id;
-        $this->email=$email;
-        $this->nom=$nom;
-        $this->password=$password;
-        $this->role=$role;
+        int $role = 0
+    ) {
+        $this->id = $id;
+        $this->nom = $nom;
+        $this->email = $email;
+        $this->password = $password;
+        $this->role = $role;
     }
 
-    public function getId(): int{
+    // getter
+    public function getId(): ?int
+    {
         return $this->id;
     }
 
-    public function getNom(): string{
+    public function getNom(): string
+    {
         return $this->nom;
     }
 
-    public function getEmail(): string{
+    public function getEmail(): string
+    {
         return $this->email;
     }
 
-    public function getPassword(): string{
+    public function getPassword(): string
+    {
         return $this->password;
     }
 
-    public function getRole(): int{
+    public function getRole(): int
+    {
         return $this->role;
+    }
+
+    // setter
+    public function setNom(string $nom): void
+    {
+        $this->nom = $nom;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function setPassword(string $password): void
+    {
+        $this->password = $password;
+    }
+
+    public function setRole(int $role): void
+    {
+        $this->role = $role;
     }
 }

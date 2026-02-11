@@ -3,10 +3,10 @@
 namespace CurioMap\src\application_core\infrastructure\repositories;
 
 use PDO;
-use CurioMap\src\application_core\application\spi\UserRepositoryInterface;
-use CurioMap\src\application_core\domain\entities\User;
+use CurioMap\src\application_core\application\spi\UtilisateurRepositoryInterface;
+use CurioMap\src\application_core\domain\entities\Utilisateur;
 
-class PDOUserRepository implements UserRepositoryInterface {
+class PDOUtilisateurRepository implements UtilisateurRepositoryInterface {
     
     private PDO $pdo;
 
@@ -15,7 +15,7 @@ class PDOUserRepository implements UserRepositoryInterface {
         $this->pdo = $pdo;
     }
 
-    public function findByEmail(string $email): ?User
+    public function findByEmail(string $email): ?Utilisateur
     {
         $stmt = $this->pdo->prepare("
             SELECT id, nom, email, motdepasse, role
@@ -31,7 +31,7 @@ class PDOUserRepository implements UserRepositoryInterface {
             return null;
         }
 
-        return new User(
+        return new Utilisateur(
             (int)$data["id"],
             $data["nom"],
             $data["email"],
@@ -40,7 +40,7 @@ class PDOUserRepository implements UserRepositoryInterface {
         );
     }
 
-    public function findById(int $id): ?User
+    public function findById(int $id): ?Utilisateur
     {
         $stmt = $this->pdo->prepare("
             SELECT id, nom, email, motdepasse, role
@@ -56,7 +56,7 @@ class PDOUserRepository implements UserRepositoryInterface {
             return null;
         }
 
-        return new User(
+        return new Utilisateur(
             (int)$data["id"],
             $data["nom"],
             $data["email"],
@@ -65,7 +65,7 @@ class PDOUserRepository implements UserRepositoryInterface {
         );
     }
 
-    public function save(User $user): User
+    public function save(Utilisateur $user): Utilisateur
     {
         $stmt = $this->pdo->prepare("
             INSERT INTO Utilisateur (nom, email, motdepasse, role)
@@ -81,7 +81,7 @@ class PDOUserRepository implements UserRepositoryInterface {
 
         $id = (int)$this->pdo->lastInsertId();
 
-        return new User(
+        return new Utilisateur(
             $id,
             $user->getNom(),
             $user->getEmail(),

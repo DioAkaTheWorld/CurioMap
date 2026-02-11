@@ -1,49 +1,53 @@
 <?php
+
 namespace CurioMap\back\src\api\providers;
 
-use charlyMatLoc\src\application_core\application\ports\api\dtos\AuthDTO;
-use charlyMatLoc\src\application_core\application\ports\api\dtos\CredentialsDTO;
-use charlyMatLoc\src\application_core\application\ports\api\dtos\ProfileDTO;
-use charlyMatLoc\src\application_core\application\ports\api\ServiceUserInterface;
+use CurioMap\src\application_core\application\services\ServiceUtilisateur;
+use CurioMap\src\application_core\application\dtos\AuthDTO;
+use CurioMap\src\application_core\application\dtos\ProfileDTO;
+use CurioMap\src\application_core\application\dtos\CredentialsDTO;
 
-class JWTAuthnProvider implements AuthnProviderInterface{
+class JWTAuthnProvider {
+    private ServiceUtilisateur $serviceUtilisateur;
+    private JWTManager $jwtManager;
 
-    private ServiceUserInterface $serviceUser;
-    private JWTManager $JWTManager;
-
-    public function __construct(JWTManager $jwtManager, ServiceUserInterface $serviceUser){
-        $this->JWTManager = $jwtManager;
-        $this->serviceUser = $serviceUser;
+    public function __construct(JWTManager $jwtManager, ServiceUtilisateur $serviceUtilisateur) {
+        $this->jwtManager = $jwtManager;
+        $this->serviceUtilisateur = $serviceUtilisateur;
     }
 
-    //authentifie l'utilisateur et génère les tokens jwt
-    public function signin(CredentialsDTO $credentials): array
-    {
-        //recherche l'utilisateur par ses id
-        $user = $this->serviceUser->byCredentials($credentials);
-        //prépare le payload (le tableau avec les données du token + infos utilisateur) du token jwt
+    /**
+     * Connecte un utilisateur et génère access + refresh token
+     */
+    public function signin(CredentialsDTO $credentials): array {
+        $utilisateur = $this->serviceUtilisateur->login($credentials->email, $credentials->password);
+
         $payload = [
-            'iss' => 'http://charlyMatLoc', //émetteur du token
-            'iat' => time(),                //date de création
-            'exp' => time()+3600,           //date d'expiration (1h)
-            'sub' => $user->id,             //id utilisateur
+            'iss' => 'http://curiomap.local', // ton application
+            'iat' => time(),
+            'exp' => time() + 3600,
+            'sub' => $utilisateur->getId(),
             'data' => [
-                'user' => $user->email      //email utilisateur
+                'email' => $utilisateur->getEmail(),
+                'nom'   => $utilisateur->getNom(),
+                'role'  => $utilisateur->getRole()
             ]
         ];
-        //génère le token d'accès et le token de rafraîchissement
-        $accessToken  = $this->JWTManager->createAccesToken($payload);
-        $refreshToken = $this->JWTManager->createRefreshToken($payload);
 
-        //retourne l'objet AuthDTO (tokens) et le profil utilisateur
-        return [new AuthDTO($accessToken, $refreshToken), new ProfileDTO($user->id,$user->email)];
+        $accessToken = $this->jwtManager->createAccessToken($payload);
+        $refreshToken = $this->jwtManager->createRefreshToken($payload);
+
+        return [
+            new AuthDTO($accessToken, $refreshToken),
+            new ProfileDTO($utilisateur->getId(), $utilisateur->getEmail())
+        ];
     }
 
-    //inscrit un nouvel utilisateur et retourne son profil
-    public function register(CredentialsDTO $credentials): ProfileDTO
-    {
-        //crée l'utilisateur via le service
-        $user = $this->serviceUser->register($credentials);
-        return new ProfileDTO($user->id, $user->email);
+    /**
+     * Inscrit un nouvel utilisateur et retourne son profil
+     */
+    public function register(CredentialsDTO $credentials): ProfileDTO {
+        $utilisateur = $this->serviceUtilisateur->register($credentials->nom, $credentials->email, $credentials->password);
+        return new ProfileDTO($utilisateur->getId(), $utilisateur->getEmail());
     }
 }

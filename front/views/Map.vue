@@ -2,76 +2,14 @@
   <div class="map-wrapper">
     <div ref="map" class="map"></div>
     <!-- Ajout du formulaire d'ajout de point -->
-    <div v-if="modaleOuverte" class="modal-overlay" @click.self="fermerModale">
-      <div class="modal-content">
-        <span class="close-btn" @click="fermerModale">&times;</span>
-        <h2>Ajouter un point</h2>
-        <form @submit.prevent="creerPoint">
-          <div class="form-group">
-            <label>Titre</label>
-            <input v-model="nouveauPoint.titre" type="text" required class="form-control" />
-          </div>
-
-          <div class="form-group">
-            <label>Catégorie</label>
-            <select v-model="nouveauPoint.categorie" class="form-control">
-              <option value="1">Restaurant</option>
-              <option value="2">Monument</option>
-              <option value="3">Concert</option>
-              <option value="4">Parc</option>
-              <option value="5">Musée</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Description</label>
-            <textarea v-model="nouveauPoint.description" class="form-control" rows="3"></textarea>
-          </div>
-
-          <div>
-            <h2>Champs optionnels</h2>
-          </div>
-
-          <div class="coords-row">
-            <div class="form-group">
-              <label>Date début</label>
-              <input v-model="nouveauPoint.dateDebut" type="date" class="form-control" />
-            </div>
-            <div class="form-group">
-              <label>Date fin</label>
-              <input v-model="nouveauPoint.dateFin" type="date" class="form-control" />
-            </div>
-          </div>
-
-          <div class="coords-row">
-            <div class="form-group">
-              <label>Heure début</label>
-              <input v-model="nouveauPoint.heureDebut" type="time" class="form-control" />
-            </div>
-            <div class="form-group">
-              <label>Heure fin</label>
-              <input v-model="nouveauPoint.heureFin" type="time" class="form-control" />
-            </div>
-          </div>
-
-          <div class="coords-row">
-            <div class="form-group">
-              <label>Latitude</label>
-              <input v-model="nouveauPoint.latitude" type="text" readonly class="form-control readonly" />
-            </div>
-            <div class="form-group">
-              <label>Longitude</label>
-              <input v-model="nouveauPoint.longitude" type="text" readonly class="form-control readonly" />
-            </div>
-          </div>
-
-           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Créer</button>
-            <button type="button" @click="fermerModale" class="btn btn-secondary">Annuler</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <ModalePoint
+      :isOpen="modaleOuverte"
+      :latitude="nouveauPoint.latitude"
+      :longitude="nouveauPoint.longitude"
+      :categories="categories"
+      @close="fermerModale"
+      @submit="creerPoint"
+    />
   </div>
 
   <div v-if="modaleAgendaOuverte" class="modal-overlay" @click.self="fermerModaleAgenda">
@@ -135,6 +73,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { markRaw } from 'vue'
 import Filtre from '../components/Filtre.vue'
+import ModalePoint from '../components/ModalePoint.vue'
 
 //Correctif pour les icônes Leaflet avec Vite
 import icon from 'leaflet/dist/images/marker-icon.png'
@@ -153,7 +92,8 @@ L.Icon.Default.mergeOptions({
 export default {
   name: 'MapView',
   components: {
-    Filtre
+    Filtre,
+    ModalePoint
   },
   data() {
     return {
@@ -176,15 +116,8 @@ export default {
       ],
       selectedCategories: [1, 2, 3, 4, 5], //Tout coché par défaut
       nouveauPoint: {
-        titre: '',
-        categorie: 1,
-        description: '',
         latitude: 0,
         longitude: 0,
-        dateDebut: '',
-        dateFin:'',
-        heureDebut:'',
-        heureFin:'',
       },
       modaleAgendaOuverte: false,
       pointSelectionne: null,
@@ -195,13 +128,16 @@ export default {
       }
     }
   },
+
   mounted() {
     this.initMap()
     this.fetchPoints()
   },
+
   beforeUnmount() {
     if (this.map) this.map.remove()
   },
+
   methods: {
     //Chargement des points au lancement
     async fetchPoints() {
@@ -220,9 +156,9 @@ export default {
     updateMarkers() {
       if (!this.markerLayerGroup) return;
         this.updateRadiusCircle();
-
         this.markerLayerGroup.clearLayers();
-      this.points.forEach(point => {
+
+        this.points.forEach(point => {
         //Filtre par distance (si user localisé et filtre activé < 100km)
         if (this.userLocation && this.maxDistance < 100) {
           const userLatLng = L.latLng(this.userLocation.lat, this.userLocation.lon);
@@ -262,23 +198,18 @@ export default {
         if (this.selectedCategories.includes(parseInt(point.categorie))) {
           const color = this.getCategoryColor(point.categorie);
           const label = this.getCategoryLabel(point.categorie);
-
           //Contenu de la popup avec les infos du point
           let popupContent = `<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span>`;
-
           if (point.description) {
             popupContent += `<br><i>${point.description}</i>`;
           }
-
           if (point.dateDebut) {
             popupContent += `<br>📅 <b>Date de debut :</b> ${this.formatDateEvent(point.dateDebut)}`;
           }
           if (point.dateFin) {
             popupContent += `<br>📅 <b>Date de fin :</b> ${this.formatDateEvent(point.dateFin)}`;
           }
-
           popupContent += `<br/><button class="btn-agenda">Ajouter à mon agenda</button></br>`;
-
 
           //Date de création
           if (point.date) {
@@ -454,13 +385,6 @@ export default {
     //Pour le fermer
     fermerModale() {
       this.modaleOuverte = false;
-      this.nouveauPoint.titre = '';
-      this.nouveauPoint.description = '';
-      this.nouveauPoint.categorie = 1;
-      this.nouveauPoint.dateDebut = '';
-      this.nouveauPoint.dateFin ='';
-      this.nouveauPoint.heureDebut='';
-      this.nouveauPoint.heureFin='';
     },
 
     //Recup le libelle des catés
@@ -519,37 +443,9 @@ export default {
     },
 
     //Créer un point
-    async creerPoint() {
+    async creerPoint(payload) {
+      //payload contient déjà les données formatées et validées par ModalePoint.vue
       try {
-        let dateDebutISO = null;
-        if (this.nouveauPoint.dateDebut) {
-          const time = this.nouveauPoint.heureDebut ? `${this.nouveauPoint.heureDebut}:00` : '00:00:00';
-          dateDebutISO = `${this.nouveauPoint.dateDebut} ${time}`;
-        }
-
-        let dateFinISO = null;
-        if (this.nouveauPoint.dateFin) {
-          const time = this.nouveauPoint.heureFin ? `${this.nouveauPoint.heureFin}:00` : '00:00:00';
-          dateFinISO = `${this.nouveauPoint.dateFin} ${time}`;
-        }
-
-        //Verif des dates
-        if (dateDebutISO && dateFinISO) {
-            const start = new Date(dateDebutISO);
-            const end = new Date(dateFinISO);
-            if (end < start) {
-                alert('La date de fin doit être postérieure ou égale à la date de début.');
-                return;
-            }
-        }
-
-        const payload = {
-          ...this.nouveauPoint,
-          categorie: parseInt(this.nouveauPoint.categorie),
-          dateDebut:dateDebutISO,
-          dateFin:dateFinISO
-        };
-
         //'http://localhost:8888/api/points'
         const response = await fetch(`${import.meta.env.VITE_API_URL}/points`, {
           method: 'POST',
@@ -580,6 +476,7 @@ export default {
         alert('Impossible de contacter le serveur.');
       }
     },
+
     ajouterEvenement(point) {
       this.pointSelectionne = point;
 
@@ -745,5 +642,37 @@ export default {
 :deep(.btn-agenda:active) {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+}
+
+.options-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+}
+.options-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #555;
+}
+.options-header span {
+    transition: transform 0.3s ease;
+    font-size: 0.8rem;
+    color: #777;
+}
+.options-header span.rotated {
+    transform: rotate(180deg);
+}
+.options-content {
+    background-color: #fafafa;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
 }
 </style>

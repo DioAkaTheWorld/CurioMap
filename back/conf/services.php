@@ -1,10 +1,10 @@
 <?php
 
 use CurioMap\src\api\actions\ajouterEventAction;
-use CurioMap\src\api\actions\creeAgendaAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\getPointsAction;
+use CurioMap\src\api\actions\modifierNotesAction;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\spi\EvenementRepositoryInterface;
@@ -49,13 +49,13 @@ return [
     ajouterEventAction::class => function (ContainerInterface $c) {
         return new ajouterEventAction($c->get(ServiceEvenementInterface::class));
     },
-    creeAgendaAction::class => function (ContainerInterface $c) {
-        return new creeAgendaAction($c->get(ServiceEvenementInterface::class));
-    },
     getAgendaAction::class => function (ContainerInterface $c) {
         return new getAgendaAction($c->get(ServiceEvenementInterface::class));
     },
     getPointsAction::class => function (ContainerInterface $c) {
         return new getPointsAction($c->get(ServicePointInteretInterface::class));
     },
+    modifierNotesAction::class => function (ContainerInterface $c) {
+    return new modifierNotesAction($c->get(ServiceEvenementInterface::class));
+    }
 ];

@@ -62,4 +62,9 @@ class Evenement{
     public function setId(int $id): void{
         $this->id = $id;
     }
+
+    public function setNotes(?string $notes): void
+    {
+        $this->notes = $notes;
+    }
 }

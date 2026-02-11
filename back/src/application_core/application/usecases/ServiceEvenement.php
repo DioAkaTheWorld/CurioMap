@@ -53,4 +53,21 @@ class ServiceEvenement implements ServiceEvenementInterface{
     public function getUserEvents(int $userId): array{
         return $this->evenementRepository->findByUser($userId);
     }
+
+    public function modifierNotes(array $data): void
+    {
+        if (empty($data['id'])) {
+            throw new InvalidArgumentException("L'identifiant de l'événement est obligatoire");
+        }
+
+        $event = $this->evenementRepository->findById($data['id']);
+
+        if (!$event) {
+            throw new InvalidArgumentException("Événement introuvable.");
+        }
+
+        $notes = $data['notes'] ?? null;
+        $this->evenementRepository->updateNotes($event->getId(),$notes);
+    }
+
 }

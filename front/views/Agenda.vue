@@ -5,6 +5,7 @@
       :show="showDetailsModal"
       :event="selectedEvent"
       @close="closeDetails"
+      @update:event="updateEvent"
     />
   </div>
 </template>
@@ -41,6 +42,7 @@ const calendarApp = createCalendar({
   callbacks: {
     onEventClick(calendarEvent) {
       selectedEvent.value = {
+        id: calendarEvent.id,
         title: calendarEvent.title,
         start: calendarEvent.start,
         end: calendarEvent.end,
@@ -80,6 +82,10 @@ const fetchEvenements = async () => {
   } catch (error) {
     console.error('Erreur lors du chargement des événements:', error)
   }
+}
+
+const updateEvent = () => {
+  fetchEvenements()
 }
 
 onMounted(() => {

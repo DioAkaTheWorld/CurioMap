@@ -22,19 +22,22 @@
           </div>
         </div>
 
-        <div v-if="event.description" class="detail-row notes">
+        <div class="detail-row notes">
           <span class="icon">📝</span>
           <div class="detail-info">
             <strong>Notes :</strong>
-            <p>{{ event.description }}</p>
+            <textarea
+                v-if="editingNotes"
+                v-model="notesValue"
+                class="notes-textarea"
+                rows="4"
+                maxlength="150"
+            ></textarea>
+            <p v-else>{{ event.description || '' }}</p>
           </div>
-        </div>
-        <div v-else class="detail-row notes">
-          <span class="icon">📝</span>
-          <div class="detail-info">
-            <strong>Notes :</strong>
-            <p>Pas de notes</p>
-          </div>
+          <button class="edit-btn" @click="toggleEditNotes" :title="editingNotes ? 'Enregistrer' : 'Modifier les notes'">
+            {{ editingNotes ? '💾' : '✏️' }}
+          </button>
         </div>
       </div>
     </div>
@@ -42,7 +45,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import {defineProps, defineEmits, ref, watch, onMounted} from 'vue'
 
 const props = defineProps({
   show: {
@@ -55,9 +58,46 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close']);
+const editingNotes = ref(false);
+const notesValue = ref(null);
+
+watch(() => props.event, (newEvent) => {
+  notesValue.value = newEvent.description || ''
+}, {immediate: true})
+
+const toggleEditNotes = async () => {
+  if (editingNotes.value) {
+    let nouvellesNotes = notesValue.value;
+    const payload = {
+      id: props.event.id,
+      notes: nouvellesNotes
+    };
+    try {
+      console.log(props.event.id)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+      if(response.ok){
+        console.log(response);
+        notesValue.value=nouvellesNotes;
+        props.event.description=nouvellesNotes;
+        emit('update:event');
+      }
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+  editingNotes.value = !editingNotes.value
+}
 
 const fermer = () => {
+  editingNotes.value=false;
   emit('close')
 }
 
@@ -105,6 +145,7 @@ const formatTime = (dateString) => {
     return dateString.toString()
   }
 }
+
 </script>
 
 <style scoped>
@@ -234,6 +275,10 @@ const formatTime = (dateString) => {
   white-space: pre-wrap;
   line-height: 1.5;
 }
+.notes-textarea {
+  resize: none;
+  width:100%;
+}
 
 @media (max-width: 768px) {
   .modal-content {
@@ -279,4 +324,3 @@ const formatTime = (dateString) => {
   }
 }
 </style>
-

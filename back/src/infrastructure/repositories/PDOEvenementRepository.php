@@ -33,6 +33,19 @@ class PDOEvenementRepository implements EvenementRepositoryInterface{
         return (int) $result['id'];
     }
 
+    public function updateNotes(int $id, ?string $notes): void
+    {
+        $sql = "UPDATE evenement SET notes = :notes WHERE id = :id";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':id' => $id,
+            ':notes' => $notes
+        ]);
+    }
+
+
+
     public function findByUser(int $userId): array{
         $sql = "SELECT * FROM evenement WHERE iduser = :iduser ORDER BY date_debut ASC";
         $stmt = $this->pdo->prepare($sql);
@@ -51,5 +64,27 @@ class PDOEvenementRepository implements EvenementRepositoryInterface{
             );
         }
         return $events;
+    }
+
+    public function findById(int $id): ?Evenement{
+        $sql = "SELECT * FROM evenement WHERE id = :id ORDER BY date_debut ASC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return null;
+        }
+
+        return new Evenement(
+            iduser: $row['iduser'],
+            idpoint: $row['idpoint'],
+            titre_evenement: $row['titre_evenement'],
+            date_debut: new DateTime($row['date_debut']),
+            date_fin: new DateTime($row['date_fin']),
+            notes: $row['notes'],
+            id: $row['id']
+        );
     }
 }

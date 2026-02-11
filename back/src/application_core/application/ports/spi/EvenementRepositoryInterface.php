@@ -9,4 +9,5 @@ interface EvenementRepositoryInterface{
      * @return Evenement[]
      */
     public function findByUser(int $userId): array;
+    public function findById(int $id): ?Evenement;
 }

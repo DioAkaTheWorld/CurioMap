@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use CurioMap\src\api\actions\ajouterEventAction;
+use CurioMap\src\api\actions\modifierNotesAction;
 use CurioMap\src\api\middlewares\CorsMiddleware;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
@@ -15,6 +16,7 @@ return function(\Slim\App $app):\Slim\App {
     //Routes pour l'agenda
     $app->post('/agenda', ajouterEventAction::class);
     $app->get('/agenda', getAgendaAction::class);
+    $app->post('/notes', modifierNotesAction::class);
 
     //Route OPTIONS pour CORS preflight (catch-all)
     $app->options('/{routes:.+}', function ($request, $response, $args) {

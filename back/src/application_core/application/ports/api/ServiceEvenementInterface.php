@@ -7,4 +7,5 @@ interface ServiceEvenementInterface{
     //ajouter un événement à l'agenda
     public function creeEvent(array $data): Evenement;
     public function getUserEvents(int $userId): array;
+    public function modifierNotes(array $data): void;
 }

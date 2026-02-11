@@ -1,6 +1,6 @@
 <template>
-  <div class="filter-panel">
-    <h3>Filtres</h3>
+  <div class="filter-panel" :style="{ top: pos.y + 'px', left: pos.x + 'px', transform: 'none' }">
+    <h3 @mousedown.prevent="startDrag" :style="{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }">Filtres</h3>
     <!-- Filtres de catés -->
     <div class="filter-group">
       <h4>Catégories</h4>
@@ -94,15 +94,63 @@ export default {
     }
   },
   emits: ['update:modelValue', 'update:distance', 'update:dateDebut', 'update:dateFin', 'change'],
+  data() {
+    return {
+      pos: { x: 10, y: 100 },
+      dragging: false,
+      offset: { x: 0, y: 0 }
+    }
+  },
+
+  mounted() {
+    //Centrer verticalement au chargement approximativement
+    this.pos.y = window.innerHeight / 2 - 150;
+  },
+
   methods: {
+    startDrag(e) {
+      this.dragging = true;
+      this.offset.x = e.clientX - this.pos.x;
+      this.offset.y = e.clientY - this.pos.y;
+      window.addEventListener('mousemove', this.doDrag);
+      window.addEventListener('mouseup', this.stopDrag);
+    },
+
+    doDrag(e) {
+      if (this.dragging) {
+        let newX = e.clientX - this.offset.x;
+        let newY = e.clientY - this.offset.y;
+
+        const el = this.$el;
+        const maxX = window.innerWidth - el.offsetWidth;
+        const maxY = window.innerHeight - el.offsetHeight;
+
+        if (newX < 0) newX = 0;
+        if (newX > maxX) newX = maxX;
+        if (newY < 0) newY = 0;
+        if (newY > maxY) newY = maxY;
+
+        this.pos.x = newX;
+        this.pos.y = newY;
+      }
+    },
+
+    stopDrag() {
+      this.dragging = false;
+      window.removeEventListener('mousemove', this.doDrag);
+      window.removeEventListener('mouseup', this.stopDrag);
+    },
+
     updateDistance(event) {
         this.$emit('update:distance', parseInt(event.target.value));
         this.$emit('change');
     },
+
     updateDate(type, value) {
       this.$emit(`update:${type}`, value);
       this.$emit('change');
     },
+
     toggleCategory(id) {
       const newSelection = [...this.modelValue];
       const index = newSelection.indexOf(id);
@@ -116,6 +164,7 @@ export default {
       this.$emit('update:modelValue', newSelection);
       this.$emit('change');
     },
+
     getCategoryColor(id) {
       switch(parseInt(id)) {
         case 1: return '#ff9800'; //Resto en orange

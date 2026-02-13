@@ -63,7 +63,7 @@
       v-model:distance="maxDistance"
       v-model:dateDebut="filterDateStart"
       v-model:dateFin="filterDateEnd"
-      :localisationActive="!!userLocation"
+      :localisationActive="!!(filterCenter || userLocation)"
       @change="updateMarkers"
     />
 </template>
@@ -78,7 +78,6 @@ import ModalePoint from '../components/ModalePoint.vue'
 //Correctif pour les icônes Leaflet avec Vite
 import icon from 'leaflet/dist/images/marker-icon.png'
 import iconShadow from 'leaflet/dist/images/marker-shadow.png'
-import router from "../router";
 
 //Reset de la config par défaut des icônes
 delete L.Icon.Default.prototype._getIconUrl;
@@ -102,6 +101,7 @@ export default {
       userMarker:null,
       distanceCircle: null, //Cercle de portée autour du user
       userLocation: null, //Pour stocker les coos du user
+      filterCenter: null, //Centre du filtre de distance
       maxDistance: 100, //Pour filtre distance (100 = partout par convention)
       filterDateStart: '',
       filterDateEnd: '',
@@ -153,17 +153,18 @@ export default {
     },
 
     //Maj de l'affichage des points
-    updateMarkers() {
+    updateMarkers(pointIdToOpen = null) {
       if (!this.markerLayerGroup) return;
         this.updateRadiusCircle();
         this.markerLayerGroup.clearLayers();
 
         this.points.forEach(point => {
-        //Filtre par distance (si user localisé et filtre activé < 100km)
-        if (this.userLocation && this.maxDistance < 100) {
-          const userLatLng = L.latLng(this.userLocation.lat, this.userLocation.lon);
+        //Filtre par distance (si filtre centré défini et filtre activé < 100km)
+        const center = this.filterCenter || this.userLocation;
+        if (center && this.maxDistance < 100) {
+          const centerLatLng = L.latLng(center.lat, center.lon);
           const pointLatLng = L.latLng(point.latitude, point.longitude);
-          const distKm = userLatLng.distanceTo(pointLatLng) / 1000;
+          const distKm = centerLatLng.distanceTo(pointLatLng) / 1000;
 
           if (distKm > this.maxDistance) {
             return; //On passe au point suivant, celui-ci est trop loin
@@ -229,6 +230,11 @@ export default {
 
           marker.bindPopup(popupContent);
 
+          //Si on a cliqué sur ce point pour filtrer, on rouvre sa popup
+          if (pointIdToOpen && point.id === pointIdToOpen) {
+            setTimeout(() => marker.openPopup(), 100);
+          }
+
           marker.on('popupopen', () => {
             const btn = document.querySelector('.btn-agenda');
             if (btn) {
@@ -236,6 +242,15 @@ export default {
                 this.ajouterEvenement(point);
               };
             }
+          });
+
+          //Au clic, on définit ce point comme centre du filtre
+          marker.on('click', () => {
+             //Pas de refresh si c'est déjà le centre
+             if (this.filterCenter && this.filterCenter.lat === point.latitude && this.filterCenter.lon === point.longitude) return;
+
+             this.filterCenter = {lat: point.latitude, lon: point.longitude};
+             this.updateMarkers(point.id);
           });
 
           this.markerLayerGroup.addLayer(marker);
@@ -249,8 +264,9 @@ export default {
             this.distanceCircle = null;
         }
 
-        if (this.userLocation && this.maxDistance < 100) {
-            this.distanceCircle = L.circle([this.userLocation.lat, this.userLocation.lon], {
+        const center = this.filterCenter || this.userLocation;
+        if (center && this.maxDistance < 100) {
+            this.distanceCircle = L.circle([center.lat, center.lon], {
                 radius: this.maxDistance * 1000, //km -> m
                 color: '#3388ff',
                 fillColor: '#3388ff',
@@ -317,6 +333,11 @@ export default {
           const lon = position.coords.longitude
 
           this.userLocation = { lat, lon }; //On garde la pos en mémoire pour les filtres
+          //Si pas encore de centre de filtre, on prend la position user
+          if (!this.filterCenter) {
+             this.filterCenter = { lat, lon };
+          }
+
           this.updateMarkers(); //Maj pour afficher le cercle de portée
 
           this.map.setView([lat, lon], 13)
@@ -354,6 +375,7 @@ export default {
           const lon = position.coords.longitude
 
           this.userLocation = {lat, lon}; //Maj
+          this.filterCenter = {lat, lon}; //On reset le filtre sur l'utilisateur
 
           if (this.userMarker) {
             this.userMarker.setStyle({opacity: 0, fillOpacity: 0});

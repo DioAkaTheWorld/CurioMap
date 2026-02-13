@@ -241,8 +241,9 @@ export default {
             setTimeout(() => marker.openPopup(), 100);
           }
 
-          marker.on('popupopen', () => {
-            const btn = document.querySelector('.btn-agenda');
+          marker.on('popupopen', (e) => {
+            const popupNode = e.popup._contentNode;
+            const btn = popupNode.querySelector('.btn-agenda');
             if (btn) {
               btn.onclick = () => {
                 this.ajouterEvenement(point);

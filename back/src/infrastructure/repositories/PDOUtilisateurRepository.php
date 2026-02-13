@@ -1,9 +1,9 @@
 <?php
 
-namespace CurioMap\src\application_core\infrastructure\repositories;
+namespace CurioMap\src\infrastructure\repositories;
 
 use PDO;
-use CurioMap\src\application_core\application\spi\UtilisateurRepositoryInterface;
+use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInterface;
 use CurioMap\src\application_core\domain\entities\Utilisateur;
 
 class PDOUtilisateurRepository implements UtilisateurRepositoryInterface {
@@ -75,7 +75,7 @@ class PDOUtilisateurRepository implements UtilisateurRepositoryInterface {
         $stmt->execute([
             "nom" => $user->getNom(),
             "email" => $user->getEmail(),
-            "motdepasse" => $user->getMotdepasse(),
+            "motdepasse" => $user->getPassword(),
             "role" => $user->getRole()
         ]);
 
@@ -85,7 +85,7 @@ class PDOUtilisateurRepository implements UtilisateurRepositoryInterface {
             $id,
             $user->getNom(),
             $user->getEmail(),
-            $user->getMotdepasse(),
+            $user->getPassword(),
             $user->getRole()
         );
     }

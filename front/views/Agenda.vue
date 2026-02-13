@@ -21,7 +21,10 @@ import {
 } from "@schedule-x/calendar"
 import '@schedule-x/theme-default/dist/index.css'
 import DetailsEvents from '../components/DetailsEvents.vue'
+import router from "../router";
+import { useAuthStore } from '../stores/auth'
 
+const authStore = useAuthStore()
 const showDetailsModal = ref(false)
 const selectedEvent = ref({
   title: '',
@@ -59,7 +62,13 @@ const closeDetails = () => {
 
 const fetchEvenements = async () => {
   try {
-    const userId = 1 //a remplacer plus tard(pour linstant on met 1 par defaut)
+    const userId = authStore.user?.id
+
+    if (!userId) {
+      console.error('Utilisateur non connecté')
+      await router.push('/connexion')
+      return
+    }
 
     const response = await fetch(`${import.meta.env.VITE_API_URL}/agenda?user_id=${userId}`)
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace CurioMap\src\application_core\application\spi;
+namespace CurioMap\src\application_core\application\ports\spi;
 
 use CurioMap\src\application_core\domain\entities\Utilisateur;
 

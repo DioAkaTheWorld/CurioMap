@@ -7,8 +7,14 @@ use CurioMap\src\api\middlewares\CorsMiddleware;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\getPointsAction;
+use CurioMap\src\api\actions\RegisterAction;
+use CurioMap\src\api\actions\LoginAction;
 
 return function(\Slim\App $app):\Slim\App {
+    // Routes d'authentification
+    $app->post('/auth/register', RegisterAction::class);
+    $app->post('/auth/login', LoginAction::class);
+
     //Route des points d'intérêt
     $app->post('/points', creePointInteretAction::class);
     $app->get('/points', getPointsAction::class);

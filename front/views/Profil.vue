@@ -1,4 +1,25 @@
 <script setup>
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+if (!authStore.isLoggedIn) {
+  router.push('/connexion')
+}
+
+const user = computed(() => authStore.currentUser)
+
+// Formatage de la date d'inscription
+const memberSince = computed(() => {
+  if (user.value?.createdAt) {
+    const date = new Date(user.value.createdAt)
+    return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' })
+  }
+  return 'Inconnu'
+})
 </script>
 
 <template>
@@ -19,11 +40,8 @@
         <div class="input-user">
           <input
               type="text"
-              placeholder="Quentin54"
-          >
-          <input
-              type="text"
-              placeholder="quentin54@gmail.com"
+              :placeholder="user?.email || 'Email'"
+              readonly
           >
         </div>
 
@@ -47,8 +65,8 @@
         <div class="photo">
           <img class="photo-profil" src="../assets/exemple.png" alt="photo-profil">
         </div>
-        <p>Quentin54</p>
-        <p>Membre depuis avril 2024</p>
+        <p>{{ user?.email || 'Utilisateur' }}</p>
+        <p>Membre depuis {{ memberSince }}</p>
         <div class="ptn-crees">
           <img class="icon-point" src="../assets/icon-point.png" alt="icon-point">
           <p>Points créés</p>

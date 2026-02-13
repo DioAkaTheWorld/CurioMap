@@ -74,6 +74,7 @@ import 'leaflet/dist/leaflet.css'
 import { markRaw } from 'vue'
 import Filtre from '../components/Filtre.vue'
 import ModalePoint from '../components/ModalePoint.vue'
+import {useAuthStore} from "../stores/auth";
 
 //Correctif pour les icônes Leaflet avec Vite
 import icon from 'leaflet/dist/images/marker-icon.png'
@@ -93,6 +94,11 @@ export default {
   components: {
     Filtre,
     ModalePoint
+  },
+  computed: {
+    authStore() {
+      return useAuthStore()
+    }
   },
   data() {
     return {
@@ -538,7 +544,7 @@ export default {
     async confirmerAjoutAgenda() {
       try {
         const payload = {
-          iduser: 1,
+          iduser: this.authStore.user?.id,
           idpoint: this.pointSelectionne.id,
           titre_evenement: this.pointSelectionne.titre,
           dateDebut: this.formulaireAgenda.dateDebut.replace('T', ' ') + ':00',

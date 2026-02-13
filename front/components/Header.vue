@@ -1,33 +1,56 @@
 <script setup>
-import {useRoute, useRouter} from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
 const emit = defineEmits(['recentrer'])
+const authStore = useAuthStore()
 
-    const router = useRouter();
-    const route = useRoute();
+const router = useRouter()
+const route = useRoute()
 
-    function goProfil() {
-        router.push('/profil')
-    }
-    function goAgenda() {
-      router.push('/agenda')
-    }
-    function goMap(){
-      router.push('/map')
-    }
-    function recentrer(){
-      emit('recentrer')
-    }
+function goProfil() {
+  router.push('/profil')
+}
+
+function goAgenda() {
+  router.push('/agenda')
+}
+
+function goMap() {
+  router.push('/map')
+}
+
+function recentrer() {
+  emit('recentrer')
+}
+
+function goConnexion() {
+  router.push('/connexion')
+}
+
+function logout() {
+  if (confirm('Êtes-vous sûr de vouloir vous déconnecter?')) {
+    authStore.logout()
+    router.push('/connexion')
+  }
+}
 </script>
 
 <template>
     <header class="top-bar">
-        <img src="../public/curiomap.ico" alt="logo" class="logo"></img>
+        <img src="../public/curiomap.ico" alt="logo" class="logo" />
         <h1 class="title">CurioMap</h1>
 
       <button v-if="route.path==='/map'" @click="recentrer" class="recenter-btn" title="Recentrer">📍</button>
       <button v-if="route.path!=='/map'" @click="goMap" class="map-btn" title="Retourner à la map">🗺️</button>
-      <button v-if="route.path!== '/agenda'" @click="goAgenda" class="agenda-btn" title="Accéder à votre agenda">📅</button>
-      <button v-if="route.path!=='/profil'" @click="goProfil" class="profile-btn" title="Profil">👤</button>
+
+      <template v-if="authStore.isLoggedIn">
+        <button v-if="route.path!== '/agenda'" @click="goAgenda" class="agenda-btn" title="Accéder à votre agenda">📅</button>
+        <button v-if="route.path!=='/profil'" @click="goProfil" class="profile-btn" title="Profil">👤</button>
+        <button @click="logout" class="logout-btn" title="Se déconnecter">🚪</button>
+      </template>
+
+      <button v-if="!authStore.isLoggedIn" @click="goConnexion" class="login-btn" title="Se connecter">🔐</button>
     </header>
 </template>
 
@@ -63,7 +86,9 @@ const emit = defineEmits(['recentrer'])
 .map-btn,
 .agenda-btn,
 .profile-btn,
-.recenter-btn {
+.recenter-btn,
+.login-btn,
+.logout-btn {
   width: 2em;
   height: 2em;
   padding: 0;
@@ -93,10 +118,20 @@ const emit = defineEmits(['recentrer'])
   background: linear-gradient(135deg, #dd9900 0%, #cc8800 100%);
 }
 
+.login-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
 .map-btn:hover,
 .agenda-btn:hover,
 .profile-btn:hover,
-.recenter-btn:hover {
+.recenter-btn:hover,
+.login-btn:hover,
+.logout-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
@@ -104,7 +139,9 @@ const emit = defineEmits(['recentrer'])
 .map-btn:active,
 .agenda-btn:active,
 .profile-btn:active,
-.recenter-btn:active {
+.recenter-btn:active,
+.login-btn:active,
+.logout-btn:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -127,7 +164,9 @@ const emit = defineEmits(['recentrer'])
   .map-btn,
   .agenda-btn,
   .profile-btn,
-  .recenter-btn {
+  .recenter-btn,
+  .login-btn,
+  .logout-btn {
     width: 1.9em;
     height: 1.9em;
     font-size: 1.3em;
@@ -152,7 +191,9 @@ const emit = defineEmits(['recentrer'])
   .map-btn,
   .agenda-btn,
   .profile-btn,
-  .recenter-btn {
+  .recenter-btn,
+  .login-btn,
+  .logout-btn {
     width: 1.6em;
     height: 1.6em;
     font-size: 1.1em;

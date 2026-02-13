@@ -1,7 +1,7 @@
 <?php
 namespace CurioMap\src\application_core\application\usecases;
 
-use CurioMap\src\application_core\application\spi\UtilisateurRepositoryInterface;
+use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInterface;
 use CurioMap\src\application_core\domain\entities\Utilisateur;
 
 class ServiceUtilisateur {

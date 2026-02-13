@@ -4,15 +4,20 @@ use CurioMap\src\api\actions\ajouterEventAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\getPointsAction;
+use CurioMap\src\api\actions\LoginAction;
 use CurioMap\src\api\actions\modifierNotesAction;
+use CurioMap\src\api\actions\RegisterAction;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\spi\EvenementRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
+use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInterface;
 use CurioMap\src\application_core\application\usecases\ServiceEvenement;
 use CurioMap\src\application_core\application\usecases\ServicePointInteret;
+use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
 use CurioMap\src\infrastructure\repositories\PDOEvenementRepository;
 use CurioMap\src\infrastructure\repositories\PDOPointRepository;
+use CurioMap\src\infrastructure\repositories\PDOUtilisateurRepository;
 use Psr\Container\ContainerInterface;
 
 return [
@@ -56,6 +61,19 @@ return [
         return new getPointsAction($c->get(ServicePointInteretInterface::class));
     },
     modifierNotesAction::class => function (ContainerInterface $c) {
-    return new modifierNotesAction($c->get(ServiceEvenementInterface::class));
+        return new modifierNotesAction($c->get(ServiceEvenementInterface::class));
+    },
+
+    UtilisateurRepositoryInterface::class => function (ContainerInterface $c) {
+        return new PDOUtilisateurRepository($c->get(PDO::class));
+    },
+    ServiceUtilisateur::class => function (ContainerInterface $c) {
+        return new ServiceUtilisateur($c->get(UtilisateurRepositoryInterface::class));
+    },
+    RegisterAction::class => function (ContainerInterface $c) {
+        return new RegisterAction($c->get(ServiceUtilisateur::class));
+    },
+    LoginAction::class => function (ContainerInterface $c) {
+        return new LoginAction($c->get(ServiceUtilisateur::class));
     }
 ];

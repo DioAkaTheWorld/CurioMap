@@ -47,7 +47,9 @@ function logout() {
       <template v-if="authStore.isLoggedIn">
         <button v-if="route.path!== '/agenda'" @click="goAgenda" class="agenda-btn" title="Accéder à votre agenda">📅</button>
         <button v-if="route.path!=='/profil'" @click="goProfil" class="profile-btn" title="Profil">👤</button>
-        <button @click="logout" class="logout-btn" title="Se déconnecter">🚪</button>
+        <button @click="logout" class="logout-btn" title="Se déconnecter">
+          <img src="/deconnexion.png" alt="Déconnexion" class="logout-icon" />
+        </button>
       </template>
 
       <button v-if="!authStore.isLoggedIn" @click="goConnexion" class="login-btn" title="Se connecter">🔐</button>
@@ -81,6 +83,14 @@ function logout() {
   font-weight: bold;
   color: #111;
   margin-right: auto;
+}
+
+.logout-btn{
+  white-space: nowrap;
+}
+
+.logout-icon{
+  width: 50%;
 }
 
 .map-btn,

@@ -68,6 +68,13 @@
             @input="updateDate('dateFin', $event.target.value)"
             style="width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 2px;"
         >
+        <button
+            v-if="dateDebut || dateFin"
+            @click="clearDates"
+            style="margin-top: 5px; padding: 4px; font-size: 0.8rem; cursor: pointer; background: #eee; border: 1px solid #ccc; border-radius: 4px;"
+        >
+            Effacer dates
+        </button>
       </div>
     </div>
   </div>
@@ -167,6 +174,12 @@ export default {
     updateDate(type, value) {
       this.$emit(`update:${type}`, value);
       this.$emit('change');
+    },
+
+    clearDates() {
+        this.$emit('update:dateDebut', '');
+        this.$emit('update:dateFin', '');
+        this.$emit('change');
     },
 
     toggleCategory(id) {

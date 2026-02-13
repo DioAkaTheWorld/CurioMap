@@ -244,13 +244,32 @@ export default {
             }
           });
 
-          //Au clic, on définit ce point comme centre du filtre
+          //Au clic, on définit ce point comme centre du filtre et on met à jour les dates
           marker.on('click', () => {
-             //Pas de refresh si c'est déjà le centre
-             if (this.filterCenter && this.filterCenter.lat === point.latitude && this.filterCenter.lon === point.longitude) return;
+             let aEteModif = false;
 
-             this.filterCenter = {lat: point.latitude, lon: point.longitude};
-             this.updateMarkers(point.id);
+             //Maj du centre (si différent)
+             if (!this.filterCenter || this.filterCenter.lat !== point.latitude || this.filterCenter.lon !== point.longitude) {
+                 this.filterCenter = {lat: point.latitude, lon: point.longitude};
+                 aEteModif = true;
+             }
+
+             //Maj des dates si le point en a
+             if (point.dateDebut && point.dateFin) {
+                 //On prend les 10 premiers caractères (YYYY-MM-DD)
+                 const pDateDebut = point.dateDebut.substring(0, 10);
+                 const pDateFin = point.dateFin.substring(0, 10);
+
+                 if (this.filterDateStart !== pDateDebut || this.filterDateEnd !== pDateFin) {
+                     this.filterDateStart = pDateDebut;
+                     this.filterDateEnd = pDateFin;
+                     aEteModif = true;
+                 }
+             }
+
+             if (aEteModif) {
+                 this.updateMarkers(point.id);
+             }
           });
 
           this.markerLayerGroup.addLayer(marker);

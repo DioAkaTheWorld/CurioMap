@@ -102,7 +102,7 @@ export default {
       distanceCircle: null, //Cercle de portée autour du user
       userLocation: null, //Pour stocker les coos du user
       filterCenter: null, //Centre du filtre de distance
-      maxDistance: 100, //Pour filtre distance (100 = partout par convention)
+      maxDistance: 500,
       filterDateStart: '',
       filterDateEnd: '',
       modaleOuverte: false,
@@ -159,9 +159,9 @@ export default {
         this.markerLayerGroup.clearLayers();
 
         this.points.forEach(point => {
-        //Filtre par distance (si filtre centré défini et filtre activé < 100km)
+        //Filtre par distance (si filtre centré défini et filtre activé < 500km)
         const center = this.filterCenter || this.userLocation;
-        if (center && this.maxDistance < 100) {
+        if (center && this.maxDistance < 500) {
           const centerLatLng = L.latLng(center.lat, center.lon);
           const pointLatLng = L.latLng(point.latitude, point.longitude);
           const distKm = centerLatLng.distanceTo(pointLatLng) / 1000;
@@ -265,7 +265,7 @@ export default {
         }
 
         const center = this.filterCenter || this.userLocation;
-        if (center && this.maxDistance < 100) {
+        if (center && this.maxDistance < 500) {
             this.distanceCircle = L.circle([center.lat, center.lon], {
                 radius: this.maxDistance * 1000, //km -> m
                 color: '#3388ff',

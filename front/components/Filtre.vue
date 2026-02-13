@@ -23,18 +23,27 @@
       <h4>Distance (km)</h4>
       <div class="range-container">
         <input
+            type="checkbox"
+            id="checkbox-unlimited"
+            :checked="distance === 500"
+            @change="togglePartout"
+            :disabled="!localisationActive"
+        >
+        <label for="checkbox-unlimited" style="font-size: 0.8rem">Partout</label>
+
+        <input
           type="range"
           min="1"
-          max="100"
-          step="1"
+          max="500"
+          step="5"
           :value="distance"
           @input="updateDistance"
-          :disabled="!localisationActive"
-          style="width: 100%"
+          :disabled="!localisationActive || distance === 500"
+          style="width: 100%; margin-top: 5px;"
         >
         <div style="font-size: 0.8rem; text-align: center; margin-top: 5px; color: #666;">
            <span v-if="!localisationActive">Géolocalisation requise</span>
-           <span v-else-if="distance >= 100">Partout</span>
+           <span v-else-if="distance === 500">Partout</span>
            <span v-else>{{ distance }} km</span>
         </div>
       </div>
@@ -78,7 +87,7 @@ export default {
     },
     distance: {
       type: Number,
-      default: 100
+      default: 20
     },
     localisationActive: {
       type: Boolean,
@@ -144,6 +153,15 @@ export default {
     updateDistance(event) {
         this.$emit('update:distance', parseInt(event.target.value));
         this.$emit('change');
+    },
+
+    togglePartout(event) {
+      if (event.target.checked) {
+        this.$emit('update:distance', 500);
+      } else {
+        this.$emit('update:distance', 20); //Revenir à un truc raisonnable en décochant
+      }
+      this.$emit('change');
     },
 
     updateDate(type, value) {

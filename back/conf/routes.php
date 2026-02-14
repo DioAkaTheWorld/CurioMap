@@ -9,6 +9,8 @@ use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\getPointsAction;
 use CurioMap\src\api\actions\RegisterAction;
 use CurioMap\src\api\actions\LoginAction;
+use CurioMap\src\api\actions\GetCategoriesAction;
+use CurioMap\src\api\actions\AddCategorieAction;
 
 return function(\Slim\App $app):\Slim\App {
     // Routes d'authentification
@@ -23,6 +25,10 @@ return function(\Slim\App $app):\Slim\App {
     $app->post('/agenda', ajouterEventAction::class);
     $app->get('/agenda', getAgendaAction::class);
     $app->post('/notes', modifierNotesAction::class);
+
+    //Routes pour les catégories
+    $app->get('/categories', GetCategoriesAction::class);
+    $app->post('/categories', AddCategorieAction::class);
 
     //Route OPTIONS pour CORS preflight (catch-all)
     $app->options('/{routes:.+}', function ($request, $response, $args) {

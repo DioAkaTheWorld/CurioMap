@@ -197,13 +197,19 @@ export default {
     },
 
     getCategoryColor(id) {
-      switch(parseInt(id)) {
+      if (!id) return '#3388ff';
+      const intId = parseInt(id);
+
+      switch(intId) {
         case 1: return '#ff9800'; //Resto en orange
         case 2: return '#774d0e'; //Monument en brun
         case 3: return '#ea5a90'; //Concert en rose
         case 4: return '#4caf50'; //Parc en vert
         case 5: return '#9c27b0'; //Musée en violet
-        default: return '#3388ff'; //Par défaut en bleu
+        default:
+            //Idem que Map.vue
+            const hue = (intId * 137.508) % 360;
+            return `hsl(${hue}, 70%, 50%)`;
       }
     }
   }

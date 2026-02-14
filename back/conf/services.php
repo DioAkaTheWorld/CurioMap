@@ -3,21 +3,27 @@
 use CurioMap\src\api\actions\ajouterEventAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
+use CurioMap\src\api\actions\GetCategoriesAction;
 use CurioMap\src\api\actions\getPointsAction;
+use CurioMap\src\api\actions\AddCategorieAction;
 use CurioMap\src\api\actions\LoginAction;
 use CurioMap\src\api\actions\modifierNotesAction;
 use CurioMap\src\api\actions\RegisterAction;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
+use CurioMap\src\application_core\application\ports\api\ServiceCategorieInterface;
 use CurioMap\src\application_core\application\ports\spi\EvenementRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInterface;
+use CurioMap\src\application_core\application\ports\spi\CategorieRepositoryInterface;
 use CurioMap\src\application_core\application\usecases\ServiceEvenement;
 use CurioMap\src\application_core\application\usecases\ServicePointInteret;
 use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
+use CurioMap\src\application_core\application\usecases\ServiceCategorie;
 use CurioMap\src\infrastructure\repositories\PDOEvenementRepository;
 use CurioMap\src\infrastructure\repositories\PDOPointRepository;
 use CurioMap\src\infrastructure\repositories\PDOUtilisateurRepository;
+use CurioMap\src\infrastructure\repositories\PDOCategorieRepository;
 use Psr\Container\ContainerInterface;
 
 return [
@@ -69,6 +75,18 @@ return [
     },
     ServiceUtilisateur::class => function (ContainerInterface $c) {
         return new ServiceUtilisateur($c->get(UtilisateurRepositoryInterface::class));
+    },
+    CategorieRepositoryInterface::class => function (ContainerInterface $c) {
+        return new PDOCategorieRepository($c->get(PDO::class));
+    },
+    ServiceCategorieInterface::class => function (ContainerInterface $c) {
+        return new ServiceCategorie($c->get(CategorieRepositoryInterface::class));
+    },
+    GetCategoriesAction::class => function (ContainerInterface $c) {
+        return new GetCategoriesAction($c->get(ServiceCategorieInterface::class));
+    },
+    AddCategorieAction::class => function (ContainerInterface $c) {
+        return new AddCategorieAction($c->get(ServiceCategorieInterface::class));
     },
     RegisterAction::class => function (ContainerInterface $c) {
         return new RegisterAction($c->get(ServiceUtilisateur::class));

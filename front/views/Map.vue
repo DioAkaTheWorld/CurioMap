@@ -113,14 +113,8 @@ export default {
       filterDateEnd: '',
       modaleOuverte: false,
       points: [], //On charge tout les points au lancement
-      categories: [
-        {id: 1, label: 'Restaurant'},
-        {id: 2, label: 'Monument'},
-        {id: 3, label: 'Concert'},
-        {id: 4, label: 'Parc'},
-        {id: 5, label: 'Musée'}
-      ],
-      selectedCategories: [1, 2, 3, 4, 5], //Tout coché par défaut
+      categories: [],
+      selectedCategories: [], //Tout coché par défaut
       nouveauPoint: {
         latitude: 0,
         longitude: 0,
@@ -137,6 +131,7 @@ export default {
 
   mounted() {
     this.initMap()
+    this.fetchCategories()
     this.fetchPoints()
   },
 
@@ -145,6 +140,34 @@ export default {
   },
 
   methods: {
+    //Chargement des catégories
+    async fetchCategories() {
+      try {
+        let url = `${import.meta.env.VITE_API_URL}/categories`;
+        if (this.authStore.isLoggedIn) {
+          url += `?user_id=${this.authStore.user.id}`;
+        }
+
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          //Mapper libelle vers label pour compatibilité
+          this.categories = data.map(cat => ({
+            id: cat.id,
+            label: cat.libelle,
+            iduser: cat.iduser
+          }));
+
+          //Maj selectedCategories pour inclure toutes les catégories au 1er chargement
+          if (this.selectedCategories.length === 0) {
+             this.selectedCategories = this.categories.map(cat => cat.id);
+          }
+        }
+      } catch (e) {
+        console.error("Erreur chargement catégories", e);
+      }
+    },
+
     //Chargement des points au lancement
     async fetchPoints() {
       try {
@@ -437,37 +460,27 @@ export default {
 
     //Recup le libelle des catés
     getCategoryLabel(id) {
-      switch (parseInt(id)) {
-        case 1:
-          return 'Restaurant';
-        case 2:
-          return 'Monument';
-        case 3:
-          return 'Concert';
-        case 4:
-          return 'Parc';
-        case 5:
-          return 'Musée';
-        default:
-          return 'Autre';
-      }
+      const cat = this.categories.find(c => c.id === parseInt(id));
+      return cat ? cat.label : 'Autre';
     },
 
     //Des jolies couleurs pour chaque caté
     getCategoryColor(id) {
-      switch (parseInt(id)) {
-        case 1:
-          return '#ff9800'; //Resto en orange
-        case 2:
-          return '#774d0e'; //Monument en brun
-        case 3:
-          return '#ea5a90'; //Concert en rose
-        case 4:
-          return '#4caf50'; //Parc en vert
-        case 5:
-          return '#9c27b0'; //Musée en violet
+      if (!id) return '#3388ff';
+      const intId = parseInt(id);
+
+      //Pour les caté de base
+      switch (intId) {
+        case 1: return '#ff9800'; //Resto en orange
+        case 2: return '#774d0e'; //Monument en brun
+        case 3: return '#ea5a90'; //Concert en rose
+        case 4: return '#4caf50'; //Parc en vert
+        case 5: return '#9c27b0'; //Musée en violet
         default:
-          return '#3388ff'; //Par défaut en bleu
+          //Génération aléatoire basée sur l'id
+          //id * golden_ratio modulo 0xFFFFFF
+          const c = (intId * 137.508) % 360;
+          return `hsl(${c}, 70%, 50%)`;
       }
     },
 
@@ -492,24 +505,61 @@ export default {
 
     //Créer un point
     async creerPoint(payload) {
-      //payload contient déjà les données formatées et validées par ModalePoint.vue
       try {
+        //Si nouvelle catégorie, on la crée d'abord
+        if (payload.newCategorie) {
+            const catResponse = await fetch(`${import.meta.env.VITE_API_URL}/categories`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    libelle: payload.newCategorie,
+                    iduser: this.authStore.user?.id
+                })
+            });
+
+            if (catResponse.ok) {
+                const catData = await catResponse.json();
+                //Ajout de la nouvelle caté à la liste locale
+                const newCat = {
+                    id: catData.id,
+                    label: catData.libelle,
+                    iduser: catData.iduser
+                };
+                this.categories.push(newCat);
+                //On l'ajoute aux filtres pour voir le point
+                this.selectedCategories.push(newCat.id);
+                //On assigne l'id de la nouvelle caté au point
+                payload.categorie = newCat.id;
+            } else {
+                const err = await catResponse.json();
+                alert('Erreur création catégorie: ' + (err.error || 'Problème serveur'));
+                return;
+            }
+        }
+
         //'http://localhost:8888/api/points'
         const response = await fetch(`${import.meta.env.VITE_API_URL}/points`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+             ...payload,
+             iduser: this.authStore.user?.id //Ajout de l'ID utilisateur
+          })
         });
 
         if (response.ok) {
           alert('Point créé avec succès !');
 
           //Ajout du point à la liste locale
-          this.points.push({
+          //Pour l'affichage immédiat, on s'assure que les types sont bons
+          const nouveauPoint = {
             ...payload,
+            id: (await response.json()).id || Date.now(), //On essaie de recup l'id sinon temp
             latitude: parseFloat(payload.latitude),
             longitude: parseFloat(payload.longitude)
-          });
+          };
+
+          this.points.push(nouveauPoint);
 
           //Maj des marqueurs (si filtre)
           this.updateMarkers();

@@ -18,10 +18,11 @@ class creePointInteretAction{
         $data = json_decode($request->getBody()->getContents(), true);
 
         try{
-            $this->service->creePoint($data);
+            $point = $this->service->creePoint($data);
 
             $response->getBody()->write(json_encode([
                 'status' => 'success',
+                'id' => $point->getId(),
                 'message' => 'Point créé avec succès'
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);

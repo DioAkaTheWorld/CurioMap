@@ -8,7 +8,10 @@ CREATE TABLE Utilisateur (
 
 CREATE TABLE Categorie (
     id SERIAL PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL UNIQUE
+    libelle VARCHAR(50) NOT NULL,
+    iduser INT DEFAULT NULL,
+    FOREIGN KEY (iduser) REFERENCES Utilisateur(id) ON DELETE CASCADE,
+    CONSTRAINT unique_libelle_preso UNIQUE (libelle, iduser)
 );
 
 CREATE TABLE PointInteret (

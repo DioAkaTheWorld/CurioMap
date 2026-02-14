@@ -11,11 +11,18 @@
 
         <div class="form-group">
           <label>Catégorie</label>
-          <select v-model="form.categorie" class="form-control">
-             <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                {{ cat.label }}
-             </option>
-          </select>
+          <div class="categorie-input-group">
+            <select v-if="!isNewCategorieMode" v-model="form.categorie" class="form-control" required>
+               <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                  {{ cat.label }}
+               </option>
+            </select>
+            <input v-else v-model="newCategorieLabel" type="text" class="form-control" placeholder="Nom de la nouvelle catégorie" required />
+
+            <button type="button" class="btn-icon" @click="toggleCategorieMode" title="Créer une nouvelle catégorie">
+              {{ isNewCategorieMode ? 'X' : '+' }}
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
@@ -97,6 +104,8 @@ export default {
   data() {
     return {
       optionsVisibles: false,
+      isNewCategorieMode: false,
+      newCategorieLabel: '',
       form: {
         titre: '',
         categorie: 1,
@@ -118,6 +127,8 @@ export default {
   methods: {
     resetForm() {
       this.optionsVisibles = false;
+      this.isNewCategorieMode = false;
+      this.newCategorieLabel = '';
       this.form = {
         titre: '',
         categorie: 1,
@@ -129,43 +140,42 @@ export default {
       };
     },
 
-    fermer() {
-      this.$emit('close');
+    toggleCategorieMode() {
+      this.isNewCategorieMode = !this.isNewCategorieMode;
+      if (!this.isNewCategorieMode) {
+        this.newCategorieLabel = '';
+      } else {
+        this.form.categorie = null;
+      }
     },
-
+    fermer() {
+      this.$emit('close')
+    },
     soumettre() {
-      //Préparation et validation des dates
-      let dateDebutISO = null;
-      if (this.form.dateDebut) {
-        const time = this.form.heureDebut ? `${this.form.heureDebut}:00` : '00:00:00';
-        dateDebutISO = `${this.form.dateDebut} ${time}`;
-      }
+      if (this.form.dateDebut && this.form.dateFin) {
+        let dDebut = this.form.dateDebut;
+        let dFin = this.form.dateFin;
 
-      let dateFinISO = null;
-      if (this.form.dateFin) {
-        const time = this.form.heureFin ? `${this.form.heureFin}:00` : '00:00:00';
-        dateFinISO = `${this.form.dateFin} ${time}`;
-      }
+        //Si les heures sont définies, on les concatène pour la comparaison
+        if (this.form.heureDebut) dDebut += 'T' + this.form.heureDebut;
+        if (this.form.heureFin) dFin += 'T' + this.form.heureFin;
 
-      if (dateDebutISO && dateFinISO) {
-        const start = new Date(dateDebutISO);
-        const end = new Date(dateFinISO);
-        if (end < start) {
-            alert('La date de fin doit être avant ou égale à la date de début.');
-            return;
+        if (new Date(dFin) < new Date(dDebut)) {
+           alert('La date de fin doit être postérieure ou égale à la date de début.');
+           return;
         }
       }
 
       const payload = {
         ...this.form,
-        categorie: parseInt(this.form.categorie),
         latitude: this.latitude,
-        longitude: this.longitude,
-        dateDebut: dateDebutISO,
-        dateFin: dateFinISO
+        longitude: this.longitude
       };
-
-      this.$emit('submit', payload);
+      if (this.isNewCategorieMode) {
+        payload.newCategorie = this.newCategorieLabel;
+        delete payload.categorie; //Pas d'id encore
+      }
+      this.$emit('submit', payload)
     }
   }
 }
@@ -271,5 +281,31 @@ export default {
     margin-bottom: 15px;
     border: 1px solid #eee;
 }
-</style>
+.categorie-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
+.categorie-input-group select,
+.categorie-input-group input {
+  flex: 1;
+}
+
+.btn-icon {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 30px;
+  height: 38px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.btn-icon:hover {
+  background-color: #f0f0f0;
+}
+</style>

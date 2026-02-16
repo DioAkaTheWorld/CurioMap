@@ -1,6 +1,7 @@
 services:
   curiomap.db:
     image: postgres:latest
+    container_name: curiomap-db
     env_file: back/conf/curioMap.env
     ports:
       - "5454:5432"
@@ -8,7 +9,7 @@ services:
       - curioMap_net
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
-      - pg-data:/var/lib/postgresql
+      - pg-data:/var/lib/postgresql/data
     restart: unless-stopped
 
   adminer:
@@ -21,18 +22,8 @@ services:
       - curiomap.db
     restart: unless-stopped
 
-  curioMap:
-    image: php:8.2-cli-alpine
-    working_dir: /app
-    volumes:
-      - ./:/app
-    ports:
-      - "8000:80"
-    command: php -S 0.0.0.0:80 -t /app/front/dist
-    networks:
-      - curioMap_net
-
   backend:
+    container_name: curiomap-backend
     env_file: back/conf/curioMap.env
     build:
       context: .
@@ -58,9 +49,11 @@ services:
       - "5173:5173"
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - VITE_API_URL=http://backend:80
+      - VITE_API_URL=http://docketu.iutnc.univ-lorraine.fr:8002
     depends_on:
       - backend
+    networks:
+      - curioMap_net
 
 networks:
   curioMap_net:

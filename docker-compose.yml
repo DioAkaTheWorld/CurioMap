@@ -7,9 +7,14 @@ services:
     networks:
       - curioMap_net
     volumes:
-      - ./sql:/var/sql
+      - ./sql:/docker-entrypoint-initdb.d
       - pg-data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   adminer:
     image: adminer
@@ -35,7 +40,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    working_dir: /app
+    working_dir: /app/back
     volumes:
       - ./:/app
     ports:
@@ -43,8 +48,10 @@ services:
     networks:
       - curioMap_net
     depends_on:
-      - curiomap.db
-    command: sh -c "composer install && php -S 0.0.0.0:80 -t /app/back/public /app/back/public/index.php"
+      curiomap.db:
+        condition: service_healthy
+    command: sh -c "composer install && php -S 0.0.0.0:80 -t public public/index.php"
+    restart: unless-stopped
 
   frontend:
     image: node:20-alpine
@@ -56,7 +63,11 @@ services:
       - "5173:5173"
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - VITE_API_URL=http://backend:80
+      - VITE_API_URL=http://localhost:8002
+    depends_on:
+      - backend
+    networks:
+      - curioMap_net
 
 networks:
   curioMap_net:

@@ -46,7 +46,9 @@
 
 <script setup>
 import {defineProps, defineEmits, ref, watch, onMounted} from 'vue'
+import { useAuthStore } from '../stores/auth'
 
+const authStore = useAuthStore()
 const props = defineProps({
   show: {
     type: Boolean,
@@ -77,9 +79,7 @@ const toggleEditNotes = async () => {
       console.log(props.event.id)
       const response = await fetch(`${import.meta.env.VITE_API_URL}/notes`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: authStore.getAuthHeaders(),
         body: JSON.stringify(payload)
     })
       if(response.ok){

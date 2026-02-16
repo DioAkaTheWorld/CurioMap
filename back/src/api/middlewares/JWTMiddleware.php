@@ -1,8 +1,8 @@
 <?php
 
-namespace CurioMap\back\src\api\middlewares;
+namespace CurioMap\src\api\middlewares;
 
-use CurioMap\back\src\api\providers\JWTManager;
+use CurioMap\src\api\providers\JWTManager;
 use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
 use CurioMap\src\application_core\domain\entities\Utilisateur;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace CurioMap\back\src\api\providers;
+namespace CurioMap\src\api\providers;
 
-use CurioMap\src\application_core\application\services\ServiceUtilisateur;
-use CurioMap\src\application_core\application\dtos\AuthDTO;
-use CurioMap\src\application_core\application\dtos\ProfileDTO;
-use CurioMap\src\application_core\application\dtos\CredentialsDTO;
+use CurioMap\src\application_core\application\ports\api\dtos\AuthDTO;
+use CurioMap\src\application_core\application\ports\api\dtos\CredentialsDTO;
+use CurioMap\src\application_core\application\ports\api\dtos\ProfileDTO;
+use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
 
 class JWTAuthnProvider {
     private ServiceUtilisateur $serviceUtilisateur;
@@ -39,7 +39,7 @@ class JWTAuthnProvider {
 
         return [
             new AuthDTO($accessToken, $refreshToken),
-            new ProfileDTO($utilisateur->getId(), $utilisateur->getEmail())
+            new ProfileDTO($utilisateur->getId(), $utilisateur->getNom(),$utilisateur->getEmail())
         ];
     }
 

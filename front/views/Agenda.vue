@@ -39,7 +39,7 @@ const calendarApp = createCalendar({
     createViewWeek(),
     createViewDay(),
   ],
-  selectedDate: Temporal.PlainDate.from('2026-02-10'),
+  selectedDate: Temporal.Now.plainDateISO(),
   locale: 'fr-FR',
   events: [],
   callbacks: {
@@ -70,7 +70,9 @@ const fetchEvenements = async () => {
       return
     }
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/agenda?user_id=${userId}`)
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/agenda?user_id=${userId}`, {
+      headers: authStore.getAuthHeaders()
+    })
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)

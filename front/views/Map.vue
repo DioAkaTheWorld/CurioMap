@@ -148,7 +148,9 @@ export default {
           url += `?user_id=${this.authStore.user.id}`;
         }
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          headers: this.authStore.getAuthHeaders()
+        });
         if (response.ok) {
           const data = await response.json();
           //Mapper libelle vers label pour compatibilité
@@ -171,7 +173,9 @@ export default {
     //Chargement des points au lancement
     async fetchPoints() {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/points`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/points`, {
+          headers: this.authStore.getAuthHeaders()
+        });
         if (response.ok) {
           this.points = await response.json();
           this.updateMarkers();
@@ -510,7 +514,7 @@ export default {
         if (payload.newCategorie) {
             const catResponse = await fetch(`${import.meta.env.VITE_API_URL}/categories`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: this.authStore.getAuthHeaders(),
                 body: JSON.stringify({
                     libelle: payload.newCategorie,
                     iduser: this.authStore.user?.id
@@ -540,7 +544,7 @@ export default {
         //'http://localhost:8888/api/points'
         const response = await fetch(`${import.meta.env.VITE_API_URL}/points`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: this.authStore.getAuthHeaders(),
           body: JSON.stringify({
              ...payload,
              iduser: this.authStore.user?.id //Ajout de l'ID utilisateur
@@ -605,7 +609,7 @@ export default {
 
         const response = await fetch(`${import.meta.env.VITE_API_URL}/agenda`, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: this.authStore.getAuthHeaders(),
           body: JSON.stringify(payload)
         });
 

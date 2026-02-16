@@ -5,12 +5,15 @@ namespace CurioMap\src\api\actions;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
+use CurioMap\src\api\providers\JWTManager;
 
 class LoginAction {
     private ServiceUtilisateur $serviceUtilisateur;
+    private JWTManager $jwtManager;
 
-    public function __construct(ServiceUtilisateur $serviceUtilisateur) {
+    public function __construct(ServiceUtilisateur $serviceUtilisateur, JWTManager $jwtManager) {
         $this->serviceUtilisateur = $serviceUtilisateur;
+        $this->jwtManager = $jwtManager;
     }
 
     public function __invoke(Request $request, Response $response): Response {
@@ -26,9 +29,15 @@ class LoginAction {
                 $data['password']
             );
 
+            $token = $this->jwtManager->createAccessToken([
+                'user_id' => $utilisateur->getId(),
+                'email' => $utilisateur->getEmail(),
+            ]);
+
             $response->getBody()->write(json_encode([
                 'success' => true,
                 'message' => 'Connexion réussie',
+                'token' => $token,
                 'user' => [
                     'id' => $utilisateur->getId(),
                     'nom' => $utilisateur->getNom(),

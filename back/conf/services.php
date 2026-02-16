@@ -9,6 +9,7 @@ use CurioMap\src\api\actions\AddCategorieAction;
 use CurioMap\src\api\actions\LoginAction;
 use CurioMap\src\api\actions\modifierNotesAction;
 use CurioMap\src\api\actions\RegisterAction;
+use CurioMap\src\api\providers\JWTManager;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\api\ServiceCategorieInterface;
@@ -88,10 +89,14 @@ return [
     AddCategorieAction::class => function (ContainerInterface $c) {
         return new AddCategorieAction($c->get(ServiceCategorieInterface::class));
     },
+    JWTManager::class => function (ContainerInterface $c) {
+        $jwtKey = $c->get('settings')['jwt']['key'];
+        return new JWTManager($jwtKey);
+    },
     RegisterAction::class => function (ContainerInterface $c) {
-        return new RegisterAction($c->get(ServiceUtilisateur::class));
+        return new RegisterAction($c->get(ServiceUtilisateur::class), $c->get(JWTManager::class));
     },
     LoginAction::class => function (ContainerInterface $c) {
-        return new LoginAction($c->get(ServiceUtilisateur::class));
+        return new LoginAction($c->get(ServiceUtilisateur::class), $c->get(JWTManager::class));
     }
 ];

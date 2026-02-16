@@ -4,6 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
+    token: null,
     isAuthenticated: false,
     loading: false,
     error: null
@@ -42,8 +43,9 @@ export const useAuthStore = defineStore('auth', {
         }
 
         this.user = data.user
+        this.token = data.token
         this.isAuthenticated = true
-        localStorage.setItem('user', JSON.stringify(data.user))
+        localStorage.setItem('token', data.token)
         this.loading = false
 
         return { success: true, user: data.user }
@@ -85,8 +87,9 @@ export const useAuthStore = defineStore('auth', {
         }
 
         this.user = data.user
+        this.token = data.token
         this.isAuthenticated = true
-        localStorage.setItem('user', JSON.stringify(data.user))
+        localStorage.setItem('token', data.token)
         this.loading = false
 
         return { success: true, user: data.user }
@@ -104,23 +107,52 @@ export const useAuthStore = defineStore('auth', {
 
     logout() {
       this.user = null
+      this.token = null
       this.isAuthenticated = false
       this.error = null
+      localStorage.removeItem('token')
       localStorage.removeItem('user')
     },
 
     loadUser() {
-      const savedUser = localStorage.getItem('user')
-      if (savedUser) {
+      const savedToken = localStorage.getItem('token')
+      if (savedToken) {
         try {
-          this.user = JSON.parse(savedUser)
+          const payload = JSON.parse(atob(savedToken.split('.')[1]))
+
+          if (payload.exp && payload.exp * 1000 < Date.now()) {
+            console.warn('Token expiré')
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            return
+          }
+
+          this.user = {
+            id: payload.user_id,
+            email: payload.email
+          }
+          this.token = savedToken
           this.isAuthenticated = true
         } catch (e) {
-          console.error('Erreur lors du chargement de l\'utilisateur:', e)
+          console.error('Erreur lors du chargement du token:', e)
+          localStorage.removeItem('token')
           localStorage.removeItem('user')
         }
       }
     },
+
+    getAuthHeaders() {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+      if (this.token) {
+        headers['Authorization'] = `Bearer ${this.token}`
+      }
+
+      return headers
+    }
   }
 })
 

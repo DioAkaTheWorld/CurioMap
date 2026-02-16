@@ -2,16 +2,16 @@
 namespace CurioMap\src\api\middlewares;
 
 use CurioMap\src\api\providers\JWTManager;
-use CurioMap\src\application_core\infrastructure\repositories\PDOUserRepository;
+use CurioMap\src\infrastructure\repositories\PDOUtilisateurRepository;
 use PDO;
 
 class AuthMiddleware {
     private JWTManager $jwtManager;
-    private PDOUserRepository $userRepository;
+    private PDOUtilisateurRepository $userRepository;
 
     public function __construct(JWTManager $jwtManager, PDO $pdo) {
         $this->jwtManager = $jwtManager;
-        $this->userRepository = new PDOUserRepository($pdo);
+        $this->userRepository = new PDOUtilisateurRepository($pdo);
     }
 
     public function handle(): int {

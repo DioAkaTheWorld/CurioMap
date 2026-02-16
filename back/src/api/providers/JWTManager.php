@@ -1,6 +1,6 @@
 <?php
 
-namespace CurioMap\back\src\api\providers;
+namespace CurioMap\src\api\providers;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;

@@ -44,6 +44,7 @@ services:
       - curioMap_net
     depends_on:
       - curiomap.db
+    command: sh -c "composer install && php -S 0.0.0.0:80 -t /app/back/public /app/back/public/index.php"
 
   frontend:
     image: node:20-alpine
@@ -55,6 +56,7 @@ services:
       - "5173:5173"
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_API_URL=http://backend:80
 
 networks:
   curioMap_net:

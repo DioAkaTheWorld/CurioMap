@@ -8,7 +8,7 @@ services:
       - curioMap_net
     volumes:
       - ./sql:/docker-entrypoint-initdb.d
-      - pg-data:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql
     restart: unless-stopped
 
   adminer:

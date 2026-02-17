@@ -170,8 +170,6 @@ export default {
           }));
 
           //Maj selectedCategories pour inclure les nouvelles catégories
-          const newIds = this.categories.map(cat => cat.id);
-
           if (this.selectedCategories.length > 0) {
               const currentSet = new Set(this.selectedCategories);
               data.forEach(cat => {

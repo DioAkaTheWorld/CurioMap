@@ -1,10 +1,12 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useFavoritesStore } from '../stores/favorites'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const favoritesStore = useFavoritesStore()
 
 if (!authStore.isLoggedIn) {
   router.push('/connexion')
@@ -12,7 +14,10 @@ if (!authStore.isLoggedIn) {
 
 const user = computed(() => authStore.currentUser)
 
-// Formatage de la date d'inscription
+onMounted(() => {
+  favoritesStore.fetchFavorites()
+})
+
 const memberSince = computed(() => {
   if (user.value?.createdAt) {
     const date = new Date(user.value.createdAt)
@@ -67,21 +72,15 @@ const memberSince = computed(() => {
         </div>
         <p>{{ user?.email || 'Utilisateur' }}</p>
         <p>Membre depuis {{ memberSince }}</p>
-        <div class="ptn-crees">
-          <img class="icon-point" src="../assets/icon-point.png" alt="icon-point">
-          <p>Points créés</p>
-          <p><strong>3</strong></p>
-        </div>
 
         <div class="fav">
           <img class="icon-fav" src="../assets/icon-fav.png" alt="icon-fav">
           <p>Favoris enregistrés</p>
-          <p><strong>10</strong></p>
+          <p><strong>{{ favoritesStore.favorites.length }}</strong></p>
         </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <style scoped>
@@ -93,9 +92,9 @@ const memberSince = computed(() => {
   background: #f0f0f0;
 }
 .titre-profil {
-    max-width: 1200px;
-    margin: 5% auto;
-    padding: 0 20px;
+  max-width: 1200px;
+  margin: 5% auto;
+  padding: 0 20px;
 }
 .profil-container {
   max-width: 1200px;
@@ -209,7 +208,6 @@ input:focus {
   margin: 6px 0;
 }
 
-.ptn-crees,
 .fav {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -218,7 +216,6 @@ input:focus {
   margin-top: 20px;
 }
 
-.icon-point,
 .icon-fav {
   width: 24px;
   height: 24px;

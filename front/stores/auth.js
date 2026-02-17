@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useFavoritesStore } from './favorites'
 
 const API_URL = import.meta.env.VITE_API_URL;
 export const useAuthStore = defineStore('auth', {
@@ -112,6 +113,9 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+
+      const favoritesStore = useFavoritesStore()
+      favoritesStore.clearFavorites()
     },
 
     loadUser() {

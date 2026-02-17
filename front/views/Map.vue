@@ -272,12 +272,12 @@ export default {
           }
 
           // Boutons d'action
-          popupContent += `<div style="display: flex; gap: 10px; margin-top: 10px;">`;
           if (isUserLoggedIn) {
+            popupContent += `<div style="display: flex; gap: 10px; margin-top: 10px;">`;
             popupContent += `<button class="btn-favorite" data-point-id="${point.id}" style="flex: 0 0 auto;">${heartIcon}</button>`;
+            popupContent += `<button class="btn-agenda" style="flex: 1;">Ajouter à mon agenda</button>`;
+            popupContent += `</div>`;
           }
-          popupContent += `<button class="btn-agenda" style="flex: 1;">Ajouter à mon agenda</button>`;
-          popupContent += `</div>`;
 
           //Date de création
           if (point.date) {
@@ -400,6 +400,17 @@ export default {
       //Gestion du clic pour ajouter un point
       this.map.on('click', (e) => {
         const {lat, lng} = e.latlng;
+
+        //popup informative quand on est pas co
+        if (!this.authStore.isLoggedIn) {
+          L.popup()
+            .setLatLng(e.latlng)
+            .setContent(`<div style="text-align: center; padding: 5px;">
+                          Connectez-vous pour ajouter un point ici !
+                         </div>`)
+            .openOn(this.map);
+          return;
+        }
 
         const div = document.createElement('div');
         div.innerHTML = `

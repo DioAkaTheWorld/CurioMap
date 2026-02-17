@@ -59,7 +59,7 @@ return [
         return new ServiceEvenement($c->get(EvenementRepositoryInterface::class));
     },
     creePointInteretAction::class => function (ContainerInterface $c) {
-        return new creePointInteretAction($c->get(ServicePointInteretInterface::class));
+        return new creePointInteretAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
     },
     ajouterEventAction::class => function (ContainerInterface $c) {
         return new ajouterEventAction($c->get(ServiceEvenementInterface::class));
@@ -68,7 +68,7 @@ return [
         return new getAgendaAction($c->get(ServiceEvenementInterface::class));
     },
     getPointsAction::class => function (ContainerInterface $c) {
-        return new getPointsAction($c->get(ServicePointInteretInterface::class));
+        return new getPointsAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
     },
     modifierNotesAction::class => function (ContainerInterface $c) {
         return new modifierNotesAction($c->get(ServiceEvenementInterface::class));

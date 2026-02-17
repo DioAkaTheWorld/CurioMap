@@ -7,14 +7,28 @@ use CurioMap\src\application_core\application\ports\api\ServicePointInteretInter
 
 class getPointsAction{
     private ServicePointInteretInterface $service;
+    private \CurioMap\src\api\providers\JWTManager $jwtManager;
 
-    public function __construct(ServicePointInteretInterface $service){
+    public function __construct(ServicePointInteretInterface $service, \CurioMap\src\api\providers\JWTManager $jwtManager){
         $this->service = $service;
+        $this->jwtManager = $jwtManager;
     }
 
     public function __invoke(Request $request, Response $response): Response{
+        $userId = null;
+        $authHeader = $request->getHeaderLine('Authorization');
+        if ($authHeader) {
+            $token = str_replace('Bearer ', '', $authHeader);
+            try {
+                $payload = $this->jwtManager->decodeToken($token);
+                $userId = $payload['user_id'] ?? null;
+            } catch (\Exception $e) {
+                //token invalide ou expiré, on continue en mode public (userId null)
+            }
+        }
+
         try {
-            $points = $this->service->getAllPoints();
+            $points = $this->service->getAllPoints($userId);
 
             $data = array_map(function($point) {
                 return [
@@ -22,6 +36,7 @@ class getPointsAction{
                     'iduser' => $point->getIdUser(),
                     'titre' => $point->getTitre(),
                     'categorie' => $point->getCategorie(),
+                    'categorieLibelle' => $point->getCategorieLibelle(),
                     'latitude' => $point->getLatitude(),
                     'longitude' => $point->getLongitude(),
                     'description' => $point->getDescription(),

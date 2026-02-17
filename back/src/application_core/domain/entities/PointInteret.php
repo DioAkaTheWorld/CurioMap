@@ -18,6 +18,7 @@ class PointInteret{
     private int $visibilite;
     private ?DateTime $dateDebut;
     private ?DateTime $dateFin;
+    private ?string $categorieLibelle = null;
 
     public function __construct(
         int $iduser,
@@ -100,6 +101,14 @@ class PointInteret{
 
     public function getDateFin(): ?DateTime{
         return $this->dateFin;
+    }
+
+    public function setCategorieLibelle(string $libelle): void {
+        $this->categorieLibelle = $libelle;
+    }
+
+    public function getCategorieLibelle(): ?string {
+        return $this->categorieLibelle;
     }
 
     public function setId(int $id): void{

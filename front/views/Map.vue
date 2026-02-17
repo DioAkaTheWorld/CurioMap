@@ -175,9 +175,16 @@ export default {
             iduser: cat.iduser
           }));
 
-          //Maj selectedCategories pour inclure toutes les catégories au 1er chargement
-          if (this.selectedCategories.length === 0) {
-             this.selectedCategories = this.categories.map(cat => cat.id);
+          //Maj selectedCategories pour inclure les nouvelles catégories
+          if (this.selectedCategories.length > 0) {
+              const currentSet = new Set(this.selectedCategories);
+              data.forEach(cat => {
+                  if (!currentSet.has(cat.id)) {
+                       this.selectedCategories.push(cat.id);
+                  }
+              });
+          } else {
+               this.selectedCategories = this.categories.map(cat => cat.id);
           }
         }
       } catch (e) {
@@ -243,10 +250,11 @@ export default {
             }
         }
 
-        //Vérif si la caté est sélectionnée
-        if (this.selectedCategories.includes(parseInt(point.categorie))) {
+        //vérif si la caté est sélectionnée (ou si catégorie inconnue/privée d'un autre user -> on affiche par défaut)
+        const isKnownCategory = this.categories.some(c => c.id === point.categorie);
+        if (this.selectedCategories.includes(parseInt(point.categorie)) || !isKnownCategory) {
           const color = this.getCategoryColor(point.categorie);
-          const label = this.getCategoryLabel(point.categorie);
+          const label = point.categorieLibelle || this.getCategoryLabel(point.categorie);
           const isUserLoggedIn = this.authStore.isLoggedIn;
           const isFavorite = isUserLoggedIn ? this.favoritesStore.isFavorite(point.id) : false;
           const heartIcon = isFavorite ? '❤️' : '🤍';
@@ -355,13 +363,13 @@ export default {
 
         const center = this.filterCenter || this.userLocation;
         if (center && this.maxDistance < 500) {
-            this.distanceCircle = L.circle([center.lat, center.lon], {
+            this.distanceCircle = markRaw(L.circle([center.lat, center.lon], {
                 radius: this.maxDistance * 1000, //km -> m
                 color: '#3388ff',
                 fillColor: '#3388ff',
                 fillOpacity: 0.1,
                 weight: 1
-            }).addTo(this.map);
+            })).addTo(this.map);
         }
     },
 
@@ -387,7 +395,7 @@ export default {
       }).addTo(this.map)
 
       //LayerGroup pour les marqueurs filtrables
-      this.markerLayerGroup = L.layerGroup().addTo(this.map);
+      this.markerLayerGroup = markRaw(L.layerGroup()).addTo(this.map);
 
       //Gestion du clic pour ajouter un point
       this.map.on('click', (e) => {
@@ -435,14 +443,14 @@ export default {
             this.userMarker = null
           }
 
-          this.userMarker = L.circleMarker([lat, lon], {
+          this.userMarker = markRaw(L.circleMarker([lat, lon], {
             radius: 8,
             fillColor: "#f00020",
             color: "#ffffff",
             weight: 2,
             opacity: 1,
             fillOpacity: 1
-          }).addTo(this.map).bindPopup("<b>Vous êtes ici !</b>").openPopup()
+          })).addTo(this.map).bindPopup("<b>Vous êtes ici !</b>").openPopup()
         }, (error) => {
           console.warn("La géolocalisation a échoué ou a été refusée", error);
         }, {
@@ -588,15 +596,17 @@ export default {
         });
 
         if (response.ok) {
+          const resData = await response.json();
           alert('Point créé avec succès !');
 
           //Ajout du point à la liste locale
           //Pour l'affichage immédiat, on s'assure que les types sont bons
           const nouveauPoint = {
             ...payload,
-            id: (await response.json()).id || Date.now(), //On essaie de recup l'id sinon temp
+            id: resData.id || Date.now(),
             latitude: parseFloat(payload.latitude),
-            longitude: parseFloat(payload.longitude)
+            longitude: parseFloat(payload.longitude),
+            visibilite: payload.visibilite !== undefined ? parseInt(payload.visibilite) : 0
           };
 
           this.points.push(nouveauPoint);

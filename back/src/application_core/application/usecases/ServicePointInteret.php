@@ -13,8 +13,8 @@ class ServicePointInteret implements ServicePointInteretInterface{
         $this->pointRepository = $pointRepository;
     }
 
-    public function getAllPoints(): array{
-        return $this->pointRepository->findAll();
+    public function getAllPoints(?int $userId = null): array{
+        return $this->pointRepository->findAll($userId);
     }
 
     public function creePoint(array $data): PointInteret{
@@ -25,18 +25,16 @@ class ServicePointInteret implements ServicePointInteretInterface{
         $dateDebut = !empty($data['dateDebut']) ? new DateTime($data['dateDebut']) : null;
         $dateFin = !empty($data['dateFin']) ? new DateTime($data['dateFin']) : null;
 
-        //NOTE : pour l'instant, on met des valeurs par défaut pour id_user et categorie
-        //ya pas encore la gestion des users connectés
         $point = new PointInteret(
-            iduser: $data['iduser'] ?? 1, //user 1 si pas précisé
+            iduser: $data['iduser'] ?? 1, //user 1 si pas précisé (devrait être géré avant)
             titre: $data['titre'],
-            categorie: $data['categorie'] ?? 1, //catégorie 1
+            categorie: $data['categorie'] ?? 1,
             latitude: (float) $data['latitude'],
             longitude: (float) $data['longitude'],
             image: $data['image'] ?? null,
             description: $data['description'] ?? null,
             adresse: $data['adresse'] ?? null,
-            visibilite: $data['visibilite'] ?? 1, //public par défaut
+            visibilite: isset($data['visibilite']) ? (int)$data['visibilite'] : 0, //0 (privé) par défaut
             dateDebut: $dateDebut,
             dateFin: $dateFin
         );

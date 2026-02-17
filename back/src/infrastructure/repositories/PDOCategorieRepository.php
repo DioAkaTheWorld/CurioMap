@@ -13,10 +13,19 @@ class PDOCategorieRepository implements CategorieRepositoryInterface {
     }
 
     public function getCategories(?int $idUser): array {
-        $sql = "SELECT * FROM Categorie WHERE iduser IS NULL";
+        //il faut recup
+        //les catés globales (iduser NULL = musée, monument...), éventuellement les mettre en publique de base
+        //les catés de l'utilisateur connecté (si idUser fourni)
+        //les catés utilisées par des points publics (même si elles appartiennent à d'autres users)
+
+        $sql = "SELECT DISTINCT c.* FROM Categorie c 
+                WHERE c.iduser IS NULL 
+                OR c.id IN (SELECT DISTINCT categorie FROM PointInteret WHERE visibilite = 1)";
+
         if ($idUser !== null) {
-            $sql .= " OR iduser = :iduser";
+            $sql .= " OR c.iduser = :iduser";
         }
+
         $stmt = $this->pdo->prepare($sql);
         if ($idUser !== null) {
             $stmt->bindValue(':iduser', $idUser);

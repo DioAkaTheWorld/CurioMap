@@ -30,6 +30,14 @@
           <textarea v-model="form.description" class="form-control" rows="3"></textarea>
         </div>
 
+        <div class="form-group">
+            <label>Visibilité</label>
+             <div class="radio-group">
+               <label><input type="radio" v-model="form.visibilite" :value="1"> Publique</label>
+               <label class="ml-10"><input type="radio" v-model="form.visibilite" :value="0"> Privée</label>
+             </div>
+        </div>
+
         <div @click="optionsVisibles = !optionsVisibles" class="options-header">
           <h2>Champs optionnels</h2>
           <span :class="{'rotated': optionsVisibles}">▼</span>
@@ -109,6 +117,7 @@ export default {
       form: {
         titre: '',
         categorie: 1,
+        visibilite: 0,
         description: '',
         dateDebut: '',
         dateFin: '',
@@ -132,6 +141,7 @@ export default {
       this.form = {
         titre: '',
         categorie: 1,
+        visibilite: 0,
         description: '',
         dateDebut: '',
         dateFin: '',
@@ -307,5 +317,14 @@ export default {
 
 .btn-icon:hover {
   background-color: #f0f0f0;
+}
+.radio-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.ml-10 {
+    margin-left: 10px;
 }
 </style>

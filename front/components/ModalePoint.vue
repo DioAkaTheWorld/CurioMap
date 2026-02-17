@@ -33,8 +33,8 @@
         <div class="form-group">
             <label>Visibilité</label>
              <div class="radio-group">
-               <label><input type="radio" v-model="form.visibilite" :value="1"> Public</label>
-               <label class="ml-10"><input type="radio" v-model="form.visibilite" :value="0"> Privé</label>
+               <label><input type="radio" v-model="form.visibilite" :value="1"> Publique</label>
+               <label class="ml-10"><input type="radio" v-model="form.visibilite" :value="0"> Privée</label>
              </div>
         </div>
 

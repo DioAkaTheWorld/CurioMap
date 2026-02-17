@@ -45,4 +45,20 @@ class ServicePointInteret implements ServicePointInteretInterface{
 
         return $point;
     }
+
+    public function getFavoritesByUser(int $userId): array
+    {
+        return $this->pointRepository->findFavoritesByUser($userId);
+    }
+
+    public function addFavorite(int $userId, int $pointId): void
+    {
+        $this->pointRepository->addFavorite($userId, $pointId);
+    }
+
+    public function removeFavorite(int $userId, int $pointId): void
+    {
+        $this->pointRepository->removeFavorite($userId, $pointId);
+    }
+
 }

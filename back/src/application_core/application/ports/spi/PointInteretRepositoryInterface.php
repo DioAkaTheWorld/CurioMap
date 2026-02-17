@@ -7,4 +7,7 @@ interface PointInteretRepositoryInterface{
     public function findAll(?int $userId = null): array;
 
     public function save(PointInteret $point): int;
+    public function addFavorite(int $userId, int $pointId): void;
+    public function removeFavorite(int $userId, int $pointId): void;
+    public function findFavoritesByUser(int $userId): array;
 }

@@ -1,14 +1,17 @@
 <?php
 
+use CurioMap\src\api\actions\AddFavoriteAction;
 use CurioMap\src\api\actions\ajouterEventAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
+use CurioMap\src\api\actions\GetFavoritesByUserAction;
 use CurioMap\src\api\actions\getPointsAction;
 use CurioMap\src\api\actions\AddCategorieAction;
 use CurioMap\src\api\actions\LoginAction;
 use CurioMap\src\api\actions\modifierNotesAction;
 use CurioMap\src\api\actions\RegisterAction;
+use CurioMap\src\api\actions\RemoveFavoriteAction;
 use CurioMap\src\api\providers\JWTManager;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
@@ -98,5 +101,14 @@ return [
     },
     LoginAction::class => function (ContainerInterface $c) {
         return new LoginAction($c->get(ServiceUtilisateur::class), $c->get(JWTManager::class));
+    },
+    AddFavoriteAction::class => function(ContainerInterface $c) {
+        return new AddFavoriteAction($c->get(ServicePointInteretInterface::class));
+    },
+    RemoveFavoriteAction::class => function(ContainerInterface $c) {
+        return new RemoveFavoriteAction($c->get(ServicePointInteretInterface::class));
+    },
+    GetFavoritesByUserAction::class => function(ContainerInterface $c) {
+        return new GetFavoritesByUserAction($c->get(ServicePointInteretInterface::class));
     }
 ];

@@ -74,7 +74,8 @@ import 'leaflet/dist/leaflet.css'
 import { markRaw } from 'vue'
 import Filtre from '../components/Filtre.vue'
 import ModalePoint from '../components/ModalePoint.vue'
-import {useAuthStore} from "../stores/auth";
+import {useAuthStore} from "../stores/auth"
+import {useFavoritesStore} from "../stores/favorites"
 
 //Correctif pour les icônes Leaflet avec Vite
 import icon from 'leaflet/dist/images/marker-icon.png'
@@ -98,6 +99,9 @@ export default {
   computed: {
     authStore() {
       return useAuthStore()
+    },
+    favoritesStore() {
+      return useFavoritesStore()
     }
   },
   data() {
@@ -133,6 +137,11 @@ export default {
     this.initMap()
     this.fetchCategories()
     this.fetchPoints()
+    if (this.authStore.isLoggedIn) {
+      this.favoritesStore.fetchFavorites().then(() => {
+        this.updateMarkers()
+      })
+    }
   },
 
   beforeUnmount() {
@@ -242,6 +251,10 @@ export default {
         if (this.selectedCategories.includes(parseInt(point.categorie)) || !isKnownCategory) {
           const color = this.getCategoryColor(point.categorie);
           const label = point.categorieLibelle || this.getCategoryLabel(point.categorie);
+          const isUserLoggedIn = this.authStore.isLoggedIn;
+          const isFavorite = isUserLoggedIn ? this.favoritesStore.isFavorite(point.id) : false;
+          const heartIcon = isFavorite ? '❤️' : '🤍';
+
           //Contenu de la popup avec les infos du point
           let popupContent = `<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span>`;
           if (point.description) {
@@ -253,7 +266,14 @@ export default {
           if (point.dateFin) {
             popupContent += `<br>📅 <b>Date de fin :</b> ${this.formatDateEvent(point.dateFin)}`;
           }
-          popupContent += `<br/><button class="btn-agenda">Ajouter à mon agenda</button></br>`;
+
+          // Boutons d'action
+          popupContent += `<div style="display: flex; gap: 10px; margin-top: 10px;">`;
+          if (isUserLoggedIn) {
+            popupContent += `<button class="btn-favorite" data-point-id="${point.id}" style="flex: 0 0 auto;">${heartIcon}</button>`;
+          }
+          popupContent += `<button class="btn-agenda" style="flex: 1;">Ajouter à mon agenda</button>`;
+          popupContent += `</div>`;
 
           //Date de création
           if (point.date) {
@@ -280,10 +300,20 @@ export default {
 
           marker.on('popupopen', (e) => {
             const popupNode = e.popup._contentNode;
-            const btn = popupNode.querySelector('.btn-agenda');
-            if (btn) {
-              btn.onclick = () => {
+            const btnAgenda = popupNode.querySelector('.btn-agenda');
+            const btnFavorite = popupNode.querySelector('.btn-favorite');
+
+            if (btnAgenda) {
+              btnAgenda.onclick = () => {
                 this.ajouterEvenement(point);
+              };
+            }
+
+            if (btnFavorite) {
+              btnFavorite.onclick = async () => {
+                await this.toggleFavorite(point.id);
+                const newIsFavorite = this.favoritesStore.isFavorite(point.id);
+                btnFavorite.textContent = newIsFavorite ? '❤️' : '🤍';
               };
             }
           });
@@ -643,6 +673,15 @@ export default {
 
     getMaxDate(){
       return this.pointSelectionne.dateFin ?? null;
+    },
+
+    async toggleFavorite(pointId) {
+      const success = await this.favoritesStore.toggleFavorite(pointId);
+      if (!success) {
+        alert('Erreur lors de la mise à jour du favori');
+      } else {
+        this.updateMarkers(pointId);
+      }
     }
 
   },
@@ -756,6 +795,28 @@ export default {
 :deep(.btn-agenda:active) {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+}
+
+:deep(.btn-favorite) {
+  padding: 8px 12px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.btn-favorite:hover) {
+  transform: scale(1.1);
+  border-color: #ff6b9d;
+  box-shadow: 0 4px 8px rgba(255, 107, 157, 0.3);
+}
+
+:deep(.btn-favorite:active) {
+  transform: scale(0.95);
 }
 
 .options-header {

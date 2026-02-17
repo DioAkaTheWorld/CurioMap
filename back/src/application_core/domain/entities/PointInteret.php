@@ -114,4 +114,23 @@ class PointInteret{
     public function setId(int $id): void{
         $this->id = $id;
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            iduser: $data['iduser'],
+            titre: $data['titre'],
+            categorie: $data['categorie'],
+            latitude: (float)$data['latitude'],
+            longitude: (float)$data['longitude'],
+            image: $data['image'],
+            description: $data['description'],
+            adresse: $data['adresse'],
+            visibilite: $data['visibilite'],
+            date: new DateTime($data['date']),
+            dateDebut: !empty($data['date_debut']) ? new DateTime($data['date_debut']) : null,
+            dateFin: !empty($data['date_fin']) ? new DateTime($data['date_fin']) : null,
+            id: $data['id']
+        );
+    }
 }

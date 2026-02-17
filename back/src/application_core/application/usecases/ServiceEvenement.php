@@ -70,4 +70,17 @@ class ServiceEvenement implements ServiceEvenementInterface{
         $this->evenementRepository->updateNotes($event->getId(),$notes);
     }
 
+    public function deleteEvent(int $id, int $userId): void {
+        $event = $this->evenementRepository->findById($id);
+
+        if (!$event) {
+            throw new InvalidArgumentException("Événement introuvable.");
+        }
+
+        if ($event->getIdUser() !== $userId) {
+             throw new \Exception("Vous n'êtes pas autorisé à supprimer cet événement.");
+        }
+
+        $this->evenementRepository->delete($id);
+    }
 }

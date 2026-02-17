@@ -108,6 +108,9 @@ return [
     RemoveFavoriteAction::class => function(ContainerInterface $c) {
         return new RemoveFavoriteAction($c->get(ServicePointInteretInterface::class));
     },
+    CurioMap\src\api\actions\DeleteEventAction::class => function(ContainerInterface $c) {
+        return new CurioMap\src\api\actions\DeleteEventAction($c->get(ServiceEvenementInterface::class), $c->get(JWTManager::class));
+    },
     GetFavoritesByUserAction::class => function(ContainerInterface $c) {
         return new GetFavoritesByUserAction($c->get(ServicePointInteretInterface::class));
     }

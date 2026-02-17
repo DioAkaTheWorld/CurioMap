@@ -10,4 +10,6 @@ interface EvenementRepositoryInterface{
      */
     public function findByUser(int $userId): array;
     public function findById(int $id): ?Evenement;
+    public function delete(int $id): void;
+    public function updateNotes(int $id, ?string $notes): void;
 }

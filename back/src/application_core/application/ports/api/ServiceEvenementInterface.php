@@ -8,4 +8,5 @@ interface ServiceEvenementInterface{
     public function creeEvent(array $data): Evenement;
     public function getUserEvents(int $userId): array;
     public function modifierNotes(array $data): void;
+    public function deleteEvent(int $id, int $userId): void;
 }

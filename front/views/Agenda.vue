@@ -6,6 +6,7 @@
       :event="selectedEvent"
       @close="closeDetails"
       @update:event="updateEvent"
+      @delete:event="updateEvent"
     />
   </div>
 </template>

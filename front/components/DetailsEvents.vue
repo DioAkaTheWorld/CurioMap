@@ -40,6 +40,10 @@
           </button>
         </div>
       </div>
+
+      <button class="delete-btn" @click="supprimerEvenement" title="Supprimer l'événement">
+        Supprimer l'événement
+      </button>
     </div>
   </div>
 </template>
@@ -60,7 +64,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'update:event', 'delete:event']);
 const editingNotes = ref(false);
 const notesValue = ref(null);
 
@@ -94,6 +98,28 @@ const toggleEditNotes = async () => {
     }
   }
   editingNotes.value = !editingNotes.value
+}
+
+const supprimerEvenement = async () => {
+    if (!confirm("Voulez-vous vraiment supprimer cet événement ?")) return;
+
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/agenda/${props.event.id}`, {
+            method: 'DELETE',
+            headers: authStore.getAuthHeaders()
+        });
+
+        if (response.ok) {
+            emit('delete:event', props.event.id);
+            emit('close');
+        } else {
+            const err = await response.json();
+            alert("Erreur lors de la suppression : " + (err.error || "Erreur inconnue"));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Impossible de contacter le serveur.");
+    }
 }
 
 const fermer = () => {
@@ -278,6 +304,23 @@ const formatTime = (dateString) => {
 .notes-textarea {
   resize: none;
   width:100%;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
 }
 
 @media (max-width: 768px) {

@@ -40,13 +40,24 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
         return (int) $result['id'];
     }
 
-    public function findAll(): array{
-        $sql = "SELECT * FROM pointinteret";
-        $stmt = $this->pdo->query($sql);
+    public function findAll(?int $userId = null): array{
+        $sql = "SELECT p.*, c.libelle as categorie_libelle 
+                FROM pointinteret p 
+                INNER JOIN categorie c ON p.categorie = c.id
+                WHERE p.visibilite = 1";
+        $params = [];
+
+        if ($userId !== null) {
+            $sql .= " OR p.iduser = :userId";
+            $params['userId'] = $userId;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
         $points = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-            $points[] = new PointInteret(
+            $point = new PointInteret(
                 iduser: $row['iduser'],
                 titre: $row['titre'],
                 categorie: $row['categorie'],
@@ -61,6 +72,10 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
                 dateFin: !empty($row['date_fin']) ? new DateTime($row['date_fin']) : null,
                 id: $row['id']
             );
+            if (!empty($row['categorie_libelle'])) {
+                $point->setCategorieLibelle($row['categorie_libelle']);
+            }
+            $points[] = $point;
         }
         return $points;
     }

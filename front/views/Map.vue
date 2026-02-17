@@ -160,9 +160,18 @@ export default {
             iduser: cat.iduser
           }));
 
-          //Maj selectedCategories pour inclure toutes les catégories au 1er chargement
-          if (this.selectedCategories.length === 0) {
-             this.selectedCategories = this.categories.map(cat => cat.id);
+          //Maj selectedCategories pour inclure les nouvelles catégories
+          const newIds = this.categories.map(cat => cat.id);
+
+          if (this.selectedCategories.length > 0) {
+              const currentSet = new Set(this.selectedCategories);
+              data.forEach(cat => {
+                  if (!currentSet.has(cat.id)) {
+                       this.selectedCategories.push(cat.id);
+                  }
+              });
+          } else {
+               this.selectedCategories = this.categories.map(cat => cat.id);
           }
         }
       } catch (e) {
@@ -228,10 +237,11 @@ export default {
             }
         }
 
-        //Vérif si la caté est sélectionnée
-        if (this.selectedCategories.includes(parseInt(point.categorie))) {
+        //vérif si la caté est sélectionnée (ou si catégorie inconnue/privée d'un autre user -> on affiche par défaut)
+        const isKnownCategory = this.categories.some(c => c.id === point.categorie);
+        if (this.selectedCategories.includes(parseInt(point.categorie)) || !isKnownCategory) {
           const color = this.getCategoryColor(point.categorie);
-          const label = this.getCategoryLabel(point.categorie);
+          const label = point.categorieLibelle || this.getCategoryLabel(point.categorie);
           //Contenu de la popup avec les infos du point
           let popupContent = `<b>${point.titre}</b><br><span style="color:${color}; font-weight:bold">${label}</span>`;
           if (point.description) {
@@ -552,15 +562,17 @@ export default {
         });
 
         if (response.ok) {
+          const resData = await response.json();
           alert('Point créé avec succès !');
 
           //Ajout du point à la liste locale
           //Pour l'affichage immédiat, on s'assure que les types sont bons
           const nouveauPoint = {
             ...payload,
-            id: (await response.json()).id || Date.now(), //On essaie de recup l'id sinon temp
+            id: resData.id || Date.now(),
             latitude: parseFloat(payload.latitude),
-            longitude: parseFloat(payload.longitude)
+            longitude: parseFloat(payload.longitude),
+            visibilite: payload.visibilite !== undefined ? parseInt(payload.visibilite) : 0
           };
 
           this.points.push(nouveauPoint);

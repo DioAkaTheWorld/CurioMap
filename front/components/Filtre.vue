@@ -207,8 +207,7 @@ export default {
         case 4: return '#4caf50'; //Parc en vert
         case 5: return '#9c27b0'; //Musée en violet
         default:
-            //Idem que Map.vue
-            const hue = (intId * 137.508) % 360;
+            const hue = (intId * 137.508) % 360; //idem Map.vue
             return `hsl(${hue}, 70%, 50%)`;
       }
     }

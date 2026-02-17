@@ -10,6 +10,10 @@
       @close="fermerModale"
       @submit="creerPoint"
     />
+    <PanelFavoris
+      @navigate-to-point="naviguerVersPointDepuisPanel"
+      @favorites-updated="updateMarkers"
+    />
   </div>
 
   <div v-if="modaleAgendaOuverte" class="modal-overlay" @click.self="fermerModaleAgenda">
@@ -74,6 +78,7 @@ import 'leaflet/dist/leaflet.css'
 import { markRaw } from 'vue'
 import Filtre from '../components/Filtre.vue'
 import ModalePoint from '../components/ModalePoint.vue'
+import PanelFavoris from '../components/PanelFavoris.vue'
 import {useAuthStore} from "../stores/auth"
 import {useFavoritesStore} from "../stores/favorites"
 
@@ -94,7 +99,8 @@ export default {
   name: 'MapView',
   components: {
     Filtre,
-    ModalePoint
+    ModalePoint,
+    PanelFavoris
   },
   computed: {
     authStore() {
@@ -670,6 +676,23 @@ export default {
       } else {
         this.updateMarkers(pointId);
       }
+    },
+
+
+    naviguerVersPointDepuisPanel(point) {
+      this.map.flyTo([point.latitude, point.longitude], 16, {
+        duration: 2
+      })
+
+      setTimeout(() => {
+        this.markerLayerGroup.eachLayer((layer) => {
+          const latLng = layer.getLatLng()
+          if (Math.abs(latLng.lat - point.latitude) < 0.0001 &&
+              Math.abs(latLng.lng - point.longitude) < 0.0001) {
+            layer.openPopup()
+          }
+        })
+      }, 2100)
     }
 
   },

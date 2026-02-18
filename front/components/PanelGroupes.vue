@@ -68,7 +68,7 @@
                     type="text"
                     required
                     class="form-control"
-                    placeholder="Ex: Voyage Japon 2026"
+                    placeholder="Nom du groupe"
                   />
                 </div>
 

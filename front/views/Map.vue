@@ -19,6 +19,7 @@
       :point="pointPourDetails"
       @close="fermerModaleDetailsPoint"
     />
+    <PanelGroupes />
   </div>
 
   <div v-if="modaleAgendaOuverte" class="modal-overlay" @click.self="fermerModaleAgenda">
@@ -85,6 +86,7 @@ import Filtre from '../components/Filtre.vue'
 import ModalePoint from '../components/ModalePoint.vue'
 import PanelFavoris from '../components/PanelFavoris.vue'
 import DetailsPointModal from '../components/DetailsPointModal.vue'
+import PanelGroupes from '../components/PanelGroupes.vue'
 import {useAuthStore} from "../stores/auth"
 import {useFavoritesStore} from "../stores/favorites"
 
@@ -107,7 +109,8 @@ export default {
     Filtre,
     ModalePoint,
     PanelFavoris,
-    DetailsPointModal
+    DetailsPointModal,
+    PanelGroupes
   },
   computed: {
     authStore() {

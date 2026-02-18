@@ -2,6 +2,10 @@
 
 use CurioMap\src\api\actions\AddFavoriteAction;
 use CurioMap\src\api\actions\ajouterEventAction;
+use CurioMap\src\api\actions\CreateGroupeAction;
+use CurioMap\src\api\actions\JoinGroupeAction;
+use CurioMap\src\api\actions\GetUserGroupesAction;
+use CurioMap\src\api\actions\LeaveGroupeAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
@@ -16,6 +20,7 @@ use CurioMap\src\api\actions\RegisterAction;
 use CurioMap\src\api\actions\RemoveFavoriteAction;
 use CurioMap\src\api\providers\JWTManager;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
+use CurioMap\src\application_core\application\ports\api\ServiceGroupeInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\api\ServiceCategorieInterface;
 use CurioMap\src\application_core\application\ports\api\ServiceCommentaireInterface;
@@ -23,17 +28,29 @@ use CurioMap\src\application_core\application\ports\spi\EvenementRepositoryInter
 use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\CategorieRepositoryInterface;
+<<<<<<< HEAD
 use CurioMap\src\application_core\application\ports\spi\CommentaireRepositoryInterface;
+=======
+use CurioMap\src\application_core\application\ports\spi\GroupeRepositoryInterface;
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
 use CurioMap\src\application_core\application\usecases\ServiceEvenement;
 use CurioMap\src\application_core\application\usecases\ServicePointInteret;
 use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
 use CurioMap\src\application_core\application\usecases\ServiceCategorie;
+<<<<<<< HEAD
 use CurioMap\src\application_core\application\usecases\ServiceCommentaire;
+=======
+use CurioMap\src\application_core\application\usecases\ServiceGroupe;
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
 use CurioMap\src\infrastructure\repositories\PDOEvenementRepository;
 use CurioMap\src\infrastructure\repositories\PDOPointRepository;
 use CurioMap\src\infrastructure\repositories\PDOUtilisateurRepository;
 use CurioMap\src\infrastructure\repositories\PDOCategorieRepository;
+<<<<<<< HEAD
 use CurioMap\src\infrastructure\repositories\PDOCommentaireRepository;
+=======
+use CurioMap\src\infrastructure\repositories\PDOGroupeRepository;
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
 use Psr\Container\ContainerInterface;
 
 return [
@@ -129,7 +146,27 @@ return [
     GetFavoritesByUserAction::class => function(ContainerInterface $c) {
         return new GetFavoritesByUserAction($c->get(ServicePointInteretInterface::class));
     },
+<<<<<<< HEAD
     GetCommentairesAction::class => function(ContainerInterface $c) {
         return new GetCommentairesAction($c->get(ServiceCommentaireInterface::class));
+=======
+    GroupeRepositoryInterface::class => function(ContainerInterface $c) {
+        return new PDOGroupeRepository($c->get(PDO::class));
+    },
+    ServiceGroupeInterface::class => function(ContainerInterface $c) {
+        return new ServiceGroupe($c->get(GroupeRepositoryInterface::class));
+    },
+    CreateGroupeAction::class => function(ContainerInterface $c) {
+        return new CreateGroupeAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
+    },
+    JoinGroupeAction::class => function(ContainerInterface $c) {
+        return new JoinGroupeAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
+    },
+    GetUserGroupesAction::class => function(ContainerInterface $c) {
+        return new GetUserGroupesAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
+    },
+    LeaveGroupeAction::class => function(ContainerInterface $c) {
+        return new LeaveGroupeAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
     }
 ];

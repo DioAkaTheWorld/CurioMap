@@ -85,4 +85,19 @@ class PDOUtilisateurRepository implements UtilisateurRepositoryInterface {
             $user->getRole()
         );
     }
+
+    public function updatePassword(int $userId, string $hashedPassword): void
+    {
+        $stmt = $this->pdo->prepare("
+        UPDATE Utilisateur
+        SET motdepasse = :motdepasse
+        WHERE id = :id
+    ");
+
+        $stmt->execute([
+            'id' => $userId,
+            'motdepasse' => $hashedPassword
+        ]);
+    }
+
 }

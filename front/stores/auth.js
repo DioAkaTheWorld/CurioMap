@@ -156,6 +156,34 @@ export const useAuthStore = defineStore('auth', {
       }
 
       return headers
+    },
+
+    async updatePassword(newPassword) {
+      this.loading = true
+      this.error = null
+
+      try {
+        const response = await fetch(`${API_URL}/auth/password`, {
+          method: 'POST',
+          headers: this.getAuthHeaders(),
+          body: JSON.stringify({ password: newPassword })
+        })
+
+        const data = await response.json()
+
+        this.loading = false
+
+        if (!response.ok) {
+          return { success: false, error: data.error || 'Erreur inconnue' }
+        }
+
+        return { success: true, message: 'Mot de passe modifié avec succès' }
+
+      } catch (error) {
+        console.error('Erreur update password:', error)
+        this.loading = false
+        return { success: false, error: 'Erreur de connexion serveur' }
+      }
     }
   }
 })

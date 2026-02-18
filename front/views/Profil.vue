@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useFavoritesStore } from '../stores/favorites'
@@ -7,6 +7,10 @@ import { useFavoritesStore } from '../stores/favorites'
 const router = useRouter()
 const authStore = useAuthStore()
 const favoritesStore = useFavoritesStore()
+
+const nouveauMdp = ref('')
+const confirmerMdp = ref('')
+const messageStatus = ref('')
 
 if (!authStore.isLoggedIn) {
   router.push('/connexion')
@@ -25,6 +29,35 @@ const memberSince = computed(() => {
   }
   return 'Inconnu'
 })
+
+const changerMotDePasse = async () => {
+  messageStatus.value = ''
+
+  if (!nouveauMdp.value || !confirmerMdp.value) {
+    messageStatus.value = "Veuillez remplir les deux champs."
+    return
+  }
+
+  if (nouveauMdp.value !== confirmerMdp.value) {
+    messageStatus.value = "Les mots de passe ne correspondent pas."
+    return
+  }
+
+  if (nouveauMdp.value.length < 6) {
+    messageStatus.value = "Le mot de passe doit faire au moins 6 caractères."
+    return
+  }
+
+  const result = await authStore.updatePassword(nouveauMdp.value)
+
+  if (result.success) {
+    messageStatus.value = "Mot de passe mis à jour !"
+    nouveauMdp.value = ''
+    confirmerMdp.value = ''
+  } else {
+    messageStatus.value = "Erreur : " + result.error
+  }
+}
 </script>
 
 <template>
@@ -53,16 +86,20 @@ const memberSince = computed(() => {
         <div>
           <p><strong>Nouveau mot de passe</strong></p>
           <input
-              type="text"
+              v-model="nouveauMdp"
+              type="password"
               placeholder="mot de passe"
           >
           <p><strong>Confirmer le nouveau mot de passe</strong></p>
           <input
-              type="text"
+              v-model="confirmerMdp"
+              type="password"
               placeholder="confirmer le mot de passe"
           >
+          <p v-if="messageStatus" class="status-msg">{{ messageStatus }}</p>
         </div>
-        <button class="btn enregistrer">Enregistrer les modifications</button>
+
+        <button @click="changerMotDePasse" class="btn enregistrer">Enregistrer les modifications</button>
       </div>
 
       <div class="votre-profil">
@@ -236,6 +273,12 @@ input:focus {
   .enregistrer {
     width: 100%;
     text-align: center;
+  }
+
+  .status-msg {
+    color: #d32f2f;
+    font-weight: bold;
+    margin-top: 10px;
   }
 
   .ptn-crees,

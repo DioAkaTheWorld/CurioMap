@@ -20,6 +20,7 @@ use CurioMap\src\api\actions\LoginAction;
 use CurioMap\src\api\actions\modifierNotesAction;
 use CurioMap\src\api\actions\RegisterAction;
 use CurioMap\src\api\actions\RemoveFavoriteAction;
+use CurioMap\src\api\actions\UpdatePasswordAction;
 use CurioMap\src\api\providers\JWTManager;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 use CurioMap\src\application_core\application\ports\api\ServiceGroupeInterface;
@@ -60,6 +61,9 @@ return [
             ]
         );
         return $pdo;
+    },
+    UpdatePasswordAction::class => function (ContainerInterface $c) {
+        return new UpdatePasswordAction($c->get(UtilisateurRepositoryInterface::class), $c->get(JWTManager::class));
     },
 
     PointInteretRepositoryInterface::class => function (ContainerInterface $c) {

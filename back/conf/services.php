@@ -5,6 +5,7 @@ use CurioMap\src\api\actions\ajouterEventAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
+use CurioMap\src\api\actions\GetCommentairesAction;
 use CurioMap\src\api\actions\GetFavoritesByUserAction;
 use CurioMap\src\api\actions\getPointsAction;
 use CurioMap\src\api\actions\DeletePointAction;
@@ -17,18 +18,22 @@ use CurioMap\src\api\providers\JWTManager;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\api\ServiceCategorieInterface;
+use CurioMap\src\application_core\application\ports\api\ServiceCommentaireInterface;
 use CurioMap\src\application_core\application\ports\spi\EvenementRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\CategorieRepositoryInterface;
+use CurioMap\src\application_core\application\ports\spi\CommentaireRepositoryInterface;
 use CurioMap\src\application_core\application\usecases\ServiceEvenement;
 use CurioMap\src\application_core\application\usecases\ServicePointInteret;
 use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
 use CurioMap\src\application_core\application\usecases\ServiceCategorie;
+use CurioMap\src\application_core\application\usecases\ServiceCommentaire;
 use CurioMap\src\infrastructure\repositories\PDOEvenementRepository;
 use CurioMap\src\infrastructure\repositories\PDOPointRepository;
 use CurioMap\src\infrastructure\repositories\PDOUtilisateurRepository;
 use CurioMap\src\infrastructure\repositories\PDOCategorieRepository;
+use CurioMap\src\infrastructure\repositories\PDOCommentaireRepository;
 use Psr\Container\ContainerInterface;
 
 return [
@@ -90,6 +95,12 @@ return [
     ServiceCategorieInterface::class => function (ContainerInterface $c) {
         return new ServiceCategorie($c->get(CategorieRepositoryInterface::class));
     },
+    CommentaireRepositoryInterface::class => function (ContainerInterface $c) {
+        return new PDOCommentaireRepository($c->get(PDO::class));
+    },
+    ServiceCommentaireInterface::class => function (ContainerInterface $c) {
+        return new ServiceCommentaire($c->get(CommentaireRepositoryInterface::class));
+    },
     GetCategoriesAction::class => function (ContainerInterface $c) {
         return new GetCategoriesAction($c->get(ServiceCategorieInterface::class));
     },
@@ -117,5 +128,8 @@ return [
     },
     GetFavoritesByUserAction::class => function(ContainerInterface $c) {
         return new GetFavoritesByUserAction($c->get(ServicePointInteretInterface::class));
+    },
+    GetCommentairesAction::class => function(ContainerInterface $c) {
+        return new GetCommentairesAction($c->get(ServiceCommentaireInterface::class));
     }
 ];

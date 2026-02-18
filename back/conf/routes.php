@@ -4,6 +4,7 @@ declare(strict_types=1);
 use CurioMap\src\api\actions\AddFavoriteAction;
 use CurioMap\src\api\actions\ajouterEventAction;
 use CurioMap\src\api\actions\DeleteEventAction;
+use CurioMap\src\api\actions\GetCommentairesAction;
 use CurioMap\src\api\actions\GetFavoritesByUserAction;
 use CurioMap\src\api\actions\modifierNotesAction;
 use CurioMap\src\api\actions\RemoveFavoriteAction;
@@ -46,11 +47,16 @@ return function(\Slim\App $app):\Slim\App {
     $app->get('/categories', GetCategoriesAction::class);
     $app->post('/categories', AddCategorieAction::class);
 
+<<<<<<< HEAD
+    //Routes pour les commentaires
+    $app->get('/points/{id}/commentaires', GetCommentairesAction::class);
+=======
     //Routes pour les groupes
     $app->post('/groupes', CreateGroupeAction::class);
     $app->post('/groupes/join', JoinGroupeAction::class);
     $app->get('/groupes', GetUserGroupesAction::class);
     $app->post('/groupes/{id}/leave', LeaveGroupeAction::class);
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
 
     //Route OPTIONS pour CORS preflight (catch-all)
     $app->options('/{routes:.+}', function ($request, $response, $args) {

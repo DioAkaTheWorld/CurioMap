@@ -9,6 +9,7 @@ use CurioMap\src\api\actions\LeaveGroupeAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
+use CurioMap\src\api\actions\GetCommentairesAction;
 use CurioMap\src\api\actions\GetFavoritesByUserAction;
 use CurioMap\src\api\actions\getPointsAction;
 use CurioMap\src\api\actions\DeletePointAction;
@@ -22,21 +23,34 @@ use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterfac
 use CurioMap\src\application_core\application\ports\api\ServiceGroupeInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\api\ServiceCategorieInterface;
+use CurioMap\src\application_core\application\ports\api\ServiceCommentaireInterface;
 use CurioMap\src\application_core\application\ports\spi\EvenementRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\CategorieRepositoryInterface;
+<<<<<<< HEAD
+use CurioMap\src\application_core\application\ports\spi\CommentaireRepositoryInterface;
+=======
 use CurioMap\src\application_core\application\ports\spi\GroupeRepositoryInterface;
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
 use CurioMap\src\application_core\application\usecases\ServiceEvenement;
 use CurioMap\src\application_core\application\usecases\ServicePointInteret;
 use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
 use CurioMap\src\application_core\application\usecases\ServiceCategorie;
+<<<<<<< HEAD
+use CurioMap\src\application_core\application\usecases\ServiceCommentaire;
+=======
 use CurioMap\src\application_core\application\usecases\ServiceGroupe;
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
 use CurioMap\src\infrastructure\repositories\PDOEvenementRepository;
 use CurioMap\src\infrastructure\repositories\PDOPointRepository;
 use CurioMap\src\infrastructure\repositories\PDOUtilisateurRepository;
 use CurioMap\src\infrastructure\repositories\PDOCategorieRepository;
+<<<<<<< HEAD
+use CurioMap\src\infrastructure\repositories\PDOCommentaireRepository;
+=======
 use CurioMap\src\infrastructure\repositories\PDOGroupeRepository;
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
 use Psr\Container\ContainerInterface;
 
 return [
@@ -98,6 +112,12 @@ return [
     ServiceCategorieInterface::class => function (ContainerInterface $c) {
         return new ServiceCategorie($c->get(CategorieRepositoryInterface::class));
     },
+    CommentaireRepositoryInterface::class => function (ContainerInterface $c) {
+        return new PDOCommentaireRepository($c->get(PDO::class));
+    },
+    ServiceCommentaireInterface::class => function (ContainerInterface $c) {
+        return new ServiceCommentaire($c->get(CommentaireRepositoryInterface::class));
+    },
     GetCategoriesAction::class => function (ContainerInterface $c) {
         return new GetCategoriesAction($c->get(ServiceCategorieInterface::class));
     },
@@ -126,6 +146,10 @@ return [
     GetFavoritesByUserAction::class => function(ContainerInterface $c) {
         return new GetFavoritesByUserAction($c->get(ServicePointInteretInterface::class));
     },
+<<<<<<< HEAD
+    GetCommentairesAction::class => function(ContainerInterface $c) {
+        return new GetCommentairesAction($c->get(ServiceCommentaireInterface::class));
+=======
     GroupeRepositoryInterface::class => function(ContainerInterface $c) {
         return new PDOGroupeRepository($c->get(PDO::class));
     },
@@ -143,5 +167,6 @@ return [
     },
     LeaveGroupeAction::class => function(ContainerInterface $c) {
         return new LeaveGroupeAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
+>>>>>>> 7704f1bd83a8a1d3a4e41c1db78804b024e03af3
     }
 ];

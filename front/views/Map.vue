@@ -14,6 +14,11 @@
       @navigate-to-point="naviguerVersPointDepuisPanel"
       @favorites-updated="updateMarkers"
     />
+    <DetailsPointModal
+      :show="modaleDetailsPointOuverte"
+      :point="pointPourDetails"
+      @close="fermerModaleDetailsPoint"
+    />
     <PanelGroupes />
   </div>
 
@@ -80,6 +85,7 @@ import { markRaw } from 'vue'
 import Filtre from '../components/Filtre.vue'
 import ModalePoint from '../components/ModalePoint.vue'
 import PanelFavoris from '../components/PanelFavoris.vue'
+import DetailsPointModal from '../components/DetailsPointModal.vue'
 import PanelGroupes from '../components/PanelGroupes.vue'
 import {useAuthStore} from "../stores/auth"
 import {useFavoritesStore} from "../stores/favorites"
@@ -103,6 +109,7 @@ export default {
     Filtre,
     ModalePoint,
     PanelFavoris,
+    DetailsPointModal,
     PanelGroupes
   },
   computed: {
@@ -138,7 +145,9 @@ export default {
         dateDebut: '',
         dateFin: '',
         notes: ''
-      }
+      },
+      modaleDetailsPointOuverte: false,
+      pointPourDetails: null
     }
   },
 
@@ -285,6 +294,8 @@ export default {
             popupContent += `</div>`;
           }
 
+          popupContent += `<button class="btn-commentaires" style="width: 100%; margin-top: 10px; padding: 8px; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">💬 Voir les commentaires</button>`;
+
           //Date de création
           if (point.date) {
             const dateCrea = new Date(point.date);
@@ -313,6 +324,7 @@ export default {
             const btnAgenda = popupNode.querySelector('.btn-agenda');
             const btnFavorite = popupNode.querySelector('.btn-favorite');
             const btnDelete = popupNode.querySelector('.btn-delete');
+            const btnCommentaires = popupNode.querySelector('.btn-commentaires');
 
             if (btnDelete) {
                btnDelete.onclick = () => {
@@ -333,6 +345,12 @@ export default {
                 await this.toggleFavorite(point.id);
                 const newIsFavorite = this.favoritesStore.isFavorite(point.id);
                 btnFavorite.textContent = newIsFavorite ? '❤️' : '🤍';
+              };
+            }
+
+            if (btnCommentaires) {
+              btnCommentaires.onclick = () => {
+                this.ouvrirModaleDetailsPoint(point);
               };
             }
           });
@@ -669,6 +687,16 @@ export default {
       this.formulaireAgenda = { dateDebut: '', dateFin: '', notes: '' };
     },
 
+    ouvrirModaleDetailsPoint(point) {
+      this.pointPourDetails = point;
+      this.modaleDetailsPointOuverte = true;
+    },
+
+    fermerModaleDetailsPoint() {
+      this.modaleDetailsPointOuverte = false;
+      this.pointPourDetails = null;
+    },
+
     async confirmerAjoutAgenda() {
       try {
         const payload = {
@@ -888,6 +916,21 @@ export default {
 
 :deep(.btn-favorite:active) {
   transform: scale(0.95);
+}
+
+:deep(.btn-commentaires) {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(23, 162, 184, 0.2);
+}
+
+:deep(.btn-commentaires:hover) {
+  background: #138496 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+}
+
+:deep(.btn-commentaires:active) {
+  transform: translateY(0);
 }
 
 .options-header {

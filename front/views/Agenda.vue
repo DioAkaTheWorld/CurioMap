@@ -108,10 +108,21 @@ onMounted(() => {
 <style scoped>
 .calendar-wrapper {
   width: 100%;
-  padding-top: 5em;
+  padding-top: 5em; 
+  box-sizing: border-box;
 }
+
 :deep(.sx__event) {
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .calendar-wrapper {
+    padding: 4em 0.5em 1em 0.5em;
+  }
+  :deep(.sx__calendar) {
+    font-size: 0.85rem;
+  }
 }
 </style>

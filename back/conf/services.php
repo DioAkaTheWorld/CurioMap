@@ -1,6 +1,8 @@
 <?php
 
 use CurioMap\src\api\actions\AddFavoriteAction;
+use CurioMap\src\api\actions\AjouterCommentaireAction;
+use CurioMap\src\api\actions\DeleteCommentaireAction;
 use CurioMap\src\api\actions\ajouterEventAction;
 use CurioMap\src\api\actions\CreateGroupeAction;
 use CurioMap\src\api\actions\JoinGroupeAction;
@@ -76,7 +78,7 @@ return [
         return new creePointInteretAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
     },
     ajouterEventAction::class => function (ContainerInterface $c) {
-        return new ajouterEventAction($c->get(ServiceEvenementInterface::class));
+        return new ajouterEventAction($c->get(ServiceEvenementInterface::class),$c->get(JWTManager::class));
     },
     getAgendaAction::class => function (ContainerInterface $c) {
         return new getAgendaAction($c->get(ServiceEvenementInterface::class));
@@ -88,7 +90,7 @@ return [
         return new DeletePointAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
     },
     modifierNotesAction::class => function (ContainerInterface $c) {
-        return new modifierNotesAction($c->get(ServiceEvenementInterface::class));
+        return new modifierNotesAction($c->get(ServiceEvenementInterface::class), $c->get(JWTManager::class));
     },
     UtilisateurRepositoryInterface::class => function (ContainerInterface $c) {
         return new PDOUtilisateurRepository($c->get(PDO::class));
@@ -112,7 +114,7 @@ return [
         return new GetCategoriesAction($c->get(ServiceCategorieInterface::class));
     },
     AddCategorieAction::class => function (ContainerInterface $c) {
-        return new AddCategorieAction($c->get(ServiceCategorieInterface::class));
+        return new AddCategorieAction($c->get(ServiceCategorieInterface::class), $c->get(JWTManager::class));
     },
     JWTManager::class => function (ContainerInterface $c) {
         $jwtKey = $c->get('settings')['jwt']['key'];
@@ -125,16 +127,16 @@ return [
         return new LoginAction($c->get(ServiceUtilisateur::class), $c->get(JWTManager::class));
     },
     AddFavoriteAction::class => function(ContainerInterface $c) {
-        return new AddFavoriteAction($c->get(ServicePointInteretInterface::class));
+        return new AddFavoriteAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
     },
     RemoveFavoriteAction::class => function(ContainerInterface $c) {
-        return new RemoveFavoriteAction($c->get(ServicePointInteretInterface::class));
+        return new RemoveFavoriteAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
     },
     CurioMap\src\api\actions\DeleteEventAction::class => function(ContainerInterface $c) {
         return new CurioMap\src\api\actions\DeleteEventAction($c->get(ServiceEvenementInterface::class), $c->get(JWTManager::class));
     },
     GetFavoritesByUserAction::class => function(ContainerInterface $c) {
-        return new GetFavoritesByUserAction($c->get(ServicePointInteretInterface::class));
+        return new GetFavoritesByUserAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
     },
     GetCommentairesAction::class => function(ContainerInterface $c) {
         return new GetCommentairesAction($c->get(ServiceCommentaireInterface::class));
@@ -156,5 +158,11 @@ return [
     },
     LeaveGroupeAction::class => function(ContainerInterface $c) {
         return new LeaveGroupeAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
+    },
+    AjouterCommentaireAction::class => function(ContainerInterface $c) {
+        return new AjouterCommentaireAction($c->get(ServiceCommentaireInterface::class), $c->get(JWTManager::class));
+    },
+    DeleteCommentaireAction::class => function(ContainerInterface $c) {
+        return new DeleteCommentaireAction($c->get(ServiceCommentaireInterface::class), $c->get(JWTManager::class));
     }
 ];

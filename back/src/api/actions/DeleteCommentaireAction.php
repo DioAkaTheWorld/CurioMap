@@ -4,19 +4,24 @@ namespace CurioMap\src\api\actions;
 use CurioMap\src\api\providers\JWTManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
+use CurioMap\src\application_core\application\ports\api\ServiceCommentaireInterface;
 
-class ajouterEventAction {
-    private ServiceEvenementInterface $service;
+class DeleteCommentaireAction {
+    private ServiceCommentaireInterface $service;
     private JWTManager $jwtManager;
 
-    public function __construct(ServiceEvenementInterface $service, JWTManager $jwtManager) {
+    public function __construct(ServiceCommentaireInterface $service, JWTManager $jwtManager) {
         $this->service = $service;
         $this->jwtManager = $jwtManager;
     }
 
-    public function __invoke(Request $request, Response $response): Response {
-        $data = json_decode($request->getBody()->getContents(), true);
+    public function __invoke(Request $request, Response $response, array $args): Response {
+        $commentId = (int)($args['id'] ?? 0);
+
+        if (!$commentId) {
+            $response->getBody()->write(json_encode(['error' => 'ID commentaire manquant']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
 
         $authHeader = $request->getHeaderLine('Authorization');
         if (!$authHeader) {
@@ -30,32 +35,19 @@ class ajouterEventAction {
             $userId = $payload['user_id'] ?? null;
             if (!$userId) throw new \Exception("ID utilisateur manquant dans le token");
 
-            $data['iduser'] = $userId;
-
         } catch (\Exception $e) {
             $response->getBody()->write(json_encode(['error' => 'Token invalide: ' . $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
         try {
-            $agenda = $this->service->creeEvent($data);
-
-            $json = json_encode([
-                'status' => 'success',
-                'message' => 'Événement ajouté à l\'agenda',
-                'data' => [
-                    'id' => $agenda->getId()
-                ]
-            ]);
-
-            $response->getBody()->write($json);
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
-        } catch (\InvalidArgumentException $e) {
-            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            $this->service->deleteCommentaire($commentId, $userId);
+            $response->getBody()->write(json_encode(['status' => 'success', 'message' => 'Commentaire supprimé']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     }
 }
+

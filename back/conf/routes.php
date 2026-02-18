@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 use CurioMap\src\api\actions\AddFavoriteAction;
 use CurioMap\src\api\actions\ajouterEventAction;
+use CurioMap\src\api\actions\AjouterCommentaireAction;
+use CurioMap\src\api\actions\DeleteCommentaireAction;
 use CurioMap\src\api\actions\DeleteEventAction;
 use CurioMap\src\api\actions\GetCommentairesAction;
 use CurioMap\src\api\actions\GetFavoritesByUserAction;
@@ -33,9 +35,9 @@ return function(\Slim\App $app):\Slim\App {
     $app->delete('/points/{id}', DeletePointAction::class);
 
     //Routes pour les favoris
-    $app->get('/users/{userId}/favorites', GetFavoritesByUserAction::class);
-    $app->post('/users/{userId}/favorites/{pointId}', AddFavoriteAction::class);
-    $app->delete('/users/{userId}/favorites/{pointId}', RemoveFavoriteAction::class);
+    $app->get('/favorites', GetFavoritesByUserAction::class);
+    $app->post('/favorites/{pointId}', AddFavoriteAction::class);
+    $app->delete('/favorites/{pointId}', RemoveFavoriteAction::class);
 
     //Routes pour l'agenda
     $app->post('/agenda', ajouterEventAction::class);
@@ -49,6 +51,8 @@ return function(\Slim\App $app):\Slim\App {
 
     //Routes pour les commentaires
     $app->get('/points/{id}/commentaires', GetCommentairesAction::class);
+    $app->post('/points/{id}/commentaires', AjouterCommentaireAction::class);
+    $app->delete('/commentaires/{id}', DeleteCommentaireAction::class);
 
     //Routes pour les groupes
     $app->post('/groupes', CreateGroupeAction::class);

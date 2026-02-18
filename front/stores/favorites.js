@@ -22,7 +22,7 @@ export const useFavoritesStore = defineStore('favorites', {
 
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/${authStore.user.id}/favorites`,
+          `${import.meta.env.VITE_API_URL}/favorites`,
           {
             headers: authStore.getAuthHeaders()
           }
@@ -51,7 +51,7 @@ export const useFavoritesStore = defineStore('favorites', {
 
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/${authStore.user.id}/favorites/${pointId}`,
+          `${import.meta.env.VITE_API_URL}/favorites/${pointId}`,
           {
             method: 'POST',
             headers: authStore.getAuthHeaders()
@@ -80,7 +80,7 @@ export const useFavoritesStore = defineStore('favorites', {
 
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/${authStore.user.id}/favorites/${pointId}`,
+          `${import.meta.env.VITE_API_URL}/favorites/${pointId}`,
           {
             method: 'DELETE',
             headers: authStore.getAuthHeaders()

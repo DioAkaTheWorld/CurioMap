@@ -17,6 +17,16 @@
         <p v-if="point.adresse"><strong>📍 Adresse:</strong> {{ point.adresse }}</p>
       </div>
 
+      <div class="add-comment">
+        <h4>Ajouter un commentaire</h4>
+        <div class="stars">
+          <button v-for="n in 5" :key="n" @click="newComment.note = n" :class="{active: newComment.note>=n}" type="button">⭐</button>
+          <button v-if="newComment.note" @click="newComment.note = null" type="button" class="clear">✖</button>
+        </div>
+        <textarea v-model="newComment.texte" placeholder="Votre avis..." rows="3"></textarea>
+        <button @click="ajouterCommentaire" :disabled="!newComment.texte.trim()">Publier</button>
+      </div>
+
       <div class="commentaires-section">
         <h3>💬 Commentaires ({{ commentaires.length }})</h3>
 
@@ -33,8 +43,18 @@
                 <strong>{{ comment.nom_utilisateur || 'Utilisateur' }}</strong>
                 <span class="comment-date">{{ comment.date_creation }}</span>
               </div>
-              <div v-if="comment.note" class="rating">
-                {{ '⭐'.repeat(comment.note) }}
+              <div class="comment-actions">
+                <div v-if="comment.note" class="rating">
+                  {{ '⭐'.repeat(comment.note) }}
+                </div>
+                <button
+                  v-if="authStore.user && authStore.user.id === comment.iduser"
+                  @click="supprimerCommentaire(comment.id)"
+                  class="delete-btn"
+                  title="Supprimer"
+                >
+                  ✖
+                </button>
               </div>
             </div>
             <p class="comment-text">{{ comment.commentaire }}</p>
@@ -47,6 +67,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useAuthStore } from '../stores/auth'
 
 const props = defineProps({
   show: {
@@ -61,8 +82,10 @@ const props = defineProps({
 
 defineEmits(['close'])
 
+const authStore = useAuthStore()
 const commentaires = ref([])
 const loading = ref(false)
+const newComment = ref({ texte: '', note: null })
 
 const getCategoryColor = (categoryId) => {
   if (!categoryId) return '#3388ff'
@@ -98,11 +121,64 @@ const chargerCommentaires = async () => {
   }
 }
 
+const ajouterCommentaire = async () => {
+  if (!authStore.isLoggedIn) {
+    alert('Connectez-vous pour commenter ce point')
+    return
+  }
 
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/points/${props.point.id}/commentaires`, {
+      method: 'POST',
+      headers: {
+        ...authStore.getAuthHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        idpoint: props.point.id,
+        commentaire: newComment.value.texte.trim(),
+        note: newComment.value.note
+      })
+    })
+
+    if (response.ok) {
+      newComment.value = { texte: '', note: null }
+      await chargerCommentaires()
+    } else {
+      alert('Erreur lors de l\'ajout')
+    }
+  } catch (error) {
+    console.error('Erreur:', error)
+    alert('Erreur réseau')
+  }
+}
+
+const supprimerCommentaire = async (idComm) => {
+  if (!confirm('Supprimer ce commentaire ?')) return
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/commentaires/${idComm}`, {
+      method: 'DELETE',
+      headers: authStore.getAuthHeaders()
+    })
+
+    if (response.ok) {
+      await chargerCommentaires()
+    } else {
+      alert('Erreur lors de la suppression')
+    }
+  } catch (error) {
+    console.error('Erreur:', error)
+    alert('Erreur réseau')
+  }
+}
 
 watch(() => props.show, (newVal) => {
   if (newVal && props.point) {
     chargerCommentaires()
+  }
+  if (!newVal) {
+    newComment.value = { texte: '', note: null }
   }
 })
 </script>
@@ -119,6 +195,7 @@ watch(() => props.show, (newVal) => {
   justify-content: center;
   align-items: center;
   z-index: 2000;
+  padding-top:2%;
 }
 
 .modal-content {
@@ -173,6 +250,8 @@ watch(() => props.show, (newVal) => {
 
 .point-info {
   margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
 }
 
 .point-info p {
@@ -218,6 +297,26 @@ watch(() => props.show, (newVal) => {
   margin-bottom: 10px;
 }
 
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 4px;
+  transition: opacity 0.2s;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+}
+
 .comment-header strong {
   display: block;
   color: #333;
@@ -240,6 +339,76 @@ watch(() => props.show, (newVal) => {
   color: #555;
   line-height: 1.6;
   margin: 0;
+}
+
+.add-comment {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.add-comment h4 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #333;
+}
+
+.add-comment .stars {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.add-comment .stars button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.3;
+  padding: 0;
+}
+
+.add-comment .stars button.active {
+  opacity: 1;
+}
+
+.add-comment .stars .clear {
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  opacity: 1;
+  margin-left: 5px;
+}
+
+.add-comment textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.add-comment > button {
+  background: #3388ff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.add-comment > button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 </style>
 

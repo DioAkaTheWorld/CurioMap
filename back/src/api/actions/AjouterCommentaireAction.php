@@ -4,13 +4,13 @@ namespace CurioMap\src\api\actions;
 use CurioMap\src\api\providers\JWTManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
+use CurioMap\src\application_core\application\ports\api\ServiceCommentaireInterface;
 
-class ajouterEventAction {
-    private ServiceEvenementInterface $service;
+class AjouterCommentaireAction {
+    private ServiceCommentaireInterface $service;
     private JWTManager $jwtManager;
 
-    public function __construct(ServiceEvenementInterface $service, JWTManager $jwtManager) {
+    public function __construct(ServiceCommentaireInterface $service, JWTManager $jwtManager) {
         $this->service = $service;
         $this->jwtManager = $jwtManager;
     }
@@ -38,14 +38,11 @@ class ajouterEventAction {
         }
 
         try {
-            $agenda = $this->service->creeEvent($data);
+            $this->service->createCommentaire($data);
 
             $json = json_encode([
                 'status' => 'success',
-                'message' => 'Événement ajouté à l\'agenda',
-                'data' => [
-                    'id' => $agenda->getId()
-                ]
+                'message' => 'Commentaire ajouté avec succès',
             ]);
 
             $response->getBody()->write($json);

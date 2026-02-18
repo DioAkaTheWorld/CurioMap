@@ -148,7 +148,7 @@ export default {
     async loadFavoris() {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/${this.authStore.user.id}/favorites`,
+          `${import.meta.env.VITE_API_URL}/favorites`,
           {
             headers: this.authStore.getAuthHeaders()
           }

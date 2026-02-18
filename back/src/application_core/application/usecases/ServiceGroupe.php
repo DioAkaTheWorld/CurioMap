@@ -45,4 +45,24 @@ class ServiceGroupe implements ServiceGroupeInterface {
     public function getGroupesUtilisateur(int $userId): array {
         return $this->groupeRepository->findAllByUser($userId);
     }
+
+    public function quitterGroupe(int $groupeId, int $userId): void {
+        $groupe = $this->groupeRepository->findById($groupeId);
+
+        if (!$groupe) {
+            throw new \Exception("Groupe non trouvé");
+        }
+
+        //Si c'est le créateur, on supprime le groupe
+        if ($groupe->getIdCreateur() === $userId) {
+             throw new \Exception("Le créateur ne peut pas quitter le groupe, il doit le supprimer (fonctionnalité non implémentée)");
+             //Pour l'instant on empeche juste, il faudrait supp le groupe, à faire après
+        }
+
+        if (!$this->groupeRepository->isMembre($groupeId, $userId)) {
+            throw new \Exception("Vous ne faites pas partie de ce groupe");
+        }
+
+        $this->groupeRepository->retirerMembre($groupeId, $userId);
+    }
 }

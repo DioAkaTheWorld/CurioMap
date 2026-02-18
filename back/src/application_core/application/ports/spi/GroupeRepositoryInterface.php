@@ -9,4 +9,5 @@ interface GroupeRepositoryInterface {
     public function findByCode(string $code): ?Groupe;
     public function isMembre(int $groupeId, int $userId): bool;
     public function findAllByUser(int $userId): array;
+    public function retirerMembre(int $groupeId, int $userId): void;
 }

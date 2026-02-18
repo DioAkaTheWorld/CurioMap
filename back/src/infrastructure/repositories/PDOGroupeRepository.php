@@ -79,4 +79,36 @@ class PDOGroupeRepository implements GroupeRepositoryInterface {
             'userId' => $userId
         ]);
     }
+
+    public function retirerMembre(int $groupeId, int $userId): void {
+        $sql = "DELETE FROM groupeutilisateur WHERE id_groupe = :groupeId AND id_utilisateur = :userId";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'groupeId' => $groupeId,
+            'userId' => $userId
+        ]);
+    }
+
+    public function findById(int $id): ?Groupe {
+        $sql = "SELECT * FROM groupe WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) return null;
+
+        return new Groupe(
+            $row['nom'],
+            $row['id_createur'],
+            $row['description'],
+            $row['code_invitation'],
+            $row['id']
+        );
+    }
+
+    public function delete(int $id): void {
+        $sql = "DELETE FROM groupe WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+    }
 }

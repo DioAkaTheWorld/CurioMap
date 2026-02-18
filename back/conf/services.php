@@ -3,6 +3,8 @@
 use CurioMap\src\api\actions\AddFavoriteAction;
 use CurioMap\src\api\actions\ajouterEventAction;
 use CurioMap\src\api\actions\CreateGroupeAction;
+use CurioMap\src\api\actions\JoinGroupeAction;
+use CurioMap\src\api\actions\GetUserGroupesAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
@@ -131,5 +133,11 @@ return [
     },
     CreateGroupeAction::class => function(ContainerInterface $c) {
         return new CreateGroupeAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
+    },
+    JoinGroupeAction::class => function(ContainerInterface $c) {
+        return new JoinGroupeAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
+    },
+    GetUserGroupesAction::class => function(ContainerInterface $c) {
+        return new GetUserGroupesAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
     }
 ];

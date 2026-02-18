@@ -7,4 +7,5 @@ interface ServiceGroupeInterface {
     public function creerGroupe(string $nom, string $description, int $idCreateur): Groupe;
     public function rejoindreGroupe(string $codeInvitation, int $userId): Groupe;
     public function getGroupesUtilisateur(int $userId): array;
+    public function quitterGroupe(int $groupeId, int $userId): void;
 }

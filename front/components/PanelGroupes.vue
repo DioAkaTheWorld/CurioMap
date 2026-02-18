@@ -38,7 +38,17 @@
 
               <div v-else class="groupes-list">
                  <div v-for="groupe in groupes" :key="groupe.id" class="groupe-item">
-                    <h3>{{ groupe.nom }}</h3>
+                    <div class="groupe-header">
+                       <h3>{{ groupe.nom }}</h3>
+                       <button
+                           class="btn-leave"
+                           @click="quitterGroupe(groupe)"
+                           :title="groupe.idCreateur === authStore.user?.id ? 'Vous ne pouvez pas quitter un groupe que vous avez créé' : 'Quitter ce groupe'"
+                           :disabled="groupe.idCreateur === authStore.user?.id"
+                       >
+                         🚪
+                       </button>
+                    </div>
                     <p v-if="groupe.description">{{ groupe.description }}</p>
                     <p v-if="groupe.idCreateur === authStore.user?.id" class="invitation-code">
                        🔑 Code d'invitation: <strong>{{ groupe.codeInvitation }}</strong>
@@ -218,6 +228,35 @@ export default {
       } catch (error) {
         console.error(error);
         alert('Impossible de contacter le serveur');
+      }
+    },
+
+    async quitterGroupe(groupe) {
+      if (groupe.idCreateur === this.authStore.user?.id) {
+          alert("En tant que créateur, vous ne pouvez pas quitter le groupe.");
+          return;
+      }
+
+      if (!confirm(`Voulez-vous vraiment quitter le groupe "${groupe.nom}" ?`)) {
+          return;
+      }
+
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/groupes/${groupe.id}/leave`, {
+            method: 'POST',
+            headers: this.authStore.getAuthHeaders()
+        });
+
+        if (response.ok) {
+            alert('Vous avez quitté le groupe.');
+            this.groupes = this.groupes.filter(g => g.id !== groupe.id);
+        } else {
+            const err = await response.json();
+            alert('Erreur: ' + (err.error || 'Problème serveur'));
+        }
+      } catch (e) {
+         console.error(e);
+         alert('Impossible de contacter le serveur');
       }
     }
   }
@@ -402,6 +441,32 @@ export default {
   padding: 10px;
   border-radius: 6px;
   border-left: 4px solid #3388ff;
+  position: relative;
+}
+
+.groupe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.btn-leave {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 5px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.btn-leave:hover {
+    opacity: 1;
+}
+
+.btn-leave:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
 }
 
 .groupe-item h3 {

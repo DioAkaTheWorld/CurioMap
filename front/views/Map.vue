@@ -629,7 +629,8 @@ export default {
             id: resData.id || Date.now(),
             latitude: parseFloat(payload.latitude),
             longitude: parseFloat(payload.longitude),
-            visibilite: payload.visibilite !== undefined ? parseInt(payload.visibilite) : 0
+            visibilite: payload.visibilite !== undefined ? parseInt(payload.visibilite) : 0,
+            iduser: this.authStore.user?.id
           };
 
           this.points.push(nouveauPoint);

@@ -13,11 +13,8 @@
     <transition name="slide">
       <div v-if="isOpen" class="favoris-panel">
         <div class="panel-header">
-          <!-- Croix en haut à gauche pour fermer -->
-          <button @click="togglePanel" class="close-left-btn" title="Fermer">✕</button>
-
           <h2>❤️ Mes Favoris</h2>
-          <button @click="togglePanel" class="close-panel-btn" title="Fermer">✕</button>
+          <button @click="togglePanel" class="close-top-right" title="Fermer">✕</button>
         </div>
 
         <div class="panel-content">
@@ -69,7 +66,6 @@
       </div>
     </transition>
 
-    <!--Pour fermer en cliquant a cote du panel-->
     <transition name="fade">
       <div v-if="isOpen" class="panel-overlay" @click="togglePanel"></div>
     </transition>
@@ -211,7 +207,6 @@ export default {
 </script>
 
 <style scoped>
-/* bouton pour ouvrir les favoris */
 .favoris-toggle-btn {
   position: fixed;
   top: 120px;
@@ -276,11 +271,26 @@ export default {
   flex-direction: column;
 }
 
-/* Croix en haut à gauche */
-.close-left-btn {
+.panel-header {
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-top-right {
   position: absolute;
   top: 15px;
-  left: 15px;
+  right: 15px;
   background: rgba(255,255,255,0.2);
   border: none;
   color: white;
@@ -295,45 +305,8 @@ export default {
   justify-content: center;
   transition: all 0.3s ease;
 }
-.close-left-btn:hover {
+.close-top-right:hover {
   background: rgba(255,255,255,0.3);
-  transform: rotate(90deg);
-}
-
-.panel-header {
-  padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  justify-content: center; /* garde le titre centré */
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.panel-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.close-panel-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-  font-size: 28px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-.close-panel-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
   transform: rotate(90deg);
 }
 

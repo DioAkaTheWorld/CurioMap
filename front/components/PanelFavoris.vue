@@ -13,6 +13,9 @@
     <transition name="slide">
       <div v-if="isOpen" class="favoris-panel">
         <div class="panel-header">
+          <!-- Croix en haut à gauche pour fermer -->
+          <button @click="togglePanel" class="close-left-btn" title="Fermer">✕</button>
+
           <h2>❤️ Mes Favoris</h2>
           <button @click="togglePanel" class="close-panel-btn" title="Fermer">✕</button>
         </div>
@@ -208,6 +211,7 @@ export default {
 </script>
 
 <style scoped>
+/* bouton pour ouvrir les favoris */
 .favoris-toggle-btn {
   position: fixed;
   top: 120px;
@@ -272,14 +276,39 @@ export default {
   flex-direction: column;
 }
 
+/* Croix en haut à gauche */
+.close-left-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 1010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.close-left-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: rotate(90deg);
+}
+
 .panel-header {
   padding: 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* garde le titre centré */
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .panel-header h2 {
@@ -430,7 +459,4 @@ export default {
     font-size: 11px;
   }
 }
-
-
 </style>
-

@@ -1,5 +1,15 @@
 <template>
-  <div class="filter-panel" :style="{ top: pos.y + 'px', left: pos.x + 'px', transform: 'none' }">
+  <!-- Bouton toggle pour mobile -->
+  <button
+    class="filter-toggle-btn"
+    @click="showFilters = !showFilters"
+  >
+    {{ showFilters ? 'Masquer filtres' : 'Afficher filtres' }}
+  </button>
+
+  <div class="filter-panel" 
+       :style="{ top: pos.y + 'px', left: pos.x + 'px', transform: 'none' }"
+       v-show="showFilters">
     <h3 @mousedown.prevent="startDrag" :style="{ cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }">Filtres</h3>
     <!-- Filtres de catés -->
     <div class="filter-group">
@@ -114,16 +124,29 @@ export default {
     return {
       pos: { x: 10, y: 100 },
       dragging: false,
-      offset: { x: 0, y: 0 }
+      offset: { x: 0, y: 0 },
+      showFilters: window.innerWidth > 768
     }
   },
 
   mounted() {
     //Centrer verticalement au chargement approximativement
     this.pos.y = window.innerHeight / 2 - 150;
+
+    window.addEventListener('resize', this.handleResize);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   },
 
   methods: {
+    handleResize() {
+      if (window.innerWidth > 768) {
+        this.showFilters = true;
+      }
+    },
+
     startDrag(e) {
       this.dragging = true;
       this.offset.x = e.clientX - this.pos.x;
@@ -265,5 +288,25 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.filter-toggle-btn {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 10px;
+  z-index: 1100;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .filter-toggle-btn {
+    display: block;
+  }
 }
 </style>

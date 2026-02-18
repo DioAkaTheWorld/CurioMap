@@ -60,6 +60,10 @@ return [
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]
         );
+
+        //on regle le fuseau horaire pour eviter les decalages
+        $pdo->exec("SET TIME ZONE 'Europe/Paris'");
+
         return $pdo;
     },
     UpdatePasswordAction::class => function (ContainerInterface $c) {

@@ -14,8 +14,8 @@ class PDOCommentaireRepository implements CommentaireRepositoryInterface {
     }
 
     public function save(Commentaire $commentaire): int {
-        $sql = "INSERT INTO Commentaire (iduser, idpoint, commentaire, note, date_creation) 
-                VALUES (:iduser, :idpoint, :commentaire, :note, :date_creation)
+        $sql = "INSERT INTO Commentaire (iduser, idpoint, commentaire, note) 
+                VALUES (:iduser, :idpoint, :commentaire, :note)
                 RETURNING id";
 
         $stmt = $this->pdo->prepare($sql);
@@ -24,8 +24,7 @@ class PDOCommentaireRepository implements CommentaireRepositoryInterface {
             'iduser' => $commentaire->getIdUser(),
             'idpoint' => $commentaire->getIdPoint(),
             'commentaire' => $commentaire->getCommentaire(),
-            'note' => $commentaire->getNote(),
-            'date_creation' => $commentaire->getDateCreation()->format('Y-m-d H:i:s')
+            'note' => $commentaire->getNote()
         ]);
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);

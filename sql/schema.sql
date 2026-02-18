@@ -70,6 +70,7 @@ CREATE TABLE Groupe (
     nom VARCHAR(100) NOT NULL,
     description TEXT,
     id_createur INT NOT NULL,
+    code_invitation VARCHAR(10) UNIQUE,
     FOREIGN KEY (id_createur) REFERENCES Utilisateur(id) ON DELETE CASCADE
 );
 

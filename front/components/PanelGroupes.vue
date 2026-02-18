@@ -23,9 +23,13 @@
 
           <div v-else>
             <!-- Mode Liste -->
-            <div v-if="!isCreating">
+            <div v-if="!isCreating && !isJoining">
               <button @click="startCreating" class="btn-create">
                 ➕ Créer un groupe
+              </button>
+
+              <button @click="startJoining" class="btn-join">
+                📩 Rejoindre un groupe
               </button>
 
               <div v-if="groupes.length === 0" class="empty-message">
@@ -35,13 +39,16 @@
               <div v-else class="groupes-list">
                  <div v-for="groupe in groupes" :key="groupe.id" class="groupe-item">
                     <h3>{{ groupe.nom }}</h3>
-                    <p>{{ groupe.description }}</p>
+                    <p v-if="groupe.description">{{ groupe.description }}</p>
+                    <p v-if="groupe.idCreateur === authStore.user?.id" class="invitation-code">
+                       🔑 Code d'invitation: <strong>{{ groupe.codeInvitation }}</strong>
+                    </p>
                  </div>
               </div>
             </div>
 
             <!-- Mode Création -->
-            <div v-else class="creation-form">
+            <div v-else-if="isCreating" class="creation-form">
               <h3>Nouveau Groupe</h3>
               <form @submit.prevent="creerGroupe">
                 <div class="form-group">
@@ -56,7 +63,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label>Description (optionnel)</label>
+                  <label>Description (optionnelle)</label>
                   <textarea
                     v-model="nouveauGroupe.description"
                     class="form-control"
@@ -68,6 +75,28 @@
                 <div class="form-actions">
                   <button type="button" @click="cancelCreating" class="btn-secondary">Annuler</button>
                   <button type="submit" class="btn-primary">Créer</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Mode Invitation -->
+            <div v-else-if="isJoining" class="joining-form">
+              <h3>Rejoindre un Groupe</h3>
+              <form @submit.prevent="rejoindreGroupe">
+                <div class="form-group">
+                  <label>Code d'invitation</label>
+                  <input
+                    v-model="codeInvitation"
+                    type="text"
+                    required
+                    class="form-control"
+                    placeholder="Entrez le code d'invitation"
+                  />
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" @click="cancelJoining" class="btn-secondary">Annuler</button>
+                  <button type="submit" class="btn-primary">Rejoindre</button>
                 </div>
               </form>
             </div>
@@ -91,11 +120,13 @@ export default {
     return {
       isOpen: false,
       isCreating: false,
+      isJoining: false,
       groupes: [],
       nouveauGroupe: {
         nom: '',
         description: ''
-      }
+      },
+      codeInvitation: ''
     }
   },
   computed: {
@@ -107,18 +138,41 @@ export default {
     togglePanel() {
       this.isOpen = !this.isOpen
       if (this.isOpen && this.authStore.isLoggedIn) {
-          //on pourrait charger les groupes existants ici, à faire après
-          //this.fetchGroupes();
+          this.fetchGroupes();
       }
     },
 
     startCreating() {
       this.isCreating = true;
+      this.isJoining = false;
       this.nouveauGroupe = { nom: '', description: '' };
+    },
+
+    startJoining() {
+      this.isJoining = true;
+      this.isCreating = false;
+      this.codeInvitation = '';
     },
 
     cancelCreating() {
       this.isCreating = false;
+    },
+
+    cancelJoining() {
+      this.isJoining = false;
+    },
+
+    async fetchGroupes() {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/groupes`, {
+          headers: this.authStore.getAuthHeaders()
+        });
+        if (response.ok) {
+          this.groupes = await response.json();
+        }
+      } catch (e) {
+        console.error("Erreur chargement groupes", e);
+      }
     },
 
     async creerGroupe() {
@@ -134,6 +188,29 @@ export default {
           this.groupes.push(createdGroupe);
           alert('Groupe créé avec succès !');
           this.isCreating = false;
+          this.fetchGroupes();
+        } else {
+          const err = await response.json();
+          alert('Erreur: ' + (err.error || 'Problème serveur'));
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Impossible de contacter le serveur');
+      }
+    },
+
+    async rejoindreGroupe() {
+       try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/groupes/join`, {
+          method: 'POST',
+          headers: this.authStore.getAuthHeaders(),
+          body: JSON.stringify({ codeInvitation: this.codeInvitation })
+        });
+
+        if (response.ok) {
+          alert('Groupe rejoint avec succès !');
+          this.isJoining = false;
+          this.fetchGroupes();
         } else {
           const err = await response.json();
           alert('Erreur: ' + (err.error || 'Problème serveur'));
@@ -247,7 +324,24 @@ export default {
   background: #2266dd;
 }
 
-.creation-form {
+.btn-join {
+  width: 100%;
+  padding: 12px;
+  background: #ff8833;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background 0.3s;
+}
+
+.btn-join:hover {
+  background: #dd6600;
+}
+
+.creation-form, .joining-form {
   background: #f9f9f9;
   padding: 20px;
   border-radius: 8px;
@@ -316,11 +410,20 @@ export default {
 }
 
 .groupe-item p {
-  margin: 0;
+  margin: 0 0 5px 0;
   color: #666;
   font-size: 14px;
 }
 
+.invitation-code {
+  font-size: 0.9em;
+  color: #333;
+  background: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  display: inline-block;
+  border: 1px dashed #aaa;
+}
 .panel-overlay {
   position: fixed;
   top: 0;
@@ -329,5 +432,20 @@ export default {
   bottom: 0;
   background: rgba(0, 0, 0, 0.3);
   z-index: 1500;
+}
+
+@media (max-width: 768px) {
+  .groupes-panel {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .groupes-toggle-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    top: 160px;
+    right: 15px;
+  }
 }
 </style>

@@ -2,6 +2,7 @@
 
 use CurioMap\src\api\actions\AddFavoriteAction;
 use CurioMap\src\api\actions\ajouterEventAction;
+use CurioMap\src\api\actions\CreateGroupeAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
@@ -15,20 +16,24 @@ use CurioMap\src\api\actions\RegisterAction;
 use CurioMap\src\api\actions\RemoveFavoriteAction;
 use CurioMap\src\api\providers\JWTManager;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
+use CurioMap\src\application_core\application\ports\api\ServiceGroupeInterface;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 use CurioMap\src\application_core\application\ports\api\ServiceCategorieInterface;
 use CurioMap\src\application_core\application\ports\spi\EvenementRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\CategorieRepositoryInterface;
+use CurioMap\src\application_core\application\ports\spi\GroupeRepositoryInterface;
 use CurioMap\src\application_core\application\usecases\ServiceEvenement;
 use CurioMap\src\application_core\application\usecases\ServicePointInteret;
 use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
 use CurioMap\src\application_core\application\usecases\ServiceCategorie;
+use CurioMap\src\application_core\application\usecases\ServiceGroupe;
 use CurioMap\src\infrastructure\repositories\PDOEvenementRepository;
 use CurioMap\src\infrastructure\repositories\PDOPointRepository;
 use CurioMap\src\infrastructure\repositories\PDOUtilisateurRepository;
 use CurioMap\src\infrastructure\repositories\PDOCategorieRepository;
+use CurioMap\src\infrastructure\repositories\PDOGroupeRepository;
 use Psr\Container\ContainerInterface;
 
 return [
@@ -117,5 +122,14 @@ return [
     },
     GetFavoritesByUserAction::class => function(ContainerInterface $c) {
         return new GetFavoritesByUserAction($c->get(ServicePointInteretInterface::class));
+    },
+    GroupeRepositoryInterface::class => function(ContainerInterface $c) {
+        return new PDOGroupeRepository($c->get(PDO::class));
+    },
+    ServiceGroupeInterface::class => function(ContainerInterface $c) {
+        return new ServiceGroupe($c->get(GroupeRepositoryInterface::class));
+    },
+    CreateGroupeAction::class => function(ContainerInterface $c) {
+        return new CreateGroupeAction($c->get(ServiceGroupeInterface::class), $c->get(JWTManager::class));
     }
 ];

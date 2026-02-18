@@ -64,3 +64,19 @@ CREATE TABLE Evenement (
     FOREIGN KEY (idpoint) REFERENCES PointInteret(id) ON DELETE SET NULL,
     CHECK (date_fin >= date_debut) -- pour éviter les bugs de dates
 );
+
+CREATE TABLE Groupe (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    description TEXT,
+    id_createur INT NOT NULL,
+    FOREIGN KEY (id_createur) REFERENCES Utilisateur(id) ON DELETE CASCADE
+);
+
+CREATE TABLE GroupeUtilisateur (
+    id_groupe INT NOT NULL,
+    id_utilisateur INT NOT NULL,
+    PRIMARY KEY (id_groupe, id_utilisateur),
+    FOREIGN KEY (id_groupe) REFERENCES Groupe(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateur(id) ON DELETE CASCADE
+);

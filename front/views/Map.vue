@@ -14,6 +14,7 @@
       @navigate-to-point="naviguerVersPointDepuisPanel"
       @favorites-updated="updateMarkers"
     />
+    <PanelGroupes />
   </div>
 
   <div v-if="modaleAgendaOuverte" class="modal-overlay" @click.self="fermerModaleAgenda">
@@ -79,6 +80,7 @@ import { markRaw } from 'vue'
 import Filtre from '../components/Filtre.vue'
 import ModalePoint from '../components/ModalePoint.vue'
 import PanelFavoris from '../components/PanelFavoris.vue'
+import PanelGroupes from '../components/PanelGroupes.vue'
 import {useAuthStore} from "../stores/auth"
 import {useFavoritesStore} from "../stores/favorites"
 
@@ -100,7 +102,8 @@ export default {
   components: {
     Filtre,
     ModalePoint,
-    PanelFavoris
+    PanelFavoris,
+    PanelGroupes
   },
   computed: {
     authStore() {

@@ -16,6 +16,7 @@ use CurioMap\src\api\actions\LoginAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
 use CurioMap\src\api\actions\AddCategorieAction;
 use CurioMap\src\api\actions\DeletePointAction;
+use CurioMap\src\api\actions\CreateGroupeAction;
 
 return function(\Slim\App $app):\Slim\App {
     // Routes d'authentification
@@ -42,6 +43,8 @@ return function(\Slim\App $app):\Slim\App {
     $app->get('/categories', GetCategoriesAction::class);
     $app->post('/categories', AddCategorieAction::class);
 
+    //Routes pour les groupes
+    $app->post('/groupes', CreateGroupeAction::class);
 
     //Route OPTIONS pour CORS preflight (catch-all)
     $app->options('/{routes:.+}', function ($request, $response, $args) {

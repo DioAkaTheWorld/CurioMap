@@ -4,7 +4,7 @@ namespace CurioMap\src\application_core\domain\entities;
 
 use DateTime;
 
-class PointInteret{
+class PointInteret {
     private ?int $id;
     private int $iduser;
     private string $titre;
@@ -51,55 +51,55 @@ class PointInteret{
     }
 
     //toutes les fonctions utile pour plus tard, yen a beaucoup mais au moins c'est fait
-    public function getId(): ?int{
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getIdUser(): int{
+    public function getIdUser(): int {
         return $this->iduser;
     }
 
-    public function getTitre(): string{
+    public function getTitre(): string {
         return $this->titre;
     }
 
-    public function getImage(): ?string{
+    public function getImage(): ?string {
         return $this->image;
     }
 
-    public function getDescription(): ?string{
+    public function getDescription(): ?string {
         return $this->description;
     }
 
-    public function getCategorie(): int{
+    public function getCategorie(): int {
         return $this->categorie;
     }
 
-    public function getDate(): DateTime{
+    public function getDate(): DateTime {
         return $this->date;
     }
 
-    public function getLatitude(): float{
+    public function getLatitude(): float {
         return $this->latitude;
     }
 
-    public function getLongitude(): float{
+    public function getLongitude(): float {
         return $this->longitude;
     }
 
-    public function getAdresse(): ?string{
+    public function getAdresse(): ?string {
         return $this->adresse;
     }
 
-    public function getVisibilite(): int{
+    public function getVisibilite(): int {
         return $this->visibilite;
     }
 
-    public function getDateDebut(): ?DateTime{
+    public function getDateDebut(): ?DateTime {
         return $this->dateDebut;
     }
 
-    public function getDateFin(): ?DateTime{
+    public function getDateFin(): ?DateTime {
         return $this->dateFin;
     }
 
@@ -111,12 +111,11 @@ class PointInteret{
         return $this->categorieLibelle;
     }
 
-    public function setId(int $id): void{
+    public function setId(int $id): void {
         $this->id = $id;
     }
 
-    public static function fromArray(array $data): self
-    {
+    public static function fromArray(array $data): self {
         return new self(
             iduser: $data['iduser'],
             titre: $data['titre'],

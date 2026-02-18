@@ -8,7 +8,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Exception\HttpUnauthorizedException;
 use Slim\Psr7\Response;
 
-class CorsMiddleware implements MiddlewareInterface{
+class CorsMiddleware implements MiddlewareInterface {
     private array $allowedOrigins;
     private bool $requireOrigin;
     private bool $allowAll;
@@ -18,32 +18,32 @@ class CorsMiddleware implements MiddlewareInterface{
      * @param bool $requireOrigin Si true, absence de header Origin -> exception
      * @param bool $allowAll Si true, utilisera '*' comme Access-Control-Allow-Origin
      */
-    public function __construct(array $allowedOrigins = [], bool $requireOrigin = false, bool $allowAll = true){
+    public function __construct(array $allowedOrigins = [], bool $requireOrigin = false, bool $allowAll = true) {
         $this->allowedOrigins = $allowedOrigins;
         $this->requireOrigin = $requireOrigin;
         $this->allowAll = $allowAll;
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface{
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
         $origin = $request->getHeaderLine('Origin');
 
-        if($this->requireOrigin && $origin === ''){
+        if($this->requireOrigin && $origin === '') {
             throw new HttpUnauthorizedException($request, 'missing Origin Header (cors)');
         }
 
         //si c'est une requête OPTIONS (preflight), on rep direct
-        if ($request->getMethod() === 'OPTIONS'){
+        if ($request->getMethod() === 'OPTIONS') {
             $response = new Response();
-        }else{
+        } else {
             $response = $handler->handle($request);
         }
 
         //détermine la valeur de Access-Control-Allow-Origin
-        if($this->allowAll){
+        if($this->allowAll) {
             $allowOrigin = $origin !== '' ? $origin : '*';
-        }elseif (!empty($this->allowedOrigins)){
+        } elseif (!empty($this->allowedOrigins)) {
             $allowOrigin = in_array($origin, $this->allowedOrigins, true) ? $origin : 'null';
-        }else{
+        } else {
             //par défaut on renvoit l'origine fournie si présente, sinon *
             $allowOrigin = $origin !== '' ? $origin : '*';
         }

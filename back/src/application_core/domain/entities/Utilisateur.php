@@ -2,8 +2,7 @@
 
 namespace CurioMap\src\application_core\domain\entities;
 
-class Utilisateur
-{
+class Utilisateur {
     private ?int $id;
     private string $nom;
     private string $email;
@@ -25,49 +24,40 @@ class Utilisateur
     }
 
     // getter
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getNom(): string
-    {
+    public function getNom(): string {
         return $this->nom;
     }
 
-    public function getEmail(): string
-    {
+    public function getEmail(): string {
         return $this->email;
     }
 
-    public function getPassword(): string
-    {
+    public function getPassword(): string {
         return $this->password;
     }
 
-    public function getRole(): int
-    {
+    public function getRole(): int {
         return $this->role;
     }
 
     // setter
-    public function setNom(string $nom): void
-    {
+    public function setNom(string $nom): void {
         $this->nom = $nom;
     }
 
-    public function setEmail(string $email): void
-    {
+    public function setEmail(string $email): void {
         $this->email = $email;
     }
 
-    public function setPassword(string $password): void
-    {
+    public function setPassword(string $password): void {
         $this->password = $password;
     }
 
-    public function setRole(int $role): void
-    {
+    public function setRole(int $role): void {
         $this->role = $role;
     }
 }

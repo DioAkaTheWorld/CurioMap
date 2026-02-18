@@ -2,15 +2,16 @@
 
 namespace CurioMap\src\api\actions;
 
+use CurioMap\src\api\providers\JWTManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 
-class creePointInteretAction{
+class creePointInteretAction {
     private ServicePointInteretInterface $service;
-    private \CurioMap\src\api\providers\JWTManager $jwtManager;
+    private JWTManager $jwtManager;
 
-    public function __construct(ServicePointInteretInterface $service, \CurioMap\src\api\providers\JWTManager $jwtManager){
+    public function __construct(ServicePointInteretInterface $service, JWTManager $jwtManager) {
         $this->service = $service;
         $this->jwtManager = $jwtManager;
     }
@@ -40,7 +41,7 @@ class creePointInteretAction{
              return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
-        try{
+        try {
             $point = $this->service->creePoint($data);
 
             $response->getBody()->write(json_encode([
@@ -50,11 +51,11 @@ class creePointInteretAction{
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 
-        }catch (\InvalidArgumentException $e){
+        } catch (\InvalidArgumentException $e) {
             //erreur client (données manquantes)
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             //erreur serv
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);

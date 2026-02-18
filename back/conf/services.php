@@ -7,6 +7,7 @@ use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
 use CurioMap\src\api\actions\GetFavoritesByUserAction;
 use CurioMap\src\api\actions\getPointsAction;
+use CurioMap\src\api\actions\DeletePointAction;
 use CurioMap\src\api\actions\AddCategorieAction;
 use CurioMap\src\api\actions\LoginAction;
 use CurioMap\src\api\actions\modifierNotesAction;
@@ -69,6 +70,9 @@ return [
     },
     getPointsAction::class => function (ContainerInterface $c) {
         return new getPointsAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
+    },
+    DeletePointAction::class => function (ContainerInterface $c) {
+        return new DeletePointAction($c->get(ServicePointInteretInterface::class), $c->get(JWTManager::class));
     },
     modifierNotesAction::class => function (ContainerInterface $c) {
         return new modifierNotesAction($c->get(ServiceEvenementInterface::class));

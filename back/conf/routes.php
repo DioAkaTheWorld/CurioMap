@@ -15,6 +15,7 @@ use CurioMap\src\api\actions\RegisterAction;
 use CurioMap\src\api\actions\LoginAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
 use CurioMap\src\api\actions\AddCategorieAction;
+use CurioMap\src\api\actions\DeletePointAction;
 
 return function(\Slim\App $app):\Slim\App {
     // Routes d'authentification
@@ -24,6 +25,7 @@ return function(\Slim\App $app):\Slim\App {
     //Route des points d'intérêt
     $app->post('/points', creePointInteretAction::class);
     $app->get('/points', getPointsAction::class);
+    $app->delete('/points/{id}', DeletePointAction::class);
 
     //Routes pour les favoris
     $app->get('/users/{userId}/favorites', GetFavoritesByUserAction::class);

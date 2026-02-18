@@ -6,18 +6,18 @@ use CurioMap\src\application_core\application\ports\spi\PointInteretRepositoryIn
 use CurioMap\src\application_core\domain\entities\PointInteret;
 use DateTime;
 
-class ServicePointInteret implements ServicePointInteretInterface{
+class ServicePointInteret implements ServicePointInteretInterface {
     private PointInteretRepositoryInterface $pointRepository;
 
-    public function __construct(PointInteretRepositoryInterface $pointRepository){
+    public function __construct(PointInteretRepositoryInterface $pointRepository) {
         $this->pointRepository = $pointRepository;
     }
 
-    public function getAllPoints(?int $userId = null): array{
+    public function getAllPoints(?int $userId = null): array {
         return $this->pointRepository->findAll($userId);
     }
 
-    public function creePoint(array $data): PointInteret{
+    public function creePoint(array $data): PointInteret {
         //champs obligatoires
         if (empty($data['titre']) || empty($data['latitude']) || empty($data['longitude'])) {
             throw new \InvalidArgumentException("Titre, latitude et longitude obligatoires");
@@ -46,19 +46,29 @@ class ServicePointInteret implements ServicePointInteretInterface{
         return $point;
     }
 
-    public function getFavoritesByUser(int $userId): array
-    {
+    public function getFavoritesByUser(int $userId): array {
         return $this->pointRepository->findFavoritesByUser($userId);
     }
 
-    public function addFavorite(int $userId, int $pointId): void
-    {
+    public function addFavorite(int $userId, int $pointId): void {
         $this->pointRepository->addFavorite($userId, $pointId);
     }
 
-    public function removeFavorite(int $userId, int $pointId): void
-    {
+    public function removeFavorite(int $userId, int $pointId): void {
         $this->pointRepository->removeFavorite($userId, $pointId);
     }
 
+    public function deletePoint(int $id, int $userId): void {
+        $point = $this->pointRepository->findById($id);
+
+        if (!$point) {
+            throw new \Exception("Point non trouvé");
+        }
+
+        if ($point->getIdUser() !== $userId) {
+            throw new \Exception("Vous ne pouvez supprimez que vos propres points");
+        }
+
+        $this->pointRepository->delete($id);
+    }
 }

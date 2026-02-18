@@ -37,5 +37,4 @@ class ServiceUtilisateur {
     public function getById(int $id): ?Utilisateur {
         return $this->utilisateurRepository->findById($id);
     }
-
 }

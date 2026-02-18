@@ -4,7 +4,7 @@ namespace CurioMap\src\application_core\domain\entities;
 
 use DateTime;
 
-class Evenement{
+class Evenement {
     private ?int $id;
     private int $iduser;
     private ?int $idpoint;
@@ -31,40 +31,39 @@ class Evenement{
         $this->notes = $notes;
     }
 
-    public function getId(): ?int{
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getIdUser(): int{
+    public function getIdUser(): int {
         return $this->iduser;
     }
 
-    public function getIdPoint(): ?int{
+    public function getIdPoint(): ?int {
         return $this->idpoint;
     }
 
-    public function getTitreEvenement(): ?string{
+    public function getTitreEvenement(): ?string {
         return $this->titre_evenement;
     }
 
-    public function getDateDebut(): DateTime{
+    public function getDateDebut(): DateTime {
         return $this->date_debut;
     }
 
-    public function getDateFin(): DateTime{
+    public function getDateFin(): DateTime {
         return $this->date_fin;
     }
 
-    public function getNotes(): ?string{
+    public function getNotes(): ?string {
         return $this->notes;
     }
 
-    public function setId(int $id): void{
+    public function setId(int $id): void {
         $this->id = $id;
     }
 
-    public function setNotes(?string $notes): void
-    {
+    public function setNotes(?string $notes): void {
         $this->notes = $notes;
     }
 }

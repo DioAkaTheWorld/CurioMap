@@ -5,17 +5,17 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 
-class ajouterEventAction{
+class ajouterEventAction {
     private ServiceEvenementInterface $service;
 
-    public function __construct(ServiceEvenementInterface $service){
+    public function __construct(ServiceEvenementInterface $service) {
         $this->service = $service;
     }
 
-    public function __invoke(Request $request, Response $response): Response{
+    public function __invoke(Request $request, Response $response): Response {
         $data = json_decode($request->getBody()->getContents(), true);
 
-        try{
+        try {
             $agenda = $this->service->creeEvent($data);
 
             $json = json_encode([
@@ -28,10 +28,10 @@ class ajouterEventAction{
 
             $response->getBody()->write($json);
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
-        }catch (\InvalidArgumentException $e){
+        } catch (\InvalidArgumentException $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }

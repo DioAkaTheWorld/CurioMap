@@ -7,8 +7,7 @@ class ProfileDTO {
     public string $email;
     public ?int $role;
 
-    public function __construct(int $id, string $nom, string $email, ?int $role = 0)
-    {
+    public function __construct(int $id, string $nom, string $email, ?int $role = 0) {
         $this->id = $id;
         $this->nom = $nom;
         $this->email = $email;

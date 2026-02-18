@@ -5,23 +5,23 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use CurioMap\src\application_core\application\ports\api\ServiceEvenementInterface;
 
-class getAgendaAction{
+class getAgendaAction {
     private ServiceEvenementInterface $service;
 
-    public function __construct(ServiceEvenementInterface $service){
+    public function __construct(ServiceEvenementInterface $service) {
         $this->service = $service;
     }
 
-    public function __invoke(Request $request, Response $response): Response{
+    public function __invoke(Request $request, Response $response): Response {
         $queryParams = $request->getQueryParams();
         $userId = $queryParams['user_id'] ?? null;
 
-        if (!$userId){
+        if (!$userId) {
              $response->getBody()->write(json_encode(['error' => 'user_id param est requis']));
              return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
-        try{
+        try {
             $events = $this->service->getUserEvents((int)$userId);
 
             $data = array_map(function($e) {
@@ -38,7 +38,7 @@ class getAgendaAction{
 
             $response->getBody()->write(json_encode($data));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }

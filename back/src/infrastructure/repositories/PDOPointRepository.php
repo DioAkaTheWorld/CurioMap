@@ -7,14 +7,14 @@ use PDO;
 use PDOException;
 use DateTime;
 
-class PDOPointRepository implements PointInteretRepositoryInterface{
+class PDOPointRepository implements PointInteretRepositoryInterface {
     private PDO $pdo;
 
-    public function __construct(PDO $pdo){
+    public function __construct(PDO $pdo) {
         $this->pdo = $pdo;
     }
 
-    public function save(PointInteret $point): int{
+    public function save(PointInteret $point): int {
         $sql = "INSERT INTO pointinteret (iduser, titre, image, description, categorie, date, latitude, longitude, adresse, visibilite, date_debut, date_fin) 
                 VALUES (:iduser, :titre, :image, :description, :categorie, :date, :latitude, :longitude, :adresse, :visibilite, :date_debut, :date_fin)
                 RETURNING id";
@@ -40,7 +40,7 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
         return (int) $result['id'];
     }
 
-    public function findAll(?int $userId = null): array{
+    public function findAll(?int $userId = null): array {
         $sql = "SELECT p.*, c.libelle as categorie_libelle 
                 FROM pointinteret p 
                 INNER JOIN categorie c ON p.categorie = c.id
@@ -56,7 +56,7 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
         $stmt->execute($params);
         $points = [];
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $point = new PointInteret(
                 iduser: $row['iduser'],
                 titre: $row['titre'],
@@ -80,8 +80,7 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
         return $points;
     }
 
-    public function findFavoritesByUser(int $userId): array
-    {
+    public function findFavoritesByUser(int $userId): array {
         $sql = "SELECT p.* FROM pointinteret p
             INNER JOIN favoris f ON p.id = f.idpoint
             WHERE f.iduser = :userId";
@@ -108,12 +107,10 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
                 id: $row['id']
             );
         }
-
         return $points;
     }
 
-    public function addFavorite(int $userId, int $pointId): void
-    {
+    public function addFavorite(int $userId, int $pointId): void {
         $sql = "INSERT INTO favoris (iduser, idpoint) VALUES (:userId, :pointId)";
 
         $stmt = $this->pdo->prepare($sql);
@@ -123,8 +120,7 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
         ]);
     }
 
-    public function removeFavorite(int $userId, int $pointId): void
-    {
+    public function removeFavorite(int $userId, int $pointId): void {
         $sql = "DELETE FROM favoris WHERE iduser = :userId AND idpoint = :pointId";
 
         $stmt = $this->pdo->prepare($sql);
@@ -134,4 +130,37 @@ class PDOPointRepository implements PointInteretRepositoryInterface{
         ]);
     }
 
+    public function delete(int $id): bool {
+        $sql = "DELETE FROM pointinteret WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute(['id' => $id]);
+    }
+
+    public function findById(int $id): ?PointInteret {
+        $sql = "SELECT * FROM pointinteret WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return null;
+        }
+
+        return new PointInteret(
+            iduser: $row['iduser'],
+            titre: $row['titre'],
+            categorie: $row['categorie'],
+            latitude: (float)$row['latitude'],
+            longitude: (float)$row['longitude'],
+            image: $row['image'],
+            description: $row['description'],
+            adresse: $row['adresse'],
+            visibilite: $row['visibilite'],
+            date: new DateTime($row['date']),
+            dateDebut: !empty($row['date_debut']) ? new DateTime($row['date_debut']) : null,
+            dateFin: !empty($row['date_fin']) ? new DateTime($row['date_fin']) : null,
+            id: $row['id']
+        );
+    }
 }

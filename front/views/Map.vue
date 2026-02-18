@@ -276,6 +276,9 @@ export default {
             popupContent += `<div style="display: flex; gap: 10px; margin-top: 10px;">`;
             popupContent += `<button class="btn-favorite" data-point-id="${point.id}" style="flex: 0 0 auto;">${heartIcon}</button>`;
             popupContent += `<button class="btn-agenda" style="flex: 1;">Ajouter à mon agenda</button>`;
+            if (this.authStore.user.id === point.iduser) {
+                popupContent += `<button class="btn-delete" style="flex: 0 0 auto; background: none; border: none; cursor: pointer; font-size: 1.2em;" title="Supprimer">🗑️</button>`;
+            }
             popupContent += `</div>`;
           }
 
@@ -306,6 +309,15 @@ export default {
             const popupNode = e.popup._contentNode;
             const btnAgenda = popupNode.querySelector('.btn-agenda');
             const btnFavorite = popupNode.querySelector('.btn-favorite');
+            const btnDelete = popupNode.querySelector('.btn-delete');
+
+            if (btnDelete) {
+               btnDelete.onclick = () => {
+                   if(confirm("Voulez-vous vraiment supprimer ce point ?")) {
+                       this.supprimerPoint(point.id);
+                   }
+               }
+            }
 
             if (btnAgenda) {
               btnAgenda.onclick = () => {
@@ -697,6 +709,29 @@ export default {
       } else {
         this.updateMarkers(pointId);
       }
+    },
+
+    async supprimerPoint(pointId) {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/points/${pointId}`, {
+                method: 'DELETE',
+                headers: this.authStore.getAuthHeaders()
+            });
+
+            if (response.ok) {
+                alert('Point supprimé avec succès');
+                //Retirer le point de la liste locale
+                this.points = this.points.filter(p => p.id !== pointId);
+                //Maj carte
+                this.updateMarkers();
+            } else {
+                const err = await response.json();
+                alert('Erreur lors de la suppression: ' + (err.error || 'Problème serveur'));
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Impossible de contacter le serveur');
+        }
     },
 
 

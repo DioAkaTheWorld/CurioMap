@@ -10,13 +10,11 @@ class PDOUtilisateurRepository implements UtilisateurRepositoryInterface {
     
     private PDO $pdo;
 
-    public function __construct(PDO $pdo)
-    {
+    public function __construct(PDO $pdo) {
         $this->pdo = $pdo;
     }
 
-    public function findByEmail(string $email): ?Utilisateur
-    {
+    public function findByEmail(string $email): ?Utilisateur {
         $stmt = $this->pdo->prepare("
             SELECT id, nom, email, motdepasse, role
             FROM Utilisateur
@@ -40,8 +38,7 @@ class PDOUtilisateurRepository implements UtilisateurRepositoryInterface {
         );
     }
 
-    public function findById(int $id): ?Utilisateur
-    {
+    public function findById(int $id): ?Utilisateur {
         $stmt = $this->pdo->prepare("
             SELECT id, nom, email, motdepasse, role
             FROM Utilisateur
@@ -65,8 +62,7 @@ class PDOUtilisateurRepository implements UtilisateurRepositoryInterface {
         );
     }
 
-    public function save(Utilisateur $user): Utilisateur
-    {
+    public function save(Utilisateur $user): Utilisateur {
         $stmt = $this->pdo->prepare("
             INSERT INTO Utilisateur (nom, email, motdepasse, role)
             VALUES (:nom, :email, :motdepasse, :role)

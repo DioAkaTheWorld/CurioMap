@@ -1,20 +1,21 @@
 <?php
 namespace CurioMap\src\api\actions;
 
+use CurioMap\src\api\providers\JWTManager;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use CurioMap\src\application_core\application\ports\api\ServicePointInteretInterface;
 
-class getPointsAction{
+class getPointsAction {
     private ServicePointInteretInterface $service;
-    private \CurioMap\src\api\providers\JWTManager $jwtManager;
+    private JWTManager $jwtManager;
 
-    public function __construct(ServicePointInteretInterface $service, \CurioMap\src\api\providers\JWTManager $jwtManager){
+    public function __construct(ServicePointInteretInterface $service, JWTManager $jwtManager) {
         $this->service = $service;
         $this->jwtManager = $jwtManager;
     }
 
-    public function __invoke(Request $request, Response $response): Response{
+    public function __invoke(Request $request, Response $response): Response {
         $userId = null;
         $authHeader = $request->getHeaderLine('Authorization');
         if ($authHeader) {
@@ -51,7 +52,7 @@ class getPointsAction{
 
             $response->getBody()->write(json_encode($data));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }

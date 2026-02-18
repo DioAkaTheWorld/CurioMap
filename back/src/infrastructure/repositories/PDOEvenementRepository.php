@@ -6,14 +6,14 @@ use CurioMap\src\application_core\domain\entities\Evenement;
 use PDO;
 use DateTime;
 
-class PDOEvenementRepository implements EvenementRepositoryInterface{
+class PDOEvenementRepository implements EvenementRepositoryInterface {
     private PDO $pdo;
 
-    public function __construct(PDO $pdo){
+    public function __construct(PDO $pdo) {
         $this->pdo = $pdo;
     }
 
-    public function save(Evenement $event): int{
+    public function save(Evenement $event): int {
         $sql = "INSERT INTO evenement (iduser, idpoint, titre_evenement, date_debut, date_fin, notes) 
                 VALUES (:iduser, :idpoint, :titre, :debut, :fin, :notes)
                 RETURNING id";
@@ -33,8 +33,7 @@ class PDOEvenementRepository implements EvenementRepositoryInterface{
         return (int) $result['id'];
     }
 
-    public function updateNotes(int $id, ?string $notes): void
-    {
+    public function updateNotes(int $id, ?string $notes): void {
         $sql = "UPDATE evenement SET notes = :notes WHERE id = :id";
 
         $stmt = $this->pdo->prepare($sql);
@@ -44,9 +43,7 @@ class PDOEvenementRepository implements EvenementRepositoryInterface{
         ]);
     }
 
-
-
-    public function findByUser(int $userId): array{
+    public function findByUser(int $userId): array {
         $sql = "SELECT * FROM evenement WHERE iduser = :iduser ORDER BY date_debut ASC";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['iduser' => $userId]);
@@ -66,7 +63,7 @@ class PDOEvenementRepository implements EvenementRepositoryInterface{
         return $events;
     }
 
-    public function findById(int $id): ?Evenement{
+    public function findById(int $id): ?Evenement {
         $sql = "SELECT * FROM evenement WHERE id = :id ORDER BY date_debut ASC";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['id' => $id]);
@@ -88,7 +85,7 @@ class PDOEvenementRepository implements EvenementRepositoryInterface{
         );
     }
 
-    public function delete(int $id): void{
+    public function delete(int $id): void {
         $stmt = $this->pdo->prepare("DELETE FROM evenement WHERE id = :id");
         $stmt->execute(['id' => $id]);
     }

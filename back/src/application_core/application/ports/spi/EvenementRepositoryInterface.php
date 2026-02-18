@@ -3,7 +3,7 @@ namespace CurioMap\src\application_core\application\ports\spi;
 
 use CurioMap\src\application_core\domain\entities\Evenement;
 
-interface EvenementRepositoryInterface{
+interface EvenementRepositoryInterface {
     public function save(Evenement $agenda): int;
     /**
      * @return Evenement[]

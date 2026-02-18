@@ -293,7 +293,7 @@ export default {
 .filter-toggle-btn {
   display: none;
   position: fixed;
-  top: 10px;
+  top: 40px;
   left: 10px;
   z-index: 1100;
   padding: 8px 12px;

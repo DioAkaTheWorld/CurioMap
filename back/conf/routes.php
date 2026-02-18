@@ -8,6 +8,7 @@ use CurioMap\src\api\actions\GetCommentairesAction;
 use CurioMap\src\api\actions\GetFavoritesByUserAction;
 use CurioMap\src\api\actions\modifierNotesAction;
 use CurioMap\src\api\actions\RemoveFavoriteAction;
+use CurioMap\src\api\actions\UpdatePasswordAction;
 use CurioMap\src\api\middlewares\CorsMiddleware;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
@@ -26,6 +27,7 @@ return function(\Slim\App $app):\Slim\App {
     // Routes d'authentification
     $app->post('/auth/register', RegisterAction::class);
     $app->post('/auth/login', LoginAction::class);
+    $app->post('/auth/password', UpdatePasswordAction::class);
 
     //Route des points d'intérêt
     $app->post('/points', creePointInteretAction::class);

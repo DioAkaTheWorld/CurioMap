@@ -10,4 +10,7 @@ interface UtilisateurRepositoryInterface {
     public function findById(int $id): ?Utilisateur;
 
     public function save(Utilisateur $user): Utilisateur;
+
+    public function updatePassword(int $userId, string $hashedPassword): void;
+
 }

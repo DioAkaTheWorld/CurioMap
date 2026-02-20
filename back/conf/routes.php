@@ -24,6 +24,9 @@ use CurioMap\src\api\actions\CreateGroupeAction;
 use CurioMap\src\api\actions\JoinGroupeAction;
 use CurioMap\src\api\actions\GetUserGroupesAction;
 use CurioMap\src\api\actions\LeaveGroupeAction;
+use CurioMap\src\api\actions\GetMessagesGroupeAction;
+use CurioMap\src\api\actions\AddMessageGroupeAction;
+use CurioMap\src\api\actions\DeleteMessageGroupeAction;
 
 return function(\Slim\App $app):\Slim\App {
     // Routes d'authentification
@@ -61,6 +64,11 @@ return function(\Slim\App $app):\Slim\App {
     $app->post('/groupes/join', JoinGroupeAction::class);
     $app->get('/groupes', GetUserGroupesAction::class);
     $app->post('/groupes/{id}/leave', LeaveGroupeAction::class);
+
+    //Routes pour la messagerie des groupes
+    $app->get('/groupes/{id}/messages', GetMessagesGroupeAction::class);
+    $app->post('/groupes/{id}/messages', AddMessageGroupeAction::class);
+    $app->delete('/messages/{idMessage}', DeleteMessageGroupeAction::class);
 
     //Route OPTIONS pour CORS preflight (catch-all)
     $app->options('/{routes:.+}', function ($request, $response, $args) {

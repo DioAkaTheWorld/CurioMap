@@ -8,6 +8,9 @@ use CurioMap\src\api\actions\CreateGroupeAction;
 use CurioMap\src\api\actions\JoinGroupeAction;
 use CurioMap\src\api\actions\GetUserGroupesAction;
 use CurioMap\src\api\actions\LeaveGroupeAction;
+use CurioMap\src\api\actions\GetMessagesGroupeAction;
+use CurioMap\src\api\actions\AddMessageGroupeAction;
+use CurioMap\src\api\actions\DeleteMessageGroupeAction;
 use CurioMap\src\api\actions\creePointInteretAction;
 use CurioMap\src\api\actions\getAgendaAction;
 use CurioMap\src\api\actions\GetCategoriesAction;
@@ -33,18 +36,21 @@ use CurioMap\src\application_core\application\ports\spi\UtilisateurRepositoryInt
 use CurioMap\src\application_core\application\ports\spi\CategorieRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\CommentaireRepositoryInterface;
 use CurioMap\src\application_core\application\ports\spi\GroupeRepositoryInterface;
+use CurioMap\src\application_core\application\spi\MessageGroupeRepositoryInterface;
 use CurioMap\src\application_core\application\usecases\ServiceEvenement;
 use CurioMap\src\application_core\application\usecases\ServicePointInteret;
 use CurioMap\src\application_core\application\usecases\ServiceUtilisateur;
 use CurioMap\src\application_core\application\usecases\ServiceCategorie;
 use CurioMap\src\application_core\application\usecases\ServiceCommentaire;
 use CurioMap\src\application_core\application\usecases\ServiceGroupe;
+use CurioMap\src\application_core\application\ServiceMessageGroupe;
 use CurioMap\src\infrastructure\repositories\PDOEvenementRepository;
 use CurioMap\src\infrastructure\repositories\PDOPointRepository;
 use CurioMap\src\infrastructure\repositories\PDOUtilisateurRepository;
 use CurioMap\src\infrastructure\repositories\PDOCategorieRepository;
 use CurioMap\src\infrastructure\repositories\PDOCommentaireRepository;
 use CurioMap\src\infrastructure\repositories\PDOGroupeRepository;
+use CurioMap\src\infrastructure\repositories\PDOMessageGroupeRepository;
 use Psr\Container\ContainerInterface;
 
 return [
@@ -172,5 +178,20 @@ return [
     },
     DeleteCommentaireAction::class => function(ContainerInterface $c) {
         return new DeleteCommentaireAction($c->get(ServiceCommentaireInterface::class), $c->get(JWTManager::class));
+    },
+    MessageGroupeRepositoryInterface::class => function(ContainerInterface $c) {
+        return new PDOMessageGroupeRepository($c->get(PDO::class));
+    },
+    ServiceMessageGroupe::class => function(ContainerInterface $c) {
+        return new ServiceMessageGroupe($c->get(MessageGroupeRepositoryInterface::class));
+    },
+    GetMessagesGroupeAction::class => function(ContainerInterface $c) {
+        return new GetMessagesGroupeAction($c->get(ServiceMessageGroupe::class), $c->get(JWTManager::class));
+    },
+    AddMessageGroupeAction::class => function(ContainerInterface $c) {
+        return new AddMessageGroupeAction($c->get(ServiceMessageGroupe::class), $c->get(JWTManager::class));
+    },
+    DeleteMessageGroupeAction::class => function(ContainerInterface $c) {
+        return new DeleteMessageGroupeAction($c->get(ServiceMessageGroupe::class), $c->get(JWTManager::class));
     }
 ];

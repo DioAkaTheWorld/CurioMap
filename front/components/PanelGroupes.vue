@@ -40,14 +40,23 @@
                  <div v-for="groupe in groupes" :key="groupe.id" class="groupe-item">
                     <div class="groupe-header">
                        <h3>{{ groupe.nom }}</h3>
-                       <button
+                       <div class="groupe-actions">
+                         <button
+                           @click="ouvrirChat(groupe)"
+                           class="btn-chat"
+                           title="Accéder à la messagerie"
+                         >
+                           💬
+                         </button>
+                         <button
                            class="btn-leave"
                            @click="quitterGroupe(groupe)"
                            :title="groupe.idCreateur === authStore.user?.id ? 'Vous ne pouvez pas quitter un groupe que vous avez créé' : 'Quitter ce groupe'"
                            :disabled="groupe.idCreateur === authStore.user?.id"
-                       >
-                         🚪
-                       </button>
+                         >
+                           🚪
+                         </button>
+                       </div>
                     </div>
                     <p v-if="groupe.description">{{ groupe.description }}</p>
                     <p v-if="groupe.idCreateur === authStore.user?.id" class="invitation-code">
@@ -118,14 +127,31 @@
     <transition name="fade">
       <div v-if="isOpen" class="panel-overlay" @click="togglePanel"></div>
     </transition>
+
+    <transition name="fade">
+      <div v-if="chatOuvert" class="chat-overlay" @click="fermerChat">
+        <div class="chat-modal" @click.stop>
+          <ChatGroupe
+            v-if="groupeSelectionne"
+            :groupe-id="groupeSelectionne.id"
+            :groupe-name="groupeSelectionne.nom"
+            @close="fermerChat"
+          />
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
 import { useAuthStore } from '../stores/auth'
+import ChatGroupe from './ChatGroupe.vue'
 
 export default {
   name: 'PanelGroupes',
+  components: {
+    ChatGroupe
+  },
   data() {
     return {
       isOpen: false,
@@ -136,7 +162,9 @@ export default {
         nom: '',
         description: ''
       },
-      codeInvitation: ''
+      codeInvitation: '',
+      chatOuvert: false,
+      groupeSelectionne: null
     }
   },
   computed: {
@@ -258,6 +286,16 @@ export default {
          console.error(e);
          alert('Impossible de contacter le serveur');
       }
+    },
+
+    ouvrirChat(groupe) {
+      this.groupeSelectionne = groupe;
+      this.chatOuvert = true;
+    },
+
+    fermerChat() {
+      this.chatOuvert = false;
+      this.groupeSelectionne = null;
     }
   }
 }
@@ -450,18 +488,37 @@ export default {
     align-items: flex-start;
 }
 
+.groupe-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-chat {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.3rem;
+    padding: 5px;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.btn-chat:hover {
+    transform: scale(1.15);
+}
+
 .btn-leave {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0 5px;
-    opacity: 0.6;
-    transition: opacity 0.2s;
+    font-size: 1.3rem;
+    padding: 5px;
+    opacity: 0.7;
+    transition: opacity 0.2s, transform 0.2s;
 }
 
 .btn-leave:hover {
     opacity: 1;
+    transform: scale(1.15);
 }
 
 .btn-leave:disabled {
@@ -499,6 +556,29 @@ export default {
   z-index: 1500;
 }
 
+.chat-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-modal {
+  width: 90%;
+  max-width: 600px;
+  height: 80vh;
+  max-height: 700px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
 @media (max-width: 768px) {
   .groupes-panel {
     width: 100%;
@@ -511,6 +591,11 @@ export default {
     font-size: 24px;
     top: 160px;
     right: 15px;
+  }
+
+  .chat-modal {
+    width: 95%;
+    height: 85vh;
   }
 }
 </style>

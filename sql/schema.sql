@@ -81,3 +81,14 @@ CREATE TABLE GroupeUtilisateur (
     FOREIGN KEY (id_groupe) REFERENCES Groupe(id) ON DELETE CASCADE,
     FOREIGN KEY (id_utilisateur) REFERENCES Utilisateur(id) ON DELETE CASCADE
 );
+
+CREATE TABLE MessageGroupe (
+    id SERIAL PRIMARY KEY,
+    id_groupe INT NOT NULL,
+    iduser INT NOT NULL,
+    message TEXT NOT NULL,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_groupe) REFERENCES Groupe(id) ON DELETE CASCADE,
+    FOREIGN KEY (iduser) REFERENCES Utilisateur(id) ON DELETE CASCADE
+);
+

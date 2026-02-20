@@ -11,6 +11,9 @@ return [
             'algorithm' => 'HS256',
             'expiration' => 3600, //= 1h
         ],
+        'encryption' => [
+            'key' => $_ENV['ENCRYPTION_KEY'] ?? 'CurioMap2026SecureKey!#$%MessageEncryption789XYZ',
+        ],
         'cors' => [
             'origin' => '*',
             'methods' => ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

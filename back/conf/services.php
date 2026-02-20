@@ -180,7 +180,8 @@ return [
         return new DeleteCommentaireAction($c->get(ServiceCommentaireInterface::class), $c->get(JWTManager::class));
     },
     MessageGroupeRepositoryInterface::class => function(ContainerInterface $c) {
-        return new PDOMessageGroupeRepository($c->get(PDO::class));
+        $encryptionKey = $c->get('settings')['encryption']['key'];
+        return new PDOMessageGroupeRepository($c->get(PDO::class), $encryptionKey);
     },
     ServiceMessageGroupe::class => function(ContainerInterface $c) {
         return new ServiceMessageGroupe($c->get(MessageGroupeRepositoryInterface::class));

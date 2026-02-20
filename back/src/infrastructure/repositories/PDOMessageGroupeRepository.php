@@ -10,14 +10,43 @@ use PDO;
 class PDOMessageGroupeRepository implements MessageGroupeRepositoryInterface
 {
     private PDO $pdo;
+    private string $encryptionKey;
 
-    public function __construct(PDO $pdo)
+    public function __construct(PDO $pdo, string $encryptionKey)
     {
         $this->pdo = $pdo;
+        $this->encryptionKey = hash('sha256', $encryptionKey, true);
+    }
+
+    private function encrypt(string $plainText): string
+    {
+        $cipher = 'aes-256-cbc';
+        $ivLength = openssl_cipher_iv_length($cipher);
+        $iv = openssl_random_pseudo_bytes($ivLength);
+
+        $encrypted = openssl_encrypt($plainText, $cipher, $this->encryptionKey, OPENSSL_RAW_DATA, $iv);
+
+        return base64_encode($iv . $encrypted);
+    }
+
+    private function decrypt(string $encryptedText): string
+    {
+        $cipher = 'aes-256-cbc';
+        $data = base64_decode($encryptedText);
+
+        $ivLength = openssl_cipher_iv_length($cipher);
+        $iv = substr($data, 0, $ivLength);
+        $encrypted = substr($data, $ivLength);
+
+        $decrypted = openssl_decrypt($encrypted, $cipher, $this->encryptionKey, OPENSSL_RAW_DATA, $iv);
+
+        return $decrypted !== false ? $decrypted : '';
     }
 
     public function addMessage(int $idGroupe, int $idUser, string $message): MessageGroupe
     {
+        $encryptedMessage = $this->encrypt($message);
+
         $stmt = $this->pdo->prepare("
             INSERT INTO MessageGroupe (id_groupe, iduser, message, date_creation)
             VALUES (:id_groupe, :iduser, :message, NOW())
@@ -27,7 +56,7 @@ class PDOMessageGroupeRepository implements MessageGroupeRepositoryInterface
         $stmt->execute([
             'id_groupe' => $idGroupe,
             'iduser' => $idUser,
-            'message' => $message
+            'message' => $encryptedMessage
         ]);
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -55,10 +84,12 @@ class PDOMessageGroupeRepository implements MessageGroupeRepositoryInterface
 
         $messages = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $decryptedMessage = $this->decrypt($row['message']);
+
             $messages[] = new MessageGroupe(
                 idGroupe: (int)$row['id_groupe'],
                 idUser: (int)$row['iduser'],
-                message: $row['message'],
+                message: $decryptedMessage,
                 dateCreation: new DateTime($row['date_creation']),
                 id: (int)$row['id'],
                 nomUtilisateur: $row['nom_utilisateur']

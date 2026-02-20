@@ -93,7 +93,7 @@ const chargerMessages = async () => {
 
   try {
     const token = localStorage.getItem('token')
-    const response = await fetch(`http://localhost:8002/groupes/${props.groupeId}/messages`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/groupes/${props.groupeId}/messages`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -134,7 +134,7 @@ const envoyerMessage = async () => {
 
   try {
     const token = localStorage.getItem('token')
-    const response = await fetch(`http://localhost:8002/groupes/${props.groupeId}/messages`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/groupes/${props.groupeId}/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -162,7 +162,7 @@ const supprimerMessage = async (idMessage) => {
 
   try {
     const token = localStorage.getItem('token')
-    const response = await fetch(`http://localhost:8002/messages/${idMessage}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/groupes/${idMessage}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`

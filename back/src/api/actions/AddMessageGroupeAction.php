@@ -33,11 +33,15 @@ class AddMessageGroupeAction
             $idGroupe = (int)$args['id'];
             $data = json_decode($request->getBody()->getContents(), true);
 
-            if (!isset($data['message'])) {
+            $idPoint = isset($data['idPoint']) ? (int)$data['idPoint'] : null;
+
+            if (!isset($data['message']) && !$idPoint) {
                 throw new \Exception('Message requis');
             }
 
-            $message = $this->serviceMessageGroupe->addMessage($idGroupe, $userId, $data['message']);
+            $messageContent = $data['message'] ?? 'Point partagé';
+
+            $message = $this->serviceMessageGroupe->addMessage($idGroupe, $userId, $messageContent, $idPoint);
 
             $response->getBody()->write(json_encode($message->toArray()));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
@@ -48,4 +52,3 @@ class AddMessageGroupeAction
         }
     }
 }
-

@@ -136,6 +136,7 @@
             :groupe-id="groupeSelectionne.id"
             :groupe-name="groupeSelectionne.nom"
             @close="fermerChat"
+            @flyToPoint="handleFlyToPoint"
           />
         </div>
       </div>
@@ -149,6 +150,7 @@ import ChatGroupe from './ChatGroupe.vue'
 
 export default {
   name: 'PanelGroupes',
+  emits: ['flyToPoint'],
   components: {
     ChatGroupe
   },
@@ -296,6 +298,12 @@ export default {
     fermerChat() {
       this.chatOuvert = false;
       this.groupeSelectionne = null;
+    },
+
+    handleFlyToPoint(id) {
+      this.fermerChat();
+      this.isOpen = false;
+      this.$emit('flyToPoint', id);
     }
   }
 }

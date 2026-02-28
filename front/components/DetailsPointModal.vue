@@ -1,7 +1,8 @@
 <template>
   <div v-if="show" class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-content">
+    <div class="modal-content" v-show="!afficherModalePartage">
       <button class="close-btn" @click="$emit('close')">&times;</button>
+      <button class="share-btn" @click="ouvrirModalePartage" title="Partager dans un groupe" v-if="authStore.isLoggedIn">🔗</button>
 
       <div v-if="point" class="point-header">
         <h2>{{ point.titre }}</h2>
@@ -63,10 +64,26 @@
       </div>
     </div>
   </div>
+
+  <!-- Share Modal -->
+  <div v-if="afficherModalePartage" class="share-modal-overlay" @click.self="fermerModalePartage">
+      <div class="share-modal-content">
+          <h3>Partager ce point</h3>
+          <p>Choisissez un groupe :</p>
+          <div v-if="loadingGroups" class="loading">Chargement des groupes...</div>
+          <div v-else-if="userGroups.length === 0">Vous n'avez rejoint aucun groupe.</div>
+          <ul v-else class="group-list">
+              <li v-for="group in userGroups" :key="group.id">
+                  <button @click="partagerPoint(group.id, group.nom)">{{ group.nom }}</button>
+              </li>
+          </ul>
+          <button class="cancel-btn" @click="fermerModalePartage">Annuler</button>
+      </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 
 const props = defineProps({
@@ -77,15 +94,74 @@ const props = defineProps({
   point: {
     type: Object,
     default: null
+  },
+  ouverturePartageAutomatique: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['close'])
+const emit = defineEmits(['close'])
 
 const authStore = useAuthStore()
 const commentaires = ref([])
 const loading = ref(false)
 const newComment = ref({ texte: '', note: null })
+
+const afficherModalePartage = ref(false)
+const userGroups = ref([])
+const loadingGroups = ref(false)
+
+const ouvrirModalePartage = async () => {
+    afficherModalePartage.value = true
+    loadingGroups.value = true
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/groupes`, {
+            headers: authStore.getAuthHeaders()
+        })
+        if (response.ok) {
+            userGroups.value = await response.json()
+        }
+    } catch (e) {
+        console.error('Erreur chargement groupes', e)
+    } finally {
+        loadingGroups.value = false
+    }
+}
+
+const fermerModalePartage = () => {
+    afficherModalePartage.value = false
+    if (props.ouverturePartageAutomatique) {
+        emit('close')
+    }
+}
+
+const partagerPoint = async (groupId, groupName) => {
+    try {
+        const message = `Regardez ce point : ${props.point.titre}`
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/groupes/${groupId}/messages`, {
+            method: 'POST',
+            headers: {
+                ...authStore.getAuthHeaders(),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message,
+                idPoint: props.point.id
+            })
+        })
+
+        if (response.ok) {
+            alert(`Point partagé dans le groupe ${groupName} !`)
+            fermerModalePartage()
+        } else {
+            alert('Erreur lors du partage')
+        }
+    } catch (e) {
+        console.error(e)
+        alert('Erreur réseau')
+    }
+}
 
 const getCategoryColor = (categoryId) => {
   if (!categoryId) return '#3388ff'
@@ -175,10 +251,15 @@ const supprimerCommentaire = async (idComm) => {
 
 watch(() => props.show, (newVal) => {
   if (newVal && props.point) {
-    chargerCommentaires()
+    if (props.ouverturePartageAutomatique) {
+        ouvrirModalePartage()
+    } else {
+        chargerCommentaires()
+    }
   }
   if (!newVal) {
     newComment.value = { texte: '', note: null }
+    afficherModalePartage.value = false;
   }
 })
 </script>
@@ -226,6 +307,76 @@ watch(() => props.show, (newVal) => {
 
 .close-btn:hover {
   color: #333;
+}
+
+.share-btn {
+    position: absolute;
+    top: 15px;
+    right: 50px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #007bff;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    line-height: 1;
+}
+
+.share-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2100; /* Higher than main modal */
+}
+
+.share-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+}
+
+.group-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.group-list li {
+    margin-bottom: 8px;
+}
+
+.group-list button {
+    width: 100%;
+    padding: 8px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.group-list button:hover {
+    background-color: #e0e0e0;
+}
+
+.cancel-btn {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .point-header {
@@ -411,4 +562,3 @@ watch(() => props.show, (newVal) => {
   cursor: not-allowed;
 }
 </style>
-

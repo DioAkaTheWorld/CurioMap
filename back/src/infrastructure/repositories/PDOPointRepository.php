@@ -41,19 +41,40 @@ class PDOPointRepository implements PointInteretRepositoryInterface {
     }
 
     public function findAll(?int $userId = null): array {
-        $sql = "SELECT p.*, c.libelle as categorie_libelle 
+        $sql = "SELECT DISTINCT p.*, c.libelle as categorie_libelle 
                 FROM pointinteret p 
-                INNER JOIN categorie c ON p.categorie = c.id
-                WHERE p.visibilite = 1";
+                LEFT JOIN categorie c ON p.categorie = c.id
+                WHERE p.visibilite = 1"; //points publics
+
         $params = [];
 
         if ($userId !== null) {
+            //points créés par l'utilisateur
             $sql .= " OR p.iduser = :userId";
-            $params['userId'] = $userId;
+
+            //points partagés dans les groupes où l'utilisateur est membre
+            $sql .= " OR p.id IN (
+                        SELECT mg.id_point 
+                        FROM MessageGroupe mg
+                        JOIN GroupeUtilisateur gu ON mg.id_groupe = gu.id_groupe
+                        WHERE gu.id_utilisateur = :userId2 AND mg.id_point IS NOT NULL
+                      )";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':userId', $userId);
+            $stmt->bindValue(':userId2', $userId);
+
+            try {
+                $stmt->execute();
+            } catch (PDOException $e) {
+                error_log("Erreur SQL PDOPointRepository: " . $e->getMessage());
+                throw $e;
+            }
+        } else {
+             $stmt = $this->pdo->prepare($sql);
+             $stmt->execute();
         }
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
         $points = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {

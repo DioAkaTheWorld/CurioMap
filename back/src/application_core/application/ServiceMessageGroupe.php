@@ -15,13 +15,13 @@ class ServiceMessageGroupe
     }
 
 
-    public function addMessage(int $idGroupe, int $idUser, string $message): MessageGroupe
+    public function addMessage(int $idGroupe, int $idUser, string $message, ?int $idPoint = null): MessageGroupe
     {
-        if (empty(trim($message))) {
+        if (empty(trim($message)) && !$idPoint) {
             throw new \InvalidArgumentException("Le message ne peut pas être vide");
         }
 
-        return $this->messageGroupeRepository->addMessage($idGroupe, $idUser, $message);
+        return $this->messageGroupeRepository->addMessage($idGroupe, $idUser, $message, $idPoint);
     }
 
 
@@ -40,4 +40,3 @@ class ServiceMessageGroupe
         return $this->messageGroupeRepository->deleteMessage($idMessage);
     }
 }
-

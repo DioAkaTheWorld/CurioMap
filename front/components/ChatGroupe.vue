@@ -25,6 +25,14 @@
           <div class="message-content">
             <p>{{ msg.message }}</p>
             <button
+              v-if="msg.idPoint"
+              @click="$emit('flyToPoint', msg.idPoint)"
+              class="fly-to-btn"
+              title="Voir sur la carte"
+            >
+              📍 Voir sur la carte
+            </button>
+            <button
               v-if="msg.idUser === authStore.user?.id"
               @click="supprimerMessage(msg.id)"
               class="delete-msg-btn"
@@ -66,7 +74,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['close'])
+defineEmits(['close', 'flyToPoint'])
 
 const authStore = useAuthStore()
 const messages = ref([])
@@ -328,10 +336,25 @@ onUnmounted(() => {
   opacity: 1;
 }
 
+.fly-to-btn {
+  display: block;
+  margin-top: 5px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.85em;
+  transition: background-color 0.2s;
+}
+
+.fly-to-btn:hover {
+  background-color: #bbdefb;
+}
+
 .chat-input {
-  display: flex;
-  gap: 10px;
-  padding: 15px 20px;
+  padding: 10px 20px;
   background: white;
   border-top: 1px solid #e2e8f0;
 }
@@ -377,4 +400,3 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 </style>
-

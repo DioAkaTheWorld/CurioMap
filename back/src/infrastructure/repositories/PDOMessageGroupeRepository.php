@@ -43,20 +43,21 @@ class PDOMessageGroupeRepository implements MessageGroupeRepositoryInterface
         return $decrypted !== false ? $decrypted : '';
     }
 
-    public function addMessage(int $idGroupe, int $idUser, string $message): MessageGroupe
+    public function addMessage(int $idGroupe, int $idUser, string $message, ?int $idPoint = null): MessageGroupe
     {
         $encryptedMessage = $this->encrypt($message);
 
         $stmt = $this->pdo->prepare("
-            INSERT INTO MessageGroupe (id_groupe, iduser, message, date_creation)
-            VALUES (:id_groupe, :iduser, :message, NOW())
+            INSERT INTO MessageGroupe (id_groupe, iduser, message, id_point, date_creation)
+            VALUES (:id_groupe, :iduser, :message, :id_point, NOW())
             RETURNING id, date_creation
         ");
 
         $stmt->execute([
             'id_groupe' => $idGroupe,
             'iduser' => $idUser,
-            'message' => $encryptedMessage
+            'message' => $encryptedMessage,
+            'id_point' => $idPoint
         ]);
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -66,6 +67,7 @@ class PDOMessageGroupeRepository implements MessageGroupeRepositoryInterface
             idUser: $idUser,
             message: $message,
             dateCreation: new DateTime($result['date_creation']),
+            idPoint: $idPoint,
             id: $result['id']
         );
     }
@@ -91,6 +93,7 @@ class PDOMessageGroupeRepository implements MessageGroupeRepositoryInterface
                 idUser: (int)$row['iduser'],
                 message: $decryptedMessage,
                 dateCreation: new DateTime($row['date_creation']),
+                idPoint: isset($row['id_point']) ? (int)$row['id_point'] : null,
                 id: (int)$row['id'],
                 nomUtilisateur: $row['nom_utilisateur']
             );
@@ -120,4 +123,3 @@ class PDOMessageGroupeRepository implements MessageGroupeRepositoryInterface
         return $result && (int)$result['iduser'] === $idUser;
     }
 }
-

@@ -17,9 +17,10 @@
     <DetailsPointModal
       :show="modaleDetailsPointOuverte"
       :point="pointPourDetails"
+      :ouverture-partage-automatique="ouverturePartageAutomatique"
       @close="fermerModaleDetailsPoint"
     />
-    <PanelGroupes />
+    <PanelGroupes @flyToPoint="naviguerVersPointDepuisGroupe" />
   </div>
 
   <div v-if="modaleAgendaOuverte" class="modal-overlay" @click.self="fermerModaleAgenda">
@@ -147,7 +148,8 @@ export default {
         notes: ''
       },
       modaleDetailsPointOuverte: false,
-      pointPourDetails: null
+      pointPourDetails: null,
+      ouverturePartageAutomatique: false
     }
   },
 
@@ -288,6 +290,7 @@ export default {
             popupContent += `<div style="display: flex; gap: 10px; margin-top: 10px;">`;
             popupContent += `<button class="btn-favorite" data-point-id="${point.id}" style="flex: 0 0 auto;">${heartIcon}</button>`;
             popupContent += `<button class="btn-agenda" style="flex: 1;">Ajouter à mon agenda</button>`;
+            popupContent += `<button class="btn-share" style="flex: 0 0 auto; background: none; border: none; cursor: pointer; font-size: 1.2em;" title="Partager">🔗</button>`;
             if (this.authStore.user.id === point.iduser) {
                 popupContent += `<button class="btn-delete" style="flex: 0 0 auto; background: none; border: none; cursor: pointer; font-size: 1.2em;" title="Supprimer">🗑️</button>`;
             }
@@ -324,6 +327,7 @@ export default {
             const btnAgenda = popupNode.querySelector('.btn-agenda');
             const btnFavorite = popupNode.querySelector('.btn-favorite');
             const btnDelete = popupNode.querySelector('.btn-delete');
+            const btnShare = popupNode.querySelector('.btn-share');
             const btnCommentaires = popupNode.querySelector('.btn-commentaires');
 
             if (btnDelete) {
@@ -346,6 +350,12 @@ export default {
                 const newIsFavorite = this.favoritesStore.isFavorite(point.id);
                 btnFavorite.textContent = newIsFavorite ? '❤️' : '🤍';
               };
+            }
+
+            if (btnShare) {
+                btnShare.onclick = () => {
+                    this.ouvrirModaleDetailsPoint(point, true);
+                };
             }
 
             if (btnCommentaires) {
@@ -687,14 +697,16 @@ export default {
       this.formulaireAgenda = { dateDebut: '', dateFin: '', notes: '' };
     },
 
-    ouvrirModaleDetailsPoint(point) {
+    ouvrirModaleDetailsPoint(point, ouvrirPartage = false) {
       this.pointPourDetails = point;
+      this.ouverturePartageAutomatique = ouvrirPartage;
       this.modaleDetailsPointOuverte = true;
     },
 
     fermerModaleDetailsPoint() {
       this.modaleDetailsPointOuverte = false;
       this.pointPourDetails = null;
+      this.ouverturePartageAutomatique = false;
     },
 
     async confirmerAjoutAgenda() {
@@ -781,8 +793,23 @@ export default {
           }
         })
       }, 2100)
-    }
+    },
 
+    async naviguerVersPointDepuisGroupe(pointId) {
+      let point = this.points.find(p => p.id === parseInt(pointId));
+
+      if (!point) {
+          await this.fetchPoints();
+          point = this.points.find(p => p.id === parseInt(pointId));
+      }
+
+      if (point) {
+          this.naviguerVersPointDepuisPanel(point);
+      } else {
+           console.warn("Point not found in loaded points:", pointId);
+           alert("Ce point n'est pas visible sur la carte (hors filtres ou inexistant).");
+      }
+    }
   },
   expose: ['recentrer']
 }

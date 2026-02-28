@@ -13,23 +13,29 @@ class PDOCategorieRepository implements CategorieRepositoryInterface {
     }
 
     public function getCategories(?int $idUser): array {
-        //il faut recup
-        //les catés globales (iduser NULL = musée, monument...), éventuellement les mettre en publique de base
-        //les catés de l'utilisateur connecté (si idUser fourni)
-        //les catés utilisées par des points publics (même si elles appartiennent à d'autres users)
-
-        $sql = "SELECT DISTINCT c.* FROM Categorie c 
-                WHERE c.iduser IS NULL 
-                OR c.id IN (SELECT DISTINCT categorie FROM PointInteret WHERE visibilite = 1)";
-
         if ($idUser !== null) {
-            $sql .= " OR c.iduser = :iduser";
+            $sql = "SELECT DISTINCT c.* FROM Categorie c 
+                    WHERE c.iduser IS NULL 
+                    OR c.id IN (SELECT DISTINCT categorie FROM PointInteret WHERE visibilite = 1)
+                    OR c.iduser = :iduser1
+                    OR c.id IN (
+                        SELECT p.categorie 
+                        FROM pointinteret p
+                        JOIN messagegroupe mg ON mg.id_point = p.id
+                        JOIN GroupeUtilisateur gu ON mg.id_groupe = gu.id_groupe
+                        WHERE gu.id_utilisateur = :iduser2
+                    )";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':iduser1', $idUser);
+            $stmt->bindValue(':iduser2', $idUser);
+        } else {
+            $sql = "SELECT DISTINCT c.* FROM Categorie c 
+                    WHERE c.iduser IS NULL 
+                    OR c.id IN (SELECT DISTINCT categorie FROM PointInteret WHERE visibilite = 1)";
+            $stmt = $this->pdo->prepare($sql);
         }
 
-        $stmt = $this->pdo->prepare($sql);
-        if ($idUser !== null) {
-            $stmt->bindValue(':iduser', $idUser);
-        }
         $stmt->execute();
 
         $categories = [];

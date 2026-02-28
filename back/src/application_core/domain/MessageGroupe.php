@@ -11,6 +11,7 @@ class MessageGroupe
     private int $idUser;
     private string $message;
     private DateTime $dateCreation;
+    private ?int $idPoint;
     private ?string $nomUtilisateur;
 
     public function __construct(
@@ -18,6 +19,7 @@ class MessageGroupe
         int $idUser,
         string $message,
         DateTime $dateCreation,
+        ?int $idPoint = null,
         ?int $id = null,
         ?string $nomUtilisateur = null
     ) {
@@ -26,6 +28,7 @@ class MessageGroupe
         $this->idUser = $idUser;
         $this->message = $message;
         $this->dateCreation = $dateCreation;
+        $this->idPoint = $idPoint;
         $this->nomUtilisateur = $nomUtilisateur;
     }
 
@@ -49,6 +52,11 @@ class MessageGroupe
         return $this->message;
     }
 
+    public function getIdPoint(): ?int
+    {
+        return $this->idPoint;
+    }
+
     public function getDateCreation(): DateTime
     {
         return $this->dateCreation;
@@ -66,9 +74,9 @@ class MessageGroupe
             'idGroupe' => $this->idGroupe,
             'idUser' => $this->idUser,
             'message' => $this->message,
+            'idPoint' => $this->idPoint,
             'dateCreation' => $this->dateCreation->format('Y-m-d H:i:s'),
             'nomUtilisateur' => $this->nomUtilisateur
         ];
     }
 }
-

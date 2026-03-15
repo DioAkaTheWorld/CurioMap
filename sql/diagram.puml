@@ -1,4 +1,5 @@
 @startuml
+skinparam linetype ortho
 
 class Utilisateur {
   + id : int
@@ -8,33 +9,54 @@ class Utilisateur {
   + role : int
 }
 
-class Favoris {
-  + iduser : int
-  + idpoint : int
-  + date_ajout : timestamp
+class Groupe {
+    + id : int
+    + nom : string
+    + description : ?string
+    + id_createur : int
+    + code_invitation : ?string
+}
+
+class GroupeUtilisateur {
+    + id_groupe : int
+    + id_utilisateur : int
+}
+
+class MessageGroupe {
+    + id : int
+    + id_groupe : int
+    + iduser : int
+    + id_point : ?int
+    + message : string
+    + date_creation : timestamp
 }
 
 class PointInteret {
-  - id : ?int
+  - id : int
   - iduser : int
   - titre : string
   - image : ?string
   - description : ?string
   - categorie : int
-  - date : Date
+  - date : timestamp
   - latitude : decimal
   - longitude : decimal
   - adresse : ?string
   - visibilite : int
-  - date_event : Date
-  - heure_event : Time
-  Getters()
-  Setters()
+  - date_debut : ?timestamp
+  - date_fin : ?timestamp
 }
 
 class Categorie {
   + id : int
   + libelle : string
+  + iduser : ?int
+}
+
+class Favoris {
+  + iduser : int
+  + idpoint : int
+  + date_ajout : timestamp
 }
 
 class Commentaire {
@@ -42,30 +64,43 @@ class Commentaire {
   + iduser : int
   + idpoint : int
   + commentaire : string
-  + note : int
-  + date_creation : Date
+  + note : ?int
+  + date_creation : timestamp
 }
 
-class Agenda {
-    - id : ?int
+class Evenement {
+    - id : int
     - iduser : int
     - idpoint : ?int
     - titre_evenement : ?string
-    - date_debut : Date
-    - date_fin : Date
+    - date_debut : timestamp
+    - date_fin : timestamp
     - notes : ?string
-    Getters()
-    Setters()
 }
 
-Utilisateur "1" -- "*" Favoris : possède
-Favoris "*" -right- "1" PointInteret
+' Partie Sociale (Haut)
+Utilisateur "1" -up- "*" Groupe : administre
+Utilisateur "1" -up- "*" GroupeUtilisateur
+Groupe "1" -left- "*" GroupeUtilisateur : composé de
+Groupe "1" -right- "*" MessageGroupe : contient
+Utilisateur "1" .up. "*" MessageGroupe : envoie
+
+' Partie Contenu principal (Centre/Bas)
 Utilisateur "1" -- "*" PointInteret : crée
 PointInteret "*" -right- "1" Categorie : défini par
-PointInteret "1" -- "*" Commentaire : contient
-Utilisateur "1" -- "*" Commentaire : rédige
+Utilisateur "1" .right. "*" Categorie : personnalise
 
-Utilisateur "1" -- "*" Agenda : planifie
-Agenda "*" -left- "0..1" PointInteret : concerne
+' Partie Interactions utilisateur (Gauche)
+Utilisateur "1" -left- "*" Favoris : possède
+Favoris "*" -- "1" PointInteret : concerne
+Utilisateur "1" -left- "*" Evenement : planifie
+Evenement "*" -- "0..1" PointInteret : concerne
+
+' Partie Détails (Bas)
+PointInteret "1" -- "*" Commentaire : reçoit
+Utilisateur "1" -- "*" Commentaire : écrit
+
+' Lien de partage (Transversal)
+MessageGroupe "*" ..> "0..1" PointInteret : partage
 
 @enduml
